@@ -12,14 +12,34 @@ enum RobotFunctions{
 };
 
 class RobotsManagement{
+
     private:
-        bool inProgress;
         int totRobots;
         int freeRobots;
         int efficiency;
         int prodCost;
+        VillageStats *villageStats;
+        std::vector<std::map<time_t,Task>> *tasks;
+
     public:
-        bool RobotsManagement::createRobot(VillageStats vila);
+        RobotsManagement();
+        void initializeStats();
+        ~RobotsManagement();
+
+        int RobotsManagement::getTotRobots();
+        int RobotsManagement::getFreeRobots();
+        int RobotsManagement::getEfficiency();
+        int RobotsManagement::getProdCost();
+
+        void RobotsManagement::setTotRobots(int newTotRobots);
+        void RobotsManagement::setFreeRobots(int newFreeRobots);
+        void RobotsManagement::setEfficiency(int newEfficiency);
+        void RobotsManagement::setProdCost(int newProdCost);
+        void RobotsManagement::setVillageStats(VillageStats *newVillageStats);
+        void RobotsManagement::setTasks(std::vector<std::map<time_t,Task>> *newTasks);
+
+        bool RobotsManagement::createRobot();
         bool RobotsManagement::destroyRobot();
-        bool RobotsManagement::sendRobot(std::vector<std::map<tm,Task>> tasks,RobotFunctions funct,int robotNo);
+        bool RobotsManagement::createTask(RobotFunctions funct);
+        bool RobotsManagement::moveRobot(RobotFunctions funct,time_t id,int robotNo);
 }

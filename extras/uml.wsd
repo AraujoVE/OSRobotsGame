@@ -3,9 +3,10 @@
 class Task{
     RobotFunctions type
     int robotsNo
-    int totTime
+    time_t initTime
     int remainingTime
 
+    updateRemainingTime()
     calcThreadTime()
     createThread()
     deleteThread()
