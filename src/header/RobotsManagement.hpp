@@ -1,3 +1,8 @@
+#include "header/Task.hpp"
+#include "header/VillageStats.hpp"
+#include <vector>
+#include <map> 
+
 enum RobotFunctions{
     PROTECTION,
     RESOURCE_GATHERING,
@@ -14,8 +19,7 @@ class RobotsManagement{
         int efficiency;
         int prodCost;
     public:
-        bool sendRobot(RobotFunctions funct);
-        bool retrieveRobot();
-        bool createRobot();
-        bool destroyRobot();
-};
+        bool RobotsManagement::createRobot(VillageStats vila);
+        bool RobotsManagement::destroyRobot();
+        bool RobotsManagement::sendRobot(std::vector<std::map<tm,Task>> tasks,RobotFunctions funct,int robotNo);
+}

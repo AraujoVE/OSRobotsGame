@@ -1,10 +1,10 @@
 #include "header/RobotsManagement.hpp"
 #include "header/Task.hpp"
 #include "header/VillageStats.hpp"
-#include <ctime>
 #include <vector>
-#include<iostream>
 #include <map> 
+#include <ctime>
+#include <iostream>
 
 tm getUTCTime(){
     // current date/time based on current system
@@ -19,6 +19,34 @@ tm getUTCTime(){
     return *gmtm;
 }
 
+int getTotRobots(){
+    
+}
+int getFreeRobots(){
+    
+}
+int getEfficiency(){
+    
+}
+int getProdCost(){
+    
+}
+
+void setTotRobots(){
+    
+}
+void setFreeRobots(){
+    
+}
+void setEfficiency(){
+    
+}
+void setProdCost(){
+    
+}
+
+
+
 bool RobotsManagement::createRobot(VillageStats vila){
     int curResources = vila.getResources();
     //Calcula se existe dinheiro o suficiente para criar um robô
@@ -29,7 +57,7 @@ bool RobotsManagement::createRobot(VillageStats vila){
     else return false;
 
     //Incrementa o número total e o número de robôs livres    
-    totRobots ++;
+    totRobots++;
     freeRobots++;
     return true;
 }
@@ -43,11 +71,13 @@ bool RobotsManagement::destroyRobot(){
     return false;
 }
 bool RobotsManagement::sendRobot(std::vector<std::map<tm,Task>> tasks,RobotFunctions funct,int robotNo){
-    if(freeRobots - robotNo) return false;
+    if(freeRobots - robotNo <= 0) return false;
     freeRobots -= robotNo;
     tm dateTime = getUTCTime();
     Task newTask(funct,robotNo,dateTime);
-    if(tasks.at(funct))
+    if(tasks.at(funct).find(dateTime) == tasks.at(funct).end()){
+        return false;
+    }
     tasks.at(funct).insert({getUTCTime(),newTask});
     return true;
 }
