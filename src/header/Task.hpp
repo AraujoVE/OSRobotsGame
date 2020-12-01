@@ -1,4 +1,4 @@
 class Task{
     public:
     private:
-}
+};

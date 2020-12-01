@@ -9,4 +9,4 @@ enum RobotFunctions{
 class RobotsManagement{
     public:
     private:
-}
+};

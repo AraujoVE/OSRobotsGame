@@ -5,4 +5,4 @@ class VillageStats{
 
     public:
 
-}
+};
