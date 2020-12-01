@@ -7,6 +7,15 @@ enum RobotFunctions{
 };
 
 class RobotsManagement{
-    public:
     private:
+        bool inProgress;
+        int totRobots;
+        int freeRobots;
+        int efficiency;
+        int prodCost;
+    public:
+        bool sendRobot(RobotFunctions funct);
+        bool retrieveRobot();
+        bool createRobot();
+        bool destroyRobot();
 };

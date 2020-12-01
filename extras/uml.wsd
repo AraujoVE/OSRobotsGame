@@ -1,7 +1,7 @@
 @startuml
 
 class Task{
-    Functions type
+    RobotFunctions type
     int robotsNo
     int totTime
     int remainingTime
