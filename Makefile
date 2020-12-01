@@ -7,7 +7,7 @@ FLAGS = -Wall -Wextra -g -fsanitize=address
 
 SRC_RULES = RobotsManagement VillageStats Task
 
-all:
+all: $(SRC_RULES)
 	$(COMPILER) $(SRC)main.cpp *.o $(INCLUDE) $(FLAGS) -o $(OUTPUT)
 	make clean
 
