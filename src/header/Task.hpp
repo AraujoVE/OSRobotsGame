@@ -1,3 +1,8 @@
+#ifndef TASK
+#define TASK
+
+
+
 #include "header/RobotsManagement.hpp"
 #include "header/VillageStats.hpp"
 //#include <vector>
@@ -6,7 +11,7 @@
 //#include <iostream>
 
 class Task{
-    public:
+    private:
         const int TIME_STEP = 30;
         const int INIT_TIME_STEP = 2;
 
@@ -14,26 +19,29 @@ class Task{
         RobotFunctions type;
         int robotsNo;
         time_t initTime;
-        int remainingTime;
-        int *efficiency;
+        time_t lastUpdateTime;
+        int timeUnits;
+        int predictedTime;
+        int efficiency;
 
-    private:
-        Task(RobotFunctions funct,time_t id,int *efficiency);
-        void Task::initializeParameters(RobotFunctions funct,time_t id,int *newEfficiency);
+    public:
+        Task(RobotFunctions funct,time_t id);
+        void initializeParameters(RobotFunctions funct,time_t id);
         ~Task();
 
         RobotFunctions getType();
         int getRobotsNo();
         time_t getInitTime();
-        int getRemainingTime();
-
+        int getPredictedTime();
+        
         void setType(RobotFunctions newType);
-        void setRobotsNo(int newRobotsNo);
         void setInitTime(time_t newInitTime);
-        void setRemainingTime(int newRemainingTime);
-
-        void updateRemainingTime();
-
+        void setPredictedTime(int newPredictedTime);
+        void setRobotsNo(int newRobotsNo);
+        
+        void efficiencyUpdate(int newEfficiency);
+        bool updatePredictedTime(time_t curTime,int newEfficiency,int newRobotsNo);
         void createThread();
         void deleteThread();
 };
+#endif

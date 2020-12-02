@@ -5,6 +5,7 @@
 #include <map> 
 #include <ctime>
 #include <iostream>
+#include <iterator>
 
 //Inicialização e destruição da classe
 
@@ -55,6 +56,14 @@ void RobotsManagement::setFreeRobots(int newFreeRobots){
 }
 
 void RobotsManagement::setEfficiency(int newEfficiency){
+    //Itera em cada funcao possivel para os robos
+    for(std::map<time_t,Task>& funct : *tasks){
+        //E se itera em cada robo de dada função
+        for(std::pair<const time_t,Task>& task : funct){
+            //Faz o update de atributos seus que são gatilhados pela alteração da eficiência
+            task.second.efficiencyUpdate(newEfficiency);
+        }
+    }
     efficiency = newEfficiency;
 }
 
@@ -104,7 +113,7 @@ bool RobotsManagement::createTask(RobotFunctions funct){
     //Verifica se ainda não foi adicionado nenhuma chave com o valor de time(0) no map da RobotFunction funct
     if(tasks->at(funct).find(curTime) == tasks->at(funct).end()){
         //Caso não tenha sido, adiciona uma Task vazia no map
-        Task newTask(funct,curTime,&efficiency);
+        Task newTask(funct,curTime);
         tasks->at(funct).insert({curTime,newTask});
         return true;
     } 

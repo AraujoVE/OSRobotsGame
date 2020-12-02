@@ -1,3 +1,6 @@
+#ifndef VILLAGE_STATS
+#define VILLAGE_STATS
+
 class VillageStats{
     private:
         const int maxStatValue = 5; // each village stat is between 0 and 6 (included)
@@ -15,17 +18,19 @@ class VillageStats{
         VillageStats();
 
         int getFood();
-        void setFood(int);
         int getHealth();
-        void setHealth(int);
         int getStructures();
-        void setStructures(int);
         int getDefenses();
-        void setDefenses(int);
         int getResources();
-        void setResources(int);
         int getPopulation();
+
+        void setFood(int);
+        void setHealth(int);
+        void setStructures(int);
+        void setDefenses(int);
+        void setResources(int);
 
         void initializeStats();
         void calcNewPop();
 };
+#endif
