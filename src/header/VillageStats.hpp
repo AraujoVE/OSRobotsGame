@@ -17,12 +17,12 @@ class VillageStats{
     public:
         VillageStats();
 
-        int getFood();
-        int getHealth();
-        int getStructures();
-        int getDefenses();
-        int getResources();
-        int getPopulation();
+        int getFood() const;
+        int getHealth() const;
+        int getStructures() const;
+        int getDefenses() const;
+        int getResources() const;
+        int getPopulation() const;
 
         void setFood(int);
         void setHealth(int);

@@ -1,18 +1,13 @@
 #ifndef ROBOTS_MANAGEMENT
 #define ROBOTS_MANAGEMENT
 
-#include "header/Task.hpp"
-#include "header/VillageStats.hpp"
+#include "RobotFunctions.hpp"
+#include "Task.hpp"
+#include "VillageStats.hpp"
 #include <vector>
 #include <map> 
+#include <ctime>
 
-enum RobotFunctions{
-    PROTECTION,
-    RESOURCE_GATHERING,
-    HUNT,
-    MEDICINE,
-    CONSTRUCTION,
-};
 
 class RobotsManagement{
 
@@ -29,21 +24,21 @@ class RobotsManagement{
         void initializeStats();
         ~RobotsManagement();
 
-        int RobotsManagement::getTotRobots();
-        int RobotsManagement::getFreeRobots();
-        int RobotsManagement::getEfficiency();
-        int RobotsManagement::getProdCost();
+        int getTotRobots() const;
+        int getFreeRobots() const;
+        int getEfficiency() const;
+        int getProdCost() const;
 
-        void RobotsManagement::setTotRobots(int newTotRobots);
-        void RobotsManagement::setFreeRobots(int newFreeRobots);
-        void RobotsManagement::setEfficiency(int newEfficiency);
-        void RobotsManagement::setProdCost(int newProdCost);
-        void RobotsManagement::setVillageStats(VillageStats *newVillageStats);
-        void RobotsManagement::setTasks(std::vector<std::map<time_t,Task>> *newTasks);
+        void setTotRobots(int newTotRobots);
+        void setFreeRobots(int newFreeRobots);
+        void setEfficiency(int newEfficiency);
+        void setProdCost(int newProdCost);
+        void setVillageStats(VillageStats *newVillageStats);
+        void setTasks(std::vector<std::map<time_t, Task>> *newTasks);
 
-        bool RobotsManagement::createRobot();
-        bool RobotsManagement::destroyRobot();
-        bool RobotsManagement::createTask(RobotFunctions funct);
-        bool RobotsManagement::moveRobot(RobotFunctions funct,time_t id,int robotNo);
+        bool createRobot();
+        bool destroyRobot();
+        bool createTask(RobotFunctions funct);
+        bool moveRobot(RobotFunctions funct,time_t id,int robotNo);
 };
 #endif

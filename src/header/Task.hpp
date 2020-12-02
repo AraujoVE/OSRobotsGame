@@ -1,13 +1,12 @@
 #ifndef TASK
 #define TASK
 
-
-
-#include "header/RobotsManagement.hpp"
-#include "header/VillageStats.hpp"
-//#include <vector>
+#include "RobotFunctions.hpp"
+// #include "RobotsManagement.hpp"
+// #include "VillageStats.hpp"
+// #include <vector>
 //#include <map> 
-//#include <ctime>
+#include <ctime>
 //#include <iostream>
 
 class Task{
@@ -29,10 +28,10 @@ class Task{
         void initializeParameters(RobotFunctions funct,time_t id);
         ~Task();
 
-        RobotFunctions getType();
-        int getRobotsNo();
-        time_t getInitTime();
-        int getPredictedTime();
+        RobotFunctions getType() const;
+        int getRobotsNo() const;
+        time_t getInitTime() const;
+        int getPredictedTime() const;
         
         void setType(RobotFunctions newType);
         void setInitTime(time_t newInitTime);

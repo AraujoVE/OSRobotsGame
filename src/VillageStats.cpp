@@ -4,7 +4,7 @@
 #include <iostream>
 
 // ======================== GETS/SETS ========================
-int VillageStats::getFood() {
+int VillageStats::getFood() const {
     return food;
 }
 
@@ -14,7 +14,7 @@ void VillageStats::setFood(int newFood) {
     return;
 }
 
-int VillageStats::getHealth() {
+int VillageStats::getHealth() const {
     return health;
 }
 
@@ -24,7 +24,7 @@ void VillageStats::setHealth(int newHealth) {
     return;
 }
 
-int VillageStats::getStructures() {
+int VillageStats::getStructures() const {
     return structures;
 }
 
@@ -34,7 +34,7 @@ void VillageStats::setStructures(int newStructures) {
     return;
 }
 
-int VillageStats::getDefenses() {
+int VillageStats::getDefenses() const {
     return defenses;
 }
 
@@ -44,7 +44,7 @@ void VillageStats::setDefenses(int newDefenses) {
     return;
 }
 
-int VillageStats::getResources() {
+int VillageStats::getResources() const {
     return resources;
 }
 
@@ -54,7 +54,7 @@ void VillageStats::setResources(int newResources) {
     return;
 }
 
-int VillageStats::getPopulation() {
+int VillageStats::getPopulation() const {
     return population;
 }
 

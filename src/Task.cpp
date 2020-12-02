@@ -2,6 +2,8 @@
 #include "header/Task.hpp"
 #include "header/VillageStats.hpp"
 #include "header/Task.hpp"
+
+#include <random>
 //#include <vector>
 //#include <map> 
 #include <ctime>
@@ -15,6 +17,9 @@ Task::Task(RobotFunctions funct,time_t id){
     std::srand(std::time(nullptr));
     initializeParameters(funct,id);
 }
+
+Task::~Task() {}
+
 void Task::initializeParameters(RobotFunctions funct,time_t id){
     type = funct;
     robotsNo = 0;
@@ -30,19 +35,19 @@ void Task::initializeParameters(RobotFunctions funct,time_t id){
 
 //Gets de cada um dos parâmetros
 
-RobotFunctions Task::getType(){
+RobotFunctions Task::getType() const{
     return type;
 }
 
-int Task::getRobotsNo(){
+int Task::getRobotsNo() const {
     return robotsNo;
 }
 
-time_t Task::getInitTime(){
+time_t Task::getInitTime() const{
     return initTime;
 }
 
-int Task::getPredictedTime(){
+int Task::getPredictedTime() const {
     return predictedTime;
 }
 

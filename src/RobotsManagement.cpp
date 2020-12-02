@@ -28,19 +28,19 @@ RobotsManagement::~RobotsManagement(){}
 
 //Gets de cada um dos parâmetros
 
-int RobotsManagement::getTotRobots(){
+int RobotsManagement::getTotRobots() const {
     return totRobots;
 }
 
-int RobotsManagement::getFreeRobots(){
+int RobotsManagement::getFreeRobots() const {
     return freeRobots;
 }
 
-int RobotsManagement::getEfficiency(){
+int RobotsManagement::getEfficiency() const {
     return efficiency;
 }
 
-int RobotsManagement::getProdCost(){
+int RobotsManagement::getProdCost() const {
     return prodCost;
 }
 
