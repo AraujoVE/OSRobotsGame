@@ -3,9 +3,9 @@
 
 class VillageStats{
     private:
-        const int maxStatValue = 5; // each village stat is between 0 and 6 (included)
-        const int initPopValue = 1000;
-        const int initResourcesValue = 100;
+        const int MAX_STAT_VALUE = 5; // each village stat is between 0 and 6 (included)
+        const int INIT_POP_VALUE = 1000;
+        const int INIT_RESOURCES_VALUE = 100;
 
         int defenses;
         int food;

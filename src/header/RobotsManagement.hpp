@@ -38,7 +38,7 @@ class RobotsManagement{
 
         bool createRobot();
         bool destroyRobot();
-        bool createTask(RobotFunctions funct);
+        void createTask(RobotFunctions funct);
         bool moveRobot(RobotFunctions funct,time_t id,int robotNo);
 };
 #endif

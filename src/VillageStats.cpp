@@ -67,20 +67,20 @@ VillageStats::VillageStats() {
 }
 
 void VillageStats::initializeStats() {
-    food = 1+(maxStatValue/2);
-    health = 1+(maxStatValue/2);
-    structures = 1+(maxStatValue/2);
-    defenses = 1+(maxStatValue/2);
+    food = 1+(MAX_STAT_VALUE/2);
+    health = 1+(MAX_STAT_VALUE/2);
+    structures = 1+(MAX_STAT_VALUE/2);
+    defenses = 1+(MAX_STAT_VALUE/2);
 
-    resources = initResourcesValue;
-    population = initPopValue;
+    resources = INIT_RESOURCES_VALUE;
+    population = INIT_POP_VALUE;
     
     return;
 }
 
 // ======================== CALCULATE NEW POPULATION ========================
 void VillageStats::calcNewPop() {
-    int threshold = maxStatValue/2;
+    int threshold = MAX_STAT_VALUE/2;
     int maxPopVariation = 151;
 
     if (food > threshold)

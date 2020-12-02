@@ -107,17 +107,10 @@ bool RobotsManagement::destroyRobot(){
     return false;
 }
 
-bool RobotsManagement::createTask(RobotFunctions funct){
-    time_t curTime = time(0);
-
-    //Verifica se ainda não foi adicionado nenhuma chave com o valor de time(0) no map da RobotFunction funct
-    if(tasks->at(funct).find(curTime) == tasks->at(funct).end()){
-        //Caso não tenha sido, adiciona uma Task vazia no map
-        Task newTask(funct,curTime);
-        tasks->at(funct).insert({curTime,newTask});
-        return true;
-    } 
-    return false;
+void RobotsManagement::createTask(RobotFunctions funct){
+    //Cria nova task com o id Incrementado
+    Task newTask(funct);
+    tasks->at(funct).insert({newTask.getId(),newTask});
 }
 
 bool RobotsManagement::moveRobot(RobotFunctions funct,time_t id,int robotNo){
