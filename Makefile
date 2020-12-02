@@ -3,19 +3,19 @@ SRC = ./src/
 OUTPUT = game
 
 INCLUDE = -I $(SRC)headers
-FLAGS = -Wall -Wextra -g -fsanitize=address
+FLAGS = -Wall -Wextra -g -fsanitize=address -lSDL2_image -lm `sdl2-config --libs --cflags`
 
-SRC_RULES = RobotsManagement VillageStats Task
+SRC_RULES = $(shell find src -name "*.cpp" | sed "s/.cpp/.o/g")
 
 all: $(SRC_RULES)
-	$(COMPILER) $(SRC)main.cpp *.o $(INCLUDE) $(FLAGS) -o $(OUTPUT)
+	$(COMPILER) $(SRC_RULES) $(INCLUDE) $(FLAGS) -o $(OUTPUT)
 	make clean
 
 run:
 	./$(OUTPUT)
 
-$(SRC_RULES):
-	$(COMPILER) $(SRC)$@.cpp -c $(INCLUDE) $(FLAGS)
+.c.o:
+	$(COMPILER) $(SRC)$<.cpp -c -o $@.o $(INCLUDE) $(FLAGS)
 
 clean:
-	rm -f *.o
+	rm -f $(shell find . -name "*.o")
