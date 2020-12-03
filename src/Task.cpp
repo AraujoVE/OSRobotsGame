@@ -10,21 +10,21 @@
 //#include <iostream>
 
 
-
+int Task::lastId = -1;
 //Inicialização e destruição de classe
-Task::Task(RobotFunctions funct,time_t id){
+Task::Task(RobotFunctions funct){
     // use current time as seed for random generator
     std::srand(std::time(nullptr));
-    initializeParameters(funct,id);
+    initializeParameters(funct);
 }
 
 Task::~Task() {}
 
-void Task::initializeParameters(RobotFunctions funct,time_t id){
+void Task::initializeParameters(RobotFunctions funct){
+    id = ++lastId; 
     type = funct;
     robotsNo = 0;
-    initTime = id;
-    lastUpdateTime = id;
+    lastUpdateTime = time(0);
     efficiency = 1;
     timeUnits = TIME_STEP * (INIT_TIME_STEP + (std::rand()%9));
     predictedTime = 0;
@@ -43,14 +43,12 @@ int Task::getRobotsNo() const {
     return robotsNo;
 }
 
-time_t Task::getInitTime() const{
-    return initTime;
-}
-
 int Task::getPredictedTime() const {
     return predictedTime;
 }
-
+int Task::getId() const {
+    return id;
+}
 
 
 //Sets de cada um dos parâmetros
@@ -59,28 +57,25 @@ void Task::setType(RobotFunctions newType){
     type = newType;
 }
 
-void Task::setInitTime(time_t newInitTime){
-    initTime = newInitTime;
-}
-
 void Task::setPredictedTime(int newPredictedTime){
     predictedTime = newPredictedTime;
 }
 
 void Task::setRobotsNo(int newRobotsNo){
-    updatePredictedTime(time(0),efficiency,newRobotsNo);
+    updatePredictedTime(efficiency,newRobotsNo);
     robotsNo = newRobotsNo;
 }
 
 
 void Task::efficiencyUpdate(int newEfficiency){
-    updatePredictedTime(time(0),newEfficiency,robotsNo);
+    updatePredictedTime(newEfficiency,robotsNo);
 }
 
 
 
 //Retorna false para quando o PredictedTime da tarefa se torna 0, caso contrário apenas muda os atributos necessários
-bool Task::updatePredictedTime(time_t curTime,int newEfficiency,int newRobotsNo){
+bool Task::updatePredictedTime(int newEfficiency,int newRobotsNo){
+    time_t curTime = time(0);
     //timeVar simboliza teoricamente quantas unidades de progresso foram geradas entre o momento atual e 
     //o momento da última atualização, isso se dá pelo produto dos termos abaixo.
     int timeVar = (efficiency) * (robotsNo) * (curTime - lastUpdateTime);

@@ -22,6 +22,12 @@ class VillageStats{
 
     calcNewPop()
 }
+class randomEvents{
+
+}
+enum eventTypes{
+
+}
 class RobotsManagment{
     int totRobots
     int freeRobots

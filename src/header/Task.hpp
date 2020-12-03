@@ -14,32 +14,31 @@ class Task{
         const int TIME_STEP = 30;
         const int INIT_TIME_STEP = 2;
 
-
+        static int lastId;
         RobotFunctions type;
         int robotsNo;
-        time_t initTime;
+        int id;
         time_t lastUpdateTime;
         int timeUnits;
         int predictedTime;
         int efficiency;
 
     public:
-        Task(RobotFunctions funct,time_t id);
-        void initializeParameters(RobotFunctions funct,time_t id);
+        Task(RobotFunctions funct);
+        void initializeParameters(RobotFunctions funct);
         ~Task();
 
         RobotFunctions getType() const;
         int getRobotsNo() const;
-        time_t getInitTime() const;
         int getPredictedTime() const;
+        int getId() const;
         
         void setType(RobotFunctions newType);
-        void setInitTime(time_t newInitTime);
         void setPredictedTime(int newPredictedTime);
         void setRobotsNo(int newRobotsNo);
         
         void efficiencyUpdate(int newEfficiency);
-        bool updatePredictedTime(time_t curTime,int newEfficiency,int newRobotsNo);
+        bool updatePredictedTime(int newEfficiency,int newRobotsNo);
         void createThread();
         void deleteThread();
 };
