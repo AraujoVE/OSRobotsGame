@@ -3,22 +3,31 @@
 #include "SDL.hpp"
 
 #include "Game.fwd.hpp"
-#include "GameRenderer.fwd.hpp"
+#include "GameGraphics.fwd.hpp"
 
 #include "VillageStats.hpp"
 #include "RobotsManagement.hpp"
 
+
 class Game {
+private:
     VillageStats *villageStats;
     RobotsManagement *robotMan;
-    GameRenderer *gameRenderer;
+
+    GameGraphics *gameGraphics;
+
+    bool gameEnded;
 
 public:
-    Game(SDL_Renderer *renderer);
+    Game(SDL_Window *window);
     ~Game();
 
-    void loadGame();
-    void saveGame();
+    void quit();
 
-    const GameRenderer* getRenderer();
+    void loadGame();
+    void saveGame() const;
+
+    void gameLoop();
+
+    GameGraphics *getGraphics() const;
 };

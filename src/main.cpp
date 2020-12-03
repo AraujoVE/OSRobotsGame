@@ -3,7 +3,7 @@
 #include "header/VillageStats.hpp"
 #include "header/RobotsManagement.hpp"
 #include "header/Game.hpp"
-#include "header/GameRenderer.hpp"
+#include "header/GameGraphics.hpp"
 
 #include <iostream>
 #include <exception>
@@ -28,36 +28,23 @@ SDL_Window *initSDLAndCreateMainWindow() {
     return window;
 }
 
-void gameLoop(Game* game) {
-    
-    while (true)
-    {   
-        game->getRenderer()->renderGame();
-        SDL_Delay(500);
-    }
-}
-
-void startGame() {
+void runGame() {
     SDL_Window *gameWindow = initSDLAndCreateMainWindow();
-    SDL_Renderer *windowRenderer = SDL_GetRenderer(gameWindow);
 
-    //TODO: remove debug
-    SDL_Delay(1000);
-
-    Game *game = new Game(windowRenderer);
+    Game *game = new Game(gameWindow);
 
     //TODO: load game
 
-    gameLoop(game);
+    game->gameLoop();
 
-    //TODO: save
+    //TODO: save game
 
     delete game;
-    SDL_Quit();
 
     return;
 }
 
+//TODO: move
 bool isGameOver(VillageStats * village,  RobotsManagement * robotsManag) {
     if (village->getPopulation() == 0 || robotsManag->getTotRobots() == 0) // if population is 0 or all robots were destroyed, game is over
         return true;
@@ -66,6 +53,6 @@ bool isGameOver(VillageStats * village,  RobotsManagement * robotsManag) {
 
 
 int main(void){
-    startGame();
+    runGame();
     return 0;
 }
