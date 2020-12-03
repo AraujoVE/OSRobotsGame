@@ -14,6 +14,7 @@ class Task{
         const int TIME_STEP = 30;
         const int INIT_TIME_STEP = 2;
 
+        static int lastId;
         RobotFunctions type;
         int robotsNo;
         int id;
@@ -23,7 +24,6 @@ class Task{
         int efficiency;
 
     public:
-        static int lastId;
         Task(RobotFunctions funct);
         void initializeParameters(RobotFunctions funct);
         ~Task();
@@ -38,7 +38,7 @@ class Task{
         void setRobotsNo(int newRobotsNo);
         
         void efficiencyUpdate(int newEfficiency);
-        bool updatePredictedTime(time_t curTime,int newEfficiency,int newRobotsNo);
+        bool updatePredictedTime(int newEfficiency,int newRobotsNo);
         void createThread();
         void deleteThread();
 };

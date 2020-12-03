@@ -62,19 +62,20 @@ void Task::setPredictedTime(int newPredictedTime){
 }
 
 void Task::setRobotsNo(int newRobotsNo){
-    updatePredictedTime(time(0),efficiency,newRobotsNo);
+    updatePredictedTime(efficiency,newRobotsNo);
     robotsNo = newRobotsNo;
 }
 
 
 void Task::efficiencyUpdate(int newEfficiency){
-    updatePredictedTime(time(0),newEfficiency,robotsNo);
+    updatePredictedTime(newEfficiency,robotsNo);
 }
 
 
 
 //Retorna false para quando o PredictedTime da tarefa se torna 0, caso contrário apenas muda os atributos necessários
-bool Task::updatePredictedTime(time_t curTime,int newEfficiency,int newRobotsNo){
+bool Task::updatePredictedTime(int newEfficiency,int newRobotsNo){
+    time_t curTime = time(0);
     //timeVar simboliza teoricamente quantas unidades de progresso foram geradas entre o momento atual e 
     //o momento da última atualização, isso se dá pelo produto dos termos abaixo.
     int timeVar = (efficiency) * (robotsNo) * (curTime - lastUpdateTime);

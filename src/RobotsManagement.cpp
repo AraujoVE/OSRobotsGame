@@ -57,9 +57,9 @@ void RobotsManagement::setFreeRobots(int newFreeRobots){
 
 void RobotsManagement::setEfficiency(int newEfficiency){
     //Itera em cada funcao possivel para os robos
-    for(std::map<time_t,Task>& funct : *tasks){
+    for(std::map<int,Task>& funct : *tasks){
         //E se itera em cada robo de dada função
-        for(std::pair<const time_t,Task>& task : funct){
+        for(std::pair<const int,Task>& task : funct){
             //Faz o update de atributos seus que são gatilhados pela alteração da eficiência
             task.second.efficiencyUpdate(newEfficiency);
         }
@@ -75,7 +75,7 @@ void RobotsManagement::setVillageStats(VillageStats *newVillageStats){
     villageStats = newVillageStats;
 }
 
-void RobotsManagement::setTasks(std::vector<std::map<time_t,Task>> *newTasks){
+void RobotsManagement::setTasks(std::vector<std::map<int,Task>> *newTasks){
     tasks = newTasks;
 }
 
@@ -113,7 +113,9 @@ void RobotsManagement::createTask(RobotFunctions funct){
     tasks->at(funct).insert({newTask.getId(),newTask});
 }
 
-bool RobotsManagement::moveRobot(RobotFunctions funct,time_t id,int robotNo){
+bool RobotsManagement::moveRobot(Task choosenTask,int robotNo){
+    RobotFunctions funct = choosenTask.getType();
+    int id = choosenTask.getId();
     if(!robotNo) return true; //Mover 0 robos para a task não muda nada
     if(robotNo > 0 && freeRobots - robotNo <= 0) return false; // Não é possível adicionar mais robôs do que se tem livre
     else if(robotNo < 0 && tasks->at(funct).at(id).getRobotsNo() + robotNo < 0) return false; //Não é possível remover mais robos de uma task do que ela possui

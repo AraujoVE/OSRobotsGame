@@ -17,7 +17,7 @@ class RobotsManagement{
         int efficiency;
         int prodCost;
         VillageStats *villageStats;
-        std::vector<std::map<time_t,Task>> *tasks;
+        std::vector<std::map<int,Task>> *tasks;
 
     public:
         RobotsManagement();
@@ -34,11 +34,11 @@ class RobotsManagement{
         void setEfficiency(int newEfficiency);
         void setProdCost(int newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
-        void setTasks(std::vector<std::map<time_t, Task>> *newTasks);
+        void setTasks(std::vector<std::map<int, Task>> *newTasks);
 
         bool createRobot();
         bool destroyRobot();
         void createTask(RobotFunctions funct);
-        bool moveRobot(RobotFunctions funct,time_t id,int robotNo);
+        bool moveRobot(Task choosenTask,int robotNo);
 };
 #endif
