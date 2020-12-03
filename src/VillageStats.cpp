@@ -82,26 +82,38 @@ void VillageStats::initializeStats() {
 void VillageStats::calcNewPop() {
     int threshold = MAX_STAT_VALUE/2;
     int maxPopVariation = 151;
+    
+    auto calcPop = [=] (int par) {
+        if (par > threshold)
+            return (par-threshold)*(std::rand() % maxPopVariation);
+        else
+            return -((1+threshold-par)*(std::rand() % maxPopVariation));
+    };
+    
+    population += calcPop(food);
+    population += calcPop(health);
+    population += calcPop(defenses);
+    population += calcPop(structures);
 
-    if (food > threshold)
-        population += (food-threshold)*(std::rand() % maxPopVariation);
-    else
-        population -= (1+threshold-food)*(std::rand() % maxPopVariation);
+//     if (food > threshold)
+//         population += (food-threshold)*(std::rand() % maxPopVariation);
+//     else
+//         population -= (1+threshold-food)*(std::rand() % maxPopVariation);
     
-    if (health > threshold)
-        population += (health-threshold)*(std::rand() % maxPopVariation);
-    else
-        population -= (1+threshold-health)*(std::rand() % maxPopVariation);
+//     if (health > threshold)
+//         population += (health-threshold)*(std::rand() % maxPopVariation);
+//     else
+//         population -= (1+threshold-health)*(std::rand() % maxPopVariation);
     
-    if (defenses > threshold)
-        population += (defenses-threshold)*(std::rand() % maxPopVariation);
-    else
-        population -= (1+threshold-defenses)*(std::rand() % maxPopVariation);
+//     if (defenses > threshold)
+//         population += (defenses-threshold)*(std::rand() % maxPopVariation);
+//     else
+//         population -= (1+threshold-defenses)*(std::rand() % maxPopVariation);
     
-    if (structures > threshold)
-        population += (structures-threshold)*(std::rand() % maxPopVariation);
-    else
-        population -= (1+threshold-structures)*(std::rand() % maxPopVariation);
+//     if (structures > threshold)
+//         population += (structures-threshold)*(std::rand() % maxPopVariation);
+//     else
+//         population -= (1+threshold-structures)*(std::rand() % maxPopVariation);
     
     std::cout << "New population: " << population << std::endl;
 }
