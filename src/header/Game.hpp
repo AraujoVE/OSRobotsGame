@@ -2,30 +2,23 @@
 
 #include "SDL.hpp"
 
+#include "Game.fwd.hpp"
+#include "GameRenderer.fwd.hpp"
+
 #include "VillageStats.hpp"
 #include "RobotsManagement.hpp"
-#include "GameRenderer.hpp"
 
-class GameRenderer;
 class Game {
     VillageStats *villageStats;
     RobotsManagement *robotMan;
     GameRenderer *gameRenderer;
 
 public:
-    Game(SDL_Renderer *renderer) {
-        this->villageStats = new VillageStats();
-        this->robotMan = new RobotsManagement();
-        // this->gameRenderer = new GameRenderer(*this, renderer);
-    }   
-
-    ~Game() {
-        delete villageStats;
-        delete robotMan;
-    }
+    Game(SDL_Renderer *renderer);
+    ~Game();
 
     void loadGame();
     void saveGame();
 
-    const GameRenderer* getRenderer() { return gameRenderer; }
+    const GameRenderer* getRenderer();
 };

@@ -3,6 +3,7 @@
 #include "header/VillageStats.hpp"
 #include "header/RobotsManagement.hpp"
 #include "header/Game.hpp"
+#include "header/GameRenderer.hpp"
 
 #include <iostream>
 #include <exception>

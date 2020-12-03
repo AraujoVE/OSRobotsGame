@@ -1,8 +1,8 @@
 #pragma once
 
 #include "SDL.hpp"
-#include "Game.hpp"
-class Game;
+#include "Game.fwd.hpp"
+#include "GameRenderer.fwd.hpp"
 
 class GameRenderer {
 private:
