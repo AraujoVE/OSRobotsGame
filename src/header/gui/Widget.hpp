@@ -13,18 +13,21 @@ class Widget {
         SDL_Rect transform;
         std::vector<Widget*> innerWidgets;
         OnClickCallback clickCallback;
-        virtual void render() const;
+
         virtual void mount();
+        virtual void update();
+        virtual void render() const;
     public:
         Widget(SDL_Renderer *renderer, const SDL_Rect& transform);
         Widget(SDL_Renderer *renderer);
         virtual ~Widget();
 
-        void requestMount();
 
         void setTransform(const SDL_Rect& transform);
         SDL_Rect getTransform() const;
 
+        void requestMount();
+        void requestUpdate();
         void requestRender(bool renderChildren = true) const;
 
         void setOnClick(OnClickCallback callback);

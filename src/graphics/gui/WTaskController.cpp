@@ -1,4 +1,5 @@
 #include "WTaskController.hpp"
+#include "WText.hpp"
 
 WTaskController::WTaskController(SDL_Renderer *renderer): Widget(renderer) {
 
@@ -17,6 +18,12 @@ void WTaskController::mount() {
 
         return true;
     });
+
+    WText *wText = new WText(renderer, "São 4 da manhã");
+
+    wText->setTransform({60,60,40,10});
+
+    innerWidgets.push_back(wText);
 }
 
 void WTaskController::render() const {

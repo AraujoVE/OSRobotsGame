@@ -52,6 +52,14 @@ void Widget::requestRender(bool renderChildren) const {
     }
 }
 
+void Widget::update() { }
+void Widget::requestUpdate() { 
+    this->update();
+    for (auto item: innerWidgets) {
+        item->requestUpdate();
+    }
+}
+
 void Widget::setOnClick(OnClickCallback callback) {
     this->clickCallback = callback;
 }

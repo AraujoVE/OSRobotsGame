@@ -3,7 +3,7 @@ SRC = ./src/
 OUTPUT = game
 
 INCLUDE = -I$(SRC)header -I$(SRC)header/gui
-FLAGS = -Wall -Wextra -g -fsanitize=address -lSDL2_image -lm `sdl2-config --libs --cflags`
+FLAGS = -Wall -Wextra -g -fsanitize=address -lSDL2_image -lSDL2_ttf -lm `sdl2-config --libs --cflags`
 
 OBJS = $(shell find src -name "*.cpp" | sed "s/.cpp/.o/g")
 

@@ -15,12 +15,18 @@ namespace OSDL {
             throw std::runtime_error(std::string("error initializing SDL_image's PNG module: ") + IMG_GetError());
         }
 
+        if (TTF_Init() != 0) {
+            throw std::runtime_error(std::string("error initializing SDL_ttf module: ") + TTF_GetError());
+        }
+
         initialized = true;
     }
 
     void stopModules() {
         if (!initialized) throw std::logic_error("Trying to stop modules before initializing SDL");
         SDL_Quit();
+        IMG_Quit();
+        TTF_Quit();
     }
 
     SDL_Window *createWindowWithRender(const std::string& title) {
