@@ -4,6 +4,7 @@
 #include "WVillageStatusPanel.hpp"
 #include "WGameMainPanel.hpp"
 #include "WImage.hpp"
+#include "WTaskController.hpp"
 
 //TODO: panel size according to game window
 WGameMainPanel::WGameMainPanel(SDL_Renderer *renderer, const Game& game) : Widget(renderer, {0,0,1000,1000}), game(game) {}
@@ -16,7 +17,15 @@ void WGameMainPanel::mount() {
     int ww, wh;
     SDL_GetWindowSize(game.getGraphics()->getWindow(), &ww, &wh);
     SDL_Rect wd = waifu->getTransform();
-    waifu->setTransform({(ww-wd.w)/2, (wh-wd.h)/2 + 20, wd.w, wd.h});
+
+    int rf = 1;
+    waifu->setTransform({(int)(ww-wd.w/rf)/2, (int)(wh-wd.h/rf)/2 + 20, (int) wd.w/rf, (int) wd.h/rf});
 
     this->innerWidgets.push_back(waifu);
+
+    WTaskController *taskController = new WTaskController(renderer);
+    taskController->setTransform({40,40,100,100});
+
+    innerWidgets.push_back(taskController);
+
 }

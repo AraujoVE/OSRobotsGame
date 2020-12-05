@@ -2,9 +2,10 @@
 
 #include "SDL.hpp"
 #include <vector>
+#include <functional>
 
 //Passing x, y and returns if the event should be passed to children elements
-typedef bool(*OnClickCallback)(int x, int y);
+typedef std::function<bool(int,int)> OnClickCallback;
 
 class Widget {
     protected:
@@ -12,17 +13,19 @@ class Widget {
         SDL_Rect transform;
         std::vector<Widget*> innerWidgets;
         OnClickCallback clickCallback;
+        virtual void render() const;
+        virtual void mount();
     public:
         Widget(SDL_Renderer *renderer, const SDL_Rect& transform);
         Widget(SDL_Renderer *renderer);
         virtual ~Widget();
 
-        virtual void mount() { }
+        void requestMount();
 
         void setTransform(const SDL_Rect& transform);
         SDL_Rect getTransform() const;
 
-        virtual void render() const;
+        void requestRender(bool renderChildren = true) const;
 
         void setOnClick(OnClickCallback callback);
         void onClick(int x, int y) const;

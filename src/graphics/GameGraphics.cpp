@@ -14,7 +14,7 @@ void GameGraphics::start() {
     rendering = true;
 
     this->mainPanel = new WGameMainPanel(renderer, game);
-    this->mainPanel->mount();
+    this->mainPanel->requestMount();
     
     this->eventListener = new EventListener(game, window);
     this->eventListener->startListening();
@@ -48,7 +48,7 @@ void GameGraphics::renderGame() const {
     SDL_RenderClear(renderer);
 
     //Render main panel and it's components
-    getMainPanel()->render();
+    getMainPanel()->requestRender();
 
     //Present staged changes to the screen (fflush-like operation)
     SDL_RenderPresent(renderer);

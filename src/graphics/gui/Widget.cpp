@@ -25,13 +25,30 @@ SDL_Rect Widget::getTransform() const {
     return this->transform;
 }
 
+//Default implementation for virtual method
 void Widget::render() const{
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderFillRect(renderer, &transform);
     SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
     SDL_RenderDrawRect(renderer, &transform);
+}
+
+//Default implementation for virtual method: do nothing
+void Widget::mount() { }
+
+void Widget::requestMount() { 
+    this->mount();
+
     for (auto item: innerWidgets) {
-        item->render();
+        item->requestMount();
+    }
+}
+
+void Widget::requestRender(bool renderChildren) const {
+    this->render();
+
+    if (renderChildren) for (auto item: innerWidgets) {
+        item->requestRender();
     }
 }
 
