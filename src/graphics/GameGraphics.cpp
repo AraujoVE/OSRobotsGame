@@ -7,19 +7,18 @@
 
 GameGraphics::GameGraphics(const Game &game, SDL_Window* window): game(game) {
     setWindow(window);
-
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    this->mainPanel = new GameMainPanel(game);
-    this->mainPanel->mount();
-
+    this->mainPanel = new GameMainPanel(renderer, game);
     this->eventListener = new EventListener(game, window);
+}
+
+void GameGraphics::init() {
+    this->mainPanel->mount();
     this->eventListener->startEventListening();    
 }
 
 GameGraphics::~GameGraphics() {
-    this->eventListener->stopEventListening();
     delete eventListener;
+    delete mainPanel;
 }
 
 void GameGraphics::setWindow(SDL_Window* window) {
@@ -31,7 +30,7 @@ void GameGraphics::setWindow(SDL_Window* window) {
 void GameGraphics::renderGame() const {
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
-    getMainPanel()->render(renderer);
+    getMainPanel()->render();
     SDL_RenderPresent(renderer);
 }
 

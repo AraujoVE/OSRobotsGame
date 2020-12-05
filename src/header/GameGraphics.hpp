@@ -23,6 +23,8 @@ public:
     GameGraphics(const Game &game, SDL_Window* window);
     ~GameGraphics();
 
+    void init();
+
     WPanel *getMainPanel() const;
     SDL_Window *getWindow() const;
     SDL_Renderer *getRenderer() const;

@@ -16,12 +16,13 @@ private:
 
     GameGraphics *gameGraphics;
 
-    bool gameEnded;
+    bool gameRunning;
 
 public:
     Game(SDL_Window *window);
     ~Game();
 
+    void start();
     void quit();
 
     void loadGame();

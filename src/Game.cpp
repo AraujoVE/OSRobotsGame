@@ -10,12 +10,12 @@ Game::Game(SDL_Window *window) {
     this->robotMan = new RobotsManagement();
     
     this->gameGraphics = new GameGraphics(*this, window);
-    this->gameEnded = false;
 }
 
 Game::~Game() {
     delete villageStats;
     delete robotMan;
+    delete gameGraphics;
 }
 
 GameGraphics* Game::getGraphics() const { 
@@ -24,13 +24,19 @@ GameGraphics* Game::getGraphics() const {
 
 void Game::quit() {
     //TODO: save game
-    gameEnded = true;
-    delete gameGraphics;
+    gameRunning = false;
+    //TODO: gameGraphics.stop() or smth
     SDL_Quit();
 }
 
+void Game::start() {
+    gameRunning = true;
+    gameGraphics->init();
+    gameLoop();
+}
+
 void Game::gameLoop() {
-    while (!gameEnded)
+    while (gameRunning)
     {   
         this->getGraphics()->renderGame();
         SDL_Delay(1000/30); //1000ms / 30 fps

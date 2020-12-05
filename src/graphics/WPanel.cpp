@@ -2,10 +2,12 @@
 
 #include <stdio.h>
 
-WPanel::WPanel(int x, int y, int w, int h) {
-    this->rect = {x, y, w, h};
+WPanel::WPanel(SDL_Renderer *renderer): WPanel(renderer, {0,0,0,0}) {}
+
+WPanel::WPanel(SDL_Renderer *renderer, const SDL_Rect& transform) {
     this->clickCallback = nullptr;
-    mount();
+    this->renderer = renderer;
+    setTransform(transform);
 }
 
 WPanel::~WPanel() {
@@ -14,14 +16,22 @@ WPanel::~WPanel() {
     }
 }
 
-void WPanel::render(SDL_Renderer *renderer) {
+void WPanel::setTransform(const SDL_Rect& transform) {
+    this->transform = transform;
+}
+
+
+SDL_Rect WPanel::getTransform() const {
+    return this->transform;
+}
+
+void WPanel::render() const{
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderFillRect(renderer, &rect);
-    SDL_RenderPresent(renderer);
+    SDL_RenderFillRect(renderer, &transform);
     SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
-    SDL_RenderDrawRect(renderer, &rect);
+    SDL_RenderDrawRect(renderer, &transform);
     for (auto item: innerPanels) {
-        item->render(renderer);
+        item->render();
     }
 }
 
@@ -29,9 +39,9 @@ void WPanel::setOnClick(OnClickCallback callback) {
     this->clickCallback = callback;
 }
 
-void WPanel::onClick(int x, int y) {
-    if (x < rect.x || x > rect.x + rect.w ) return;
-    if (y < rect.y || y > rect.y + rect.h ) return;
+void WPanel::onClick(int x, int y) const{
+    if (x < transform.x || x > transform.x + transform.w ) return;
+    if (y < transform.y || y > transform.y + transform.h ) return;
 
     printf("WPanel %p received click! at (%d, %d)\n", this, x, y);
 

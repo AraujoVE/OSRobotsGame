@@ -41,11 +41,15 @@ void *EventListener::threadLoop(void *gamePtr) {
 }
 
 void EventListener::startEventListening() {
+    if (listening) return;
+
     listening = true;
     pthread_create(&thread, NULL, threadLoop, (void*)&game);
 }
 
 void EventListener::stopEventListening() {
+    if (!listening) return;
+
     listening = false;
     pthread_cancel(thread);
     pthread_join(thread, NULL);

@@ -6,8 +6,8 @@ class VillageStatusPanel : public WPanel {
         VillageStats *villageStats;
 
     public:
-        VillageStatusPanel(VillageStats* villageStats);
+        VillageStatusPanel(SDL_Renderer *renderer, VillageStats* villageStats);
 
         void mount();
-        void render(SDL_Renderer *renderer);
+        void render() const;
 };

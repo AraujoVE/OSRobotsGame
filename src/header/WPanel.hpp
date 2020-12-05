@@ -8,19 +8,24 @@ typedef bool(*OnClickCallback)(int x, int y);
 
 class WPanel {
     protected:
-        SDL_Rect rect;
+        SDL_Renderer *renderer;
+        SDL_Rect transform;
         std::vector<WPanel*> innerPanels;
-        void clear();
         OnClickCallback clickCallback;
     public:
-        WPanel(int x, int y, int w, int h);
+        WPanel(SDL_Renderer *renderer, const SDL_Rect& transform);
+        WPanel(SDL_Renderer *renderer);
         virtual ~WPanel();
-
-        void setOnClick(OnClickCallback callback);
-        virtual void render(SDL_Renderer *renderer);
 
         virtual void mount() { }
 
-        void onClick(int x, int y);
+        void setTransform(const SDL_Rect& transform);
+        SDL_Rect getTransform() const;
+
+        virtual void render() const;
+
+        void setOnClick(OnClickCallback callback);
+        void onClick(int x, int y) const;
+
 
 };

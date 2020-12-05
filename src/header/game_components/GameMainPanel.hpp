@@ -7,6 +7,6 @@ class GameMainPanel : public WPanel {
         const Game& game;
     
     public:
-        GameMainPanel(const Game& game);
+        GameMainPanel(SDL_Renderer *renderer, const Game& game);
         void mount();
 };
