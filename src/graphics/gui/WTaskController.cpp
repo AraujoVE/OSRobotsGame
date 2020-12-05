@@ -21,8 +21,6 @@ void WTaskController::mount() {
 
     WText *wText = new WText(renderer, "São 4 da manhã");
 
-    wText->setTransform({60,60,40,10});
-
     innerWidgets.push_back(wText);
 }
 

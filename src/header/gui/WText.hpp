@@ -8,6 +8,7 @@ class WText : public Widget {
     private:
         void mount();
         void render() const;
+        void update();
         SDL_Texture *texture;
         OSDL::Font font;
     public:
