@@ -8,6 +8,8 @@
 #include "EventListener.hpp"
 #include "WGameMainPanel.hpp"
 
+#define WINDOW_TITLE "OSRobots"
+
 class GameGraphics {
 private:
     const Game& game;
@@ -16,15 +18,18 @@ private:
 
     WGameMainPanel *mainPanel;
     EventListener *eventListener;
+
+    bool rendering;
 public:
-    void setWindow(SDL_Window *window);
+    void setWindowAndRenderer(SDL_Window *window);
 
     void renderGame() const;
 
-    GameGraphics(const Game &game, SDL_Window* window);
+    GameGraphics(const Game &game);
     ~GameGraphics();
 
-    void init();
+    void start();
+    void stop();
 
     WGameMainPanel *getMainPanel() const;
     SDL_Window *getWindow() const;

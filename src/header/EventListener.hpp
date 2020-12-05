@@ -19,6 +19,6 @@ public:
     EventListener(const Game& game, SDL_Window *window);
     ~EventListener();
 
-    void startEventListening();
-    void stopEventListening();
+    void startListening();
+    void stopListening();
 };

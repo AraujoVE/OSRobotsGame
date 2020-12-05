@@ -19,16 +19,14 @@ private:
     bool gameRunning;
 
 public:
-    Game(SDL_Window *window);
+    Game();
     ~Game();
 
-    void start();
-    void quit();
+    void run();
+    void requestGameStop();
 
     void loadGame();
     void saveGame() const;
-
-    void gameLoop();
 
     GameGraphics *getGraphics() const;
     VillageStats *getVillageStatus() const;

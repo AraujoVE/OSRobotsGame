@@ -3,12 +3,11 @@
 #include "EventListener.hpp"
 
 
-Game::Game(SDL_Window *window) {
+Game::Game() {
     //Game status related fields
     this->villageStats = new VillageStats();
     this->robotMan = new RobotsManagement();
-    
-    this->gameGraphics = new GameGraphics(*this, window);
+    this->gameGraphics = new GameGraphics(*this);
 }
 
 Game::~Game() {
@@ -21,25 +20,28 @@ GameGraphics* Game::getGraphics() const {
     return gameGraphics; 
 }
 
-void Game::quit() {
-    //TODO: save game
+void Game::requestGameStop() {
     gameRunning = false;
-    //TODO: gameGraphics.stop() or smth
-    SDL_Quit();
 }
 
-void Game::start() {
+void Game::run() {
+    //Initialization
     gameRunning = true;
-    gameGraphics->init();
-    gameLoop();
-}
+    gameGraphics->start();
 
-void Game::gameLoop() {
+    //TODO: load game
+
+    //GameLoop
     while (gameRunning)
     {   
         this->getGraphics()->renderGame();
         SDL_Delay(1000/30); //1000ms / 30 fps
     }
+
+    //TODO: save game
+
+    //Cleanup/destruction of dependencies
+    gameGraphics->stop();
 }
 
 VillageStats *Game::getVillageStatus() const { 

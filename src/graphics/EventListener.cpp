@@ -10,7 +10,7 @@ EventListener::EventListener(const Game& game, SDL_Window *window): game(game) {
 }
 
 EventListener::~EventListener() {
-    if (listening) stopEventListening();
+    if (listening) stopListening();
 }
 
 //TODO: encerrar gracefully
@@ -22,7 +22,7 @@ void *EventListener::threadLoop(void *gamePtr) {
             switch(e.type){
                 case SDL_QUIT:
                     std::cout << "Requisitado para sair!!" << std::endl;
-                    game.quit();
+                    game.requestGameStop();
                     break;
                 case SDL_MOUSEBUTTONDOWN:
                     int x, y;
@@ -40,14 +40,14 @@ void *EventListener::threadLoop(void *gamePtr) {
     return NULL;
 }
 
-void EventListener::startEventListening() {
+void EventListener::startListening() {
     if (listening) return;
 
     listening = true;
     pthread_create(&thread, NULL, threadLoop, (void*)&game);
 }
 
-void EventListener::stopEventListening() {
+void EventListener::stopListening() {
     if (!listening) return;
 
     listening = false;
