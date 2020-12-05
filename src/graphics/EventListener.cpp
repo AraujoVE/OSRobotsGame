@@ -13,11 +13,11 @@ EventListener::~EventListener() {
     if (listening) stopEventListening();
 }
 
+//TODO: encerrar gracefully
 void *EventListener::threadLoop(void *gamePtr) {
     Game& game = *(Game*)gamePtr;
     while(true) {
         SDL_Event e;
-        std::cout << "Tentando..." << std::endl;
         while(SDL_PollEvent(&e)){
             switch(e.type){
                 case SDL_QUIT:
@@ -28,6 +28,7 @@ void *EventListener::threadLoop(void *gamePtr) {
                     int x, y;
                     SDL_GetMouseState(&x, &y);
                     std::cout << "Cliquei com o mouse em (" << x << ',' << y << ')' << std::endl;
+                    game.getGraphics()->getMainPanel()->onClick(x, y);
                     break;
                 default:
                     break;

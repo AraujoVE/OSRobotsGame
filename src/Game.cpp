@@ -36,3 +36,11 @@ void Game::gameLoop() {
         SDL_Delay(500);
     }
 }
+
+VillageStats *Game::getVillageStatus() const { 
+    return villageStats;
+}
+
+RobotsManagement *Game::getRobotManagement() const { 
+    return robotMan;
+}

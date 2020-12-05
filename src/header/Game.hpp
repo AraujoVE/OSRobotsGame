@@ -30,4 +30,7 @@ public:
     void gameLoop();
 
     GameGraphics *getGraphics() const;
+    VillageStats *getVillageStatus() const;
+    RobotsManagement *getRobotManagement() const;
+
 };

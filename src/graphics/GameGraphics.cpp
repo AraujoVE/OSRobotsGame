@@ -3,13 +3,15 @@
 
 #include "GameGraphics.hpp"
 #include "Game.hpp"
+#include "GameMainPanel.hpp"
 
 GameGraphics::GameGraphics(const Game &game, SDL_Window* window): game(game) {
     setWindow(window);
 
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
-    this->mainPanel = new WPanel(0,0, w, h);
+    this->mainPanel = new GameMainPanel(game);
+    this->mainPanel->mount();
 
     this->eventListener = new EventListener(game, window);
     this->eventListener->startEventListening();    
