@@ -45,7 +45,7 @@ void EventListener::startEventListening() {
     pthread_create(&thread, NULL, threadLoop, (void*)&game);
 }
 
-void EventListener::stopEventListening(){
+void EventListener::stopEventListening() {
     listening = false;
     pthread_cancel(thread);
     pthread_join(thread, NULL);

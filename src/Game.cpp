@@ -33,7 +33,7 @@ void Game::gameLoop() {
     while (!gameEnded)
     {   
         this->getGraphics()->renderGame();
-        SDL_Delay(500);
+        SDL_Delay(1000/30); //1000ms / 30 fps
     }
 }
 

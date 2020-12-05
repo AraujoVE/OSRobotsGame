@@ -19,12 +19,6 @@ SDL_Window *initSDLAndCreateMainWindow() {
     if (renderer == nullptr) { throw std::runtime_error("Unable to create SDL Renderer"); }
 
 
-    //Paint it all black
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
     return window;
 }
 
@@ -50,7 +44,6 @@ bool isGameOver(VillageStats * village,  RobotsManagement * robotsManag) {
         return true;
     return false;
 } 
-
 
 int main(void){
     runGame();

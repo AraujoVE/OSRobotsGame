@@ -18,6 +18,7 @@ GameGraphics::GameGraphics(const Game &game, SDL_Window* window): game(game) {
 }
 
 GameGraphics::~GameGraphics() {
+    this->eventListener->stopEventListening();
     delete eventListener;
 }
 
@@ -28,7 +29,10 @@ void GameGraphics::setWindow(SDL_Window* window) {
 }
 
 void GameGraphics::renderGame() const {
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(renderer);
     getMainPanel()->render(renderer);
+    SDL_RenderPresent(renderer);
 }
 
 WPanel *GameGraphics::getMainPanel() const { 
@@ -36,7 +40,6 @@ WPanel *GameGraphics::getMainPanel() const {
 }
 
 SDL_Window *GameGraphics::getWindow() const {
-    std::cout << "TEET" << std::endl;
     return window;
 }
 
