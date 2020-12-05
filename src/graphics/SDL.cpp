@@ -1,6 +1,5 @@
 #include "SDL.hpp"
 
-
 namespace OSDL {
     bool initialized = false;
 
@@ -41,4 +40,31 @@ namespace OSDL {
 
         return window;  
     }
+
+    TTF_Font *loadFont(const std::string& path, int point_size) {
+        if (!initialized) throw std::logic_error("Trying to load font before initializing SDL_ttf");
+
+
+        TTF_Font *ttf_font = TTF_OpenFont(path.c_str(), point_size);
+        if (ttf_font == NULL) { throw std::runtime_error("error: font not found: " + path + "\n\tmsg: " + TTF_GetError()); }
+        return ttf_font;
+    }
+
+
+    FontWrapper::FontWrapper(const std::string& path, int point_size) {
+        this->ttf_font = loadFont(path, point_size);
+    }
+
+    FontWrapper::~FontWrapper() {
+        TTF_CloseFont(ttf_font);
+    }
+
+    TTF_Font *FontWrapper::getSDLFont() const {
+        return ttf_font;
+    }
+
+    std::shared_ptr<FontWrapper> useFont(const std::string& path, int point_size) {
+        return std::make_shared<FontWrapper>(path, point_size);
+    }
+
 };

@@ -1,6 +1,7 @@
 #include "WText.hpp"
 
 WText::WText(SDL_Renderer *renderer, const std::string& text): Widget(renderer) {
+    this->font = OSDL::useFont(OSDL::FontPaths::OPEN_SANS, 200);
     setText(text);
 }
 
@@ -9,12 +10,9 @@ WText::~WText() {
 }
 
 void WText::setText(const std::string& text) {
-    TTF_Font *font = FONT_MACRO;
-    if (font == NULL) {
-        throw std::runtime_error("error: font not found");
-    }
+    TTF_Font *ttf_font = font->getSDLFont();
 
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text.c_str(), {0x00,0x00,0x00,0xFF});
+    SDL_Surface *surface = TTF_RenderUTF8_Solid(ttf_font, text.c_str(), {0x00,0x00,0x00,0xFF});
     if (surface == NULL) {
         throw std::runtime_error("error: surface");
     }
@@ -25,8 +23,7 @@ void WText::setText(const std::string& text) {
     }
 
     //TODO: make this unchangeable from outside if I have patience
-    transform.w = surface->w/2;
-    transform.h = surface->h/2;
+    SDL_QueryTexture(texture, NULL, NULL, &transform.w, &transform.h);
 
     SDL_FreeSurface(surface);
     
@@ -39,5 +36,5 @@ void WText::mount() {
 }
 
 void WText::render() const {
-    SDL_RenderCopy(renderer, texture, NULL, &transform);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
 }
