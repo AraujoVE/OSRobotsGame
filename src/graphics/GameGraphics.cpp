@@ -1,13 +1,13 @@
 #include <stdexcept>
-#include <iostream>
 
 #include "GameGraphics.hpp"
 #include "Game.hpp"
-#include "GameMainPanel.hpp"
+
+#include "WGameMainPanel.hpp"
 
 GameGraphics::GameGraphics(const Game &game, SDL_Window* window): game(game) {
     setWindow(window);
-    this->mainPanel = new GameMainPanel(renderer, game);
+    this->mainPanel = new WGameMainPanel(renderer, game);
     this->eventListener = new EventListener(game, window);
 }
 
@@ -34,7 +34,7 @@ void GameGraphics::renderGame() const {
     SDL_RenderPresent(renderer);
 }
 
-WPanel *GameGraphics::getMainPanel() const { 
+WGameMainPanel *GameGraphics::getMainPanel() const { 
     return mainPanel; 
 }
 

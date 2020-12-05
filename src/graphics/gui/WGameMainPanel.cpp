@@ -1,15 +1,15 @@
-#include "GameMainPanel.hpp"
 #include "Game.hpp"
 #include "GameGraphics.hpp"
 
-#include "VillageStatusPanel.hpp"
+#include "WVillageStatusPanel.hpp"
+#include "WGameMainPanel.hpp"
 #include "WImage.hpp"
 
 //TODO: panel size according to game window
-GameMainPanel::GameMainPanel(SDL_Renderer *renderer, const Game& game) : WPanel(renderer, {0,0,1000,1000}), game(game) {}
+WGameMainPanel::WGameMainPanel(SDL_Renderer *renderer, const Game& game) : Widget(renderer, {0,0,1000,1000}), game(game) {}
 
-void GameMainPanel::mount() {
-    this->innerPanels.push_back(new VillageStatusPanel(renderer, game.getVillageStatus()));
+void WGameMainPanel::mount() {
+    this->innerWidgets.push_back(new WVillageStatusPanel(renderer, game.getVillageStatus()));
     
     WImage *waifu = new WImage(renderer, "/home/marucs/Development/USP/BCC/2020-2/SO/OSRobotsGame/assets/hitagi.png");
 
@@ -18,5 +18,5 @@ void GameMainPanel::mount() {
     SDL_Rect wd = waifu->getTransform();
     waifu->setTransform({(ww-wd.w)/2, (wh-wd.h)/2 + 20, wd.w, wd.h});
 
-    this->innerPanels.push_back(waifu);
+    this->innerWidgets.push_back(waifu);
 }

@@ -1,7 +1,9 @@
-#include "WPanel.hpp"
+#pragma once
+
+#include "Widget.hpp"
 #include <string>
 
-class WImage: public WPanel {
+class WImage: public Widget {
     private:
         std::string imagePath;
         SDL_Texture *texture;

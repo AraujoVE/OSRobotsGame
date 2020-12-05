@@ -1,16 +1,16 @@
-#include "VillageStatusPanel.hpp"
+#include "WVillageStatusPanel.hpp"
 
 //TODO: panel size according to game window
-VillageStatusPanel::VillageStatusPanel(SDL_Renderer *renderer, VillageStats *villageStats) : WPanel(renderer, {0,0,1000,20}) { 
+WVillageStatusPanel::WVillageStatusPanel(SDL_Renderer *renderer, VillageStats *villageStats) : Widget(renderer, {0,0,1000,20}) { 
     this->villageStats = villageStats;
 }
 
-void VillageStatusPanel::mount() {
+void WVillageStatusPanel::mount() {
     
 }
 
-void VillageStatusPanel::render() const{
-    this->WPanel::render();
+void WVillageStatusPanel::render() const{
+    this->Widget::render();
     
     SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
     SDL_RenderFillRect(renderer, &transform);

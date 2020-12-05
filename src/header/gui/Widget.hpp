@@ -6,16 +6,16 @@
 //Passing x, y and returns if the event should be passed to children elements
 typedef bool(*OnClickCallback)(int x, int y);
 
-class WPanel {
+class Widget {
     protected:
         SDL_Renderer *renderer;
         SDL_Rect transform;
-        std::vector<WPanel*> innerPanels;
+        std::vector<Widget*> innerWidgets;
         OnClickCallback clickCallback;
     public:
-        WPanel(SDL_Renderer *renderer, const SDL_Rect& transform);
-        WPanel(SDL_Renderer *renderer);
-        virtual ~WPanel();
+        Widget(SDL_Renderer *renderer, const SDL_Rect& transform);
+        Widget(SDL_Renderer *renderer);
+        virtual ~Widget();
 
         virtual void mount() { }
 

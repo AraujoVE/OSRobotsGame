@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-WImage::WImage(SDL_Renderer *renderer, const std::string& imagePath): WPanel(renderer) {
+WImage::WImage(SDL_Renderer *renderer, const std::string& imagePath): Widget(renderer) {
     setImage(imagePath);
 }
 

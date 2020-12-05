@@ -5,8 +5,7 @@
 #include "header/Game.hpp"
 #include "header/GameGraphics.hpp"
 
-#include <iostream>
-#include <exception>
+#include <stdexcept>
 
 //TODO: move
 SDL_Window *initSDLAndCreateMainWindow() {

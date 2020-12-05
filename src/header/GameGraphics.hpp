@@ -4,8 +4,9 @@
 #include "Game.fwd.hpp"
 #include "GameGraphics.fwd.hpp"
 
-#include "WPanel.hpp"
+#include "Widget.hpp"
 #include "EventListener.hpp"
+#include "WGameMainPanel.hpp"
 
 class GameGraphics {
 private:
@@ -13,7 +14,7 @@ private:
     SDL_Renderer *renderer;
     SDL_Window *window;
 
-    WPanel *mainPanel;
+    WGameMainPanel *mainPanel;
     EventListener *eventListener;
 public:
     void setWindow(SDL_Window *window);
@@ -25,7 +26,7 @@ public:
 
     void init();
 
-    WPanel *getMainPanel() const;
+    WGameMainPanel *getMainPanel() const;
     SDL_Window *getWindow() const;
     SDL_Renderer *getRenderer() const;
 

@@ -2,7 +2,6 @@
 #include "GameGraphics.hpp"
 #include "EventListener.hpp"
 
-#include <iostream>
 
 Game::Game(SDL_Window *window) {
     //Game status related fields

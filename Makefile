@@ -2,7 +2,7 @@ COMPILER = g++
 SRC = ./src/
 OUTPUT = game
 
-INCLUDE = -I$(SRC)header -I$(SRC)header/game_components
+INCLUDE = -I$(SRC)header -I$(SRC)header/gui
 FLAGS = -Wall -Wextra -g -fsanitize=address -lSDL2_image -lm `sdl2-config --libs --cflags`
 
 OBJS = $(shell find src -name "*.cpp" | sed "s/.cpp/.o/g")
