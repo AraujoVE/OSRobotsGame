@@ -18,7 +18,7 @@ project "DampEngine"
 
 	includedirs {
 		"src",
-		"src/DampEngine"
+		"vendor/spdlog/include"
 	}
 
 	links {}
@@ -30,17 +30,22 @@ project "DampEngine"
 			OS_SYSTEM_WINDOWS
 		}
 
+	filter "system:linux"
+		defines {
+			OS_SYSTEM_LINUX
+		}
+
 	filter "configurations:Debug"
-		defines "DE_DEBUG"
+		defines "DE_ENGINE_BUILD_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "DE_RELEASE"
+		defines "DE_ENGINE_BUILD_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "DE_DIST"
+		defines "DE_ENGINE_BUILD_DIST"
 		runtime "Release"
 		optimize "on"

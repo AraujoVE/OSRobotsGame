@@ -1,0 +1,1 @@
+make && ./bin/Debug*/Application/Application

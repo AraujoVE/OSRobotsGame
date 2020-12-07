@@ -14,7 +14,8 @@ project "Application"
 	defines {}
 
 	includedirs {
-		"%{wks.location}/DampEngine/src"
+		"%{wks.location}/DampEngine/src",
+		"%{wks.location}/DampEngine/vendor/spdlog/include"
 	}
 
 	libdirs {
@@ -35,16 +36,16 @@ project "Application"
 	-- filter "system:"
 
 	filter "configurations:Debug"
-		defines "OS_DEBUG"
+		defines "DE_APP_BUILD_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "OS_RELEASE"
+		defines "DE_APP_BUILD_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "OS_DIST"
+		defines "DE_APP_BUILD_DIST"
 		runtime "Release"
 		optimize "on"

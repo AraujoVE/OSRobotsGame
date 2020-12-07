@@ -1,3 +1,6 @@
 #pragma once
 
-#include "Core/EntryPoint.hpp"
+#include "DampEngine/Core/Application.hpp"
+#include "DampEngine/Core/Layer.hpp"
+#include "DampEngine/Core/Log.h"
+#include "DampEngine/Core/Macros.hpp"
