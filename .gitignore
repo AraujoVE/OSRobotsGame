@@ -1,3 +1,4 @@
-game
+Makefile
+bin
+bin-int
 extras/annotations.txt
-*.o
