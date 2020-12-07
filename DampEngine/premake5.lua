@@ -17,7 +17,8 @@ project "DampEngine"
 	defines {}
 
 	includedirs {
-		"src"
+		"src",
+		"src/DampEngine"
 	}
 
 	links {}
