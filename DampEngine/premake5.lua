@@ -3,6 +3,10 @@ project "DampEngine"
 	language "C++"
 	cppdialect "C++17"
 
+	platforms { 
+		"OpenGL"
+	}
+
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
@@ -10,18 +14,21 @@ project "DampEngine"
 	pchsource "src/depch.cpp"
 
 	files {
-		"src/**.cpp",
-		"src/**.hpp"		
+		"src/DampEngine/**.cpp",
+		"src/DampEngine/**.hpp"		
 	}
-
+	
 	defines {}
 
 	includedirs {
 		"src",
-		"vendor/spdlog/include"
+		"vendor/spdlog/include",
+		"%{IncludeDir.GLFW}"
 	}
 
-	links {}
+	links {
+		"GLFW"
+	}
 
 	filter "system:windows"
 		systemversion "latest"
@@ -34,6 +41,19 @@ project "DampEngine"
 		defines {
 			OS_SYSTEM_LINUX
 		}
+		
+		files {
+			"src/Platform/Linux/**.cpp",
+			"src/Platform/Linux/**.hpp"
+		}
+
+	filter "platforms:OpenGL"
+		
+		files {
+			"src/Platform/OpenGL/**.cpp",
+			"src/Platform/OpenGL/**.hpp"
+		}
+	
 
 	filter "configurations:Debug"
 		defines "DE_ENGINE_BUILD_DEBUG"

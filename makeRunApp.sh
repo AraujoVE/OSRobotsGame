@@ -1,1 +1,1 @@
-make && ./bin/Debug*/Application/Application
+make -j 10 && ./bin/Debug*/Application/Application
