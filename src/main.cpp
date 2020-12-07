@@ -1,11 +1,13 @@
-#include "header/SDL.hpp"
+#include "SDL.hpp"
 
-#include "header/VillageStats.hpp"
-#include "header/RobotsManagement.hpp"
-#include "header/Game.hpp"
-#include "header/GameGraphics.hpp"
+#include "VillageStats.hpp"
+#include "RobotsManagement.hpp"
+#include "Game.hpp"
+#include "GameGraphics.hpp"
 
 #include <stdexcept>
+
+#include <iostream>
 
 //TODO: move
 bool isGameOver(VillageStats * village,  RobotsManagement * robotsManag) {
@@ -14,17 +16,22 @@ bool isGameOver(VillageStats * village,  RobotsManagement * robotsManag) {
     return false;
 } 
 
+
+
 int main(void){
     //Initialize all used SDL modules.    
     OSDL::initModules();
 
     Game *game = new Game();
 
-    game->run();
+    // game->run();
     
     delete game;
 
     OSDL::stopModules();
+
+    
+    //TODO: use override in classes and more virtual destructors
 
     return 0;
 }

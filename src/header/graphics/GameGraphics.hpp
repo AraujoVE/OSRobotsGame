@@ -31,8 +31,8 @@ public:
     void start();
     void stop();
 
-    WGameMainPanel *getMainPanel() const;
-    SDL_Window *getWindow() const;
-    SDL_Renderer *getRenderer() const;
+    inline WGameMainPanel *getMainPanel() const;
+    inline SDL_Window *getWindow() const;
+    inline SDL_Renderer *getRenderer() const;
 
 };

@@ -1,37 +1,38 @@
 #pragma once
 
+#include "Vec2D.hpp"
 #include "SDL.hpp"
 #include <vector>
 #include <functional>
+#include "EventHandler.hpp"
 
-//Passing x, y and returns if the event should be passed to children elements
-typedef std::function<bool(int,int)> OnClickCallback;
-
+//Every 2D GUI element is a Widget, this class is their root class
 class Widget {
     protected:
         SDL_Renderer *renderer;
         SDL_Rect transform;
         std::vector<Widget*> innerWidgets;
-        OnClickCallback clickCallback;
-
+        EventHandler *eventHandler;
+        
         virtual void mount();
         virtual void update();
         virtual void render() const;
     public:
-        Widget(SDL_Renderer *renderer, const SDL_Rect& transform);
-        Widget(SDL_Renderer *renderer);
+        Widget(SDL_Renderer *renderer, const SDL_Rect& transform = {0,0,0,0});
         virtual ~Widget();
 
+        EventHandler *getEventHandler();
 
         void setTransform(const SDL_Rect& transform);
-        SDL_Rect getTransform() const;
+        inline SDL_Rect getTransform() const;
+
+        void setPosition(const Vec2D& position);
+        inline Vec2D getPosition() const;
+
+        void setDimention(const Vec2D& position);
+        inline Vec2D getDimension() const;
 
         void requestMount();
         void requestUpdate();
         void requestRender(bool renderChildren = true) const;
-
-        void setOnClick(OnClickCallback callback);
-        void onClick(int x, int y) const;
-
-
 };

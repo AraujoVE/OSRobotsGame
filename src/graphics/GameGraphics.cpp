@@ -54,14 +54,14 @@ void GameGraphics::renderGame() const {
     SDL_RenderPresent(renderer);
 }
 
-WGameMainPanel *GameGraphics::getMainPanel() const { 
+inline WGameMainPanel *GameGraphics::getMainPanel() const { 
     return mainPanel; 
 }
 
-SDL_Window *GameGraphics::getWindow() const {
+inline SDL_Window *GameGraphics::getWindow() const {
     return window;
 }
 
-SDL_Renderer *GameGraphics::getRenderer() const {
+inline SDL_Renderer *GameGraphics::getRenderer() const {
     return renderer;
 }

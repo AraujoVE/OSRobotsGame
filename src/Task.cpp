@@ -12,7 +12,7 @@
 
 int Task::lastId = -1;
 //Inicialização e destruição de classe
-Task::Task(RobotFunctions funct){
+Task::Task(RobotFunctions::RobotFunction funct){
     // use current time as seed for random generator
     std::srand(std::time(nullptr));
     initializeParameters(funct);
@@ -20,7 +20,7 @@ Task::Task(RobotFunctions funct){
 
 Task::~Task() {}
 
-void Task::initializeParameters(RobotFunctions funct){
+void Task::initializeParameters(RobotFunctions::RobotFunction funct){
     id = ++lastId; 
     type = funct;
     robotsNo = 0;
@@ -35,7 +35,7 @@ void Task::initializeParameters(RobotFunctions funct){
 
 //Gets de cada um dos parâmetros
 
-RobotFunctions Task::getType() const{
+RobotFunctions::RobotFunction Task::getType() const{
     return type;
 }
 
@@ -53,7 +53,7 @@ int Task::getId() const {
 
 //Sets de cada um dos parâmetros
 
-void Task::setType(RobotFunctions newType){
+void Task::setType(RobotFunctions::RobotFunction newType){
     type = newType;
 }
 

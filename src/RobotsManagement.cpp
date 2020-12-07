@@ -107,14 +107,14 @@ bool RobotsManagement::destroyRobot(){
     return false;
 }
 
-void RobotsManagement::createTask(RobotFunctions funct){
+void RobotsManagement::createTask(RobotFunctions::RobotFunction funct){
     //Cria nova task com o id Incrementado
     Task newTask(funct);
     tasks->at(funct).insert({newTask.getId(),newTask});
 }
 
 bool RobotsManagement::moveRobot(Task choosenTask,int robotNo){
-    RobotFunctions funct = choosenTask.getType();
+    RobotFunctions::RobotFunction funct = choosenTask.getType();
     int id = choosenTask.getId();
     if(!robotNo) return true; //Mover 0 robos para a task não muda nada
     if(robotNo > 0 && freeRobots - robotNo <= 0) return false; // Não é possível adicionar mais robôs do que se tem livre

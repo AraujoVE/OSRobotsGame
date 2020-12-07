@@ -40,8 +40,7 @@ void WText::render() const {
 
 void WText::update() {
     SDL_QueryTexture(texture, NULL, NULL, &transform.w, &transform.h);
-    transform.x = transform.y = 0;
-    
+
     //TODO: find wich unit it is using (px?)
     const int lineHeight = 50; 
 

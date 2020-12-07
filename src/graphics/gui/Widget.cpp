@@ -2,11 +2,9 @@
 
 #include <stdio.h>
 
-Widget::Widget(SDL_Renderer *renderer): Widget(renderer, {0,0,0,0}) {}
-
 Widget::Widget(SDL_Renderer *renderer, const SDL_Rect& transform) {
-    this->clickCallback = nullptr;
     this->renderer = renderer;
+    this->eventHandler = new EventHandler();
     setTransform(transform);
 }
 
@@ -14,27 +12,51 @@ Widget::~Widget() {
     for (auto item: innerWidgets) {
         delete item;
     }
+    delete eventHandler;
 }
+
+EventHandler *Widget::getEventHandler() {
+    return eventHandler;
+}
+
+#pragma region Trasform
 
 void Widget::setTransform(const SDL_Rect& transform) {
     this->transform = transform;
 }
 
-
 SDL_Rect Widget::getTransform() const {
     return this->transform;
 }
 
-//Default implementation for virtual method
-void Widget::render() const{
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderFillRect(renderer, &transform);
-    SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
-    SDL_RenderDrawRect(renderer, &transform);
+void Widget::setPosition(const Vec2D& position) {
+    transform.x = position.x;
+    transform.y = position.y;
 }
 
-//Default implementation for virtual method: do nothing
+Vec2D Widget::getPosition() const {
+    return {transform.x, transform.y};
+}
+
+void Widget::setDimention(const Vec2D& dimension) {
+    transform.w = dimension.x;
+    transform.h = dimension.y;
+}
+
+Vec2D Widget::getDimension() const {
+    return {transform.w, transform.h};
+}
+
+#pragma endregion Transform
+
+#pragma region Virtual_Methods
 void Widget::mount() { }
+void Widget::render() const { }
+void Widget::update() { }
+
+#pragma endregion Virtual_Methods
+
+#pragma region Child_Propagation
 
 void Widget::requestMount() { 
     this->mount();
@@ -52,31 +74,14 @@ void Widget::requestRender(bool renderChildren) const {
     }
 }
 
-void Widget::update() { }
 void Widget::requestUpdate() { 
     this->update();
+
     for (auto item: innerWidgets) {
         item->requestUpdate();
     }
 }
 
-void Widget::setOnClick(OnClickCallback callback) {
-    this->clickCallback = callback;
-}
+#pragma endregion Child_Propagation
 
-void Widget::onClick(int x, int y) const{
-    if (x < transform.x || x > transform.x + transform.w ) return;
-    if (y < transform.y || y > transform.y + transform.h ) return;
 
-    printf("Widget %p received click! at (%d, %d)\n", this, x, y);
-
-    bool passToChildren = true;
-    if (clickCallback != nullptr)
-        passToChildren = clickCallback(x, y);
-
-    if (passToChildren) {
-        for (auto child: innerWidgets) {
-            child->onClick(x, y);
-        }
-    }
-}

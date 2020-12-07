@@ -1,7 +1,7 @@
 @startuml
 
 class Task{
-    RobotFunctions type
+    RobotFunctions::RobotFunctions type
     int robotsNo
     time_t initTime
     int remainingTime
@@ -39,7 +39,7 @@ class RobotsManagment{
     createRobot()
     destroyRobot()
 }
-enum RobotFunctions{
+enum RobotFunctions::RobotFunctions{
     PROTECTION
     RESOURCE_GATHERING
     HUNT

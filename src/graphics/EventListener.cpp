@@ -24,12 +24,17 @@ void *EventListener::threadLoop(void *gamePtr) {
                     std::cout << "Requisitado para sair!!" << std::endl;
                     game.requestGameStop();
                     break;
-                case SDL_MOUSEBUTTONDOWN:
+                case SDL_MOUSEBUTTONDOWN: {
                     int x, y;
                     SDL_GetMouseState(&x, &y);
                     std::cout << "Cliquei com o mouse em (" << x << ',' << y << ')' << std::endl;
-                    game.getGraphics()->getMainPanel()->onClick(x, y);
+                    game.getGraphics()->getMainPanel()->getEventHandler();
+
                     break;
+                }
+                case SDL_MOUSEMOTION: {
+                    auto a = e.motion;
+                }
                 default:
                     break;
 
