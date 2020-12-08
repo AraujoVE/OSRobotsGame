@@ -36,27 +36,19 @@
 #include <DampEngine.hpp>
 #include <DampEngine/Core/EntryPoint.hpp>
 
-#include <iostream>
 
-class MyApplication : public DampEngine::Application
-{
-public:
-    MyApplication(): DampEngine::Application("OSRobotsGame") {}
+// class MyApplication : public DampEngine::Application
+// {
+// public:
+//     MyApplication(): DampEngine::Application("OSRobotsGame") {}
 
-    ~MyApplication() override {}
+//     bool OnWindowClose(DampEngine::WindowClosedEvent &event) override { return true; }
+//     bool OnWindowResize(DampEngine::WindowResizedEvent &event) override { return true; }
 
-    void Run() override
-    {
-        std::cout << "Run method Called" << std::endl;
-        DampEngine::Logger::GetClientLogger()->info("Run method Called");
-        DE_ASSERT(0 == 1, "oloko");
-    }
-};
+//     ~MyApplication() override {}
+// };
 
-extern DampEngine::Application *CreateApplication() {
-    std::cout << "CreateApplication Called" << std::endl;
-    DampEngine::Logger::GetClientLogger()->info("CreateApplication Called");
-    return new MyApplication();
+DampEngine::Application *CreateApplication() {
+    DE_DEBUG("Creating application");
+    return new DampEngine::Application();
 }
-
-
