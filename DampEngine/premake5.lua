@@ -1,59 +1,59 @@
 project "DampEngine"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
 
-	platforms { 
-		"OpenGL"
-	}
+	-- platforms { 
+	-- 	"OpenGL"
+	-- }
 
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "depch.hpp"
 	pchsource "src/depch.cpp"
+	
+	defines {}
 
 	files {
 		"src/DampEngine/**.cpp",
-		"src/DampEngine/**.hpp"		
+		"src/DampEngine/**.hpp"
 	}
-	
-	defines {}
 
 	includedirs {
 		"src",
 		"vendor/spdlog/include",
 		"%{IncludeDir.GLFW}"
+		-- "%{IncludeDir.Glad}"
 	}
 
 	links {
 		"GLFW"
+		-- "Glad",
+		-- "opengl32.lib"
 	}
 
 	filter "system:windows"
 		systemversion "latest"
 
 		defines {
-			OS_SYSTEM_WINDOWS
+			DE_SYSTEM_WINDOWS
 		}
 
 	filter "system:linux"
 		defines {
-			OS_SYSTEM_LINUX
+			DE_SYSTEM_LINUX
 		}
 		
 		files {
 			"src/Platform/Linux/**.cpp",
-			"src/Platform/Linux/**.hpp"
+			"src/Platform/Linux/**.hpp",
 		}
 
-	filter "platforms:OpenGL"
-		
-		files {
-			"src/Platform/OpenGL/**.cpp",
-			"src/Platform/OpenGL/**.hpp"
+		links {
+			"dl",
+			"pthread"
 		}
-	
 
 	filter "configurations:Debug"
 		defines "DE_ENGINE_BUILD_DEBUG"

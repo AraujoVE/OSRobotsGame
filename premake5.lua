@@ -5,7 +5,7 @@ workspace "OSRobotGame"
     configurations { 
         "Debug", 
         "Release", 
-        "Dist" 
+        "Dist",
     }
 
     flags {
@@ -14,6 +14,7 @@ workspace "OSRobotGame"
 
 	IncludeDir = {}
 	IncludeDir["GLFW"] = "%{wks.location}/DampEngine/vendor/GLFW/include"
+	IncludeDir["Glad"] = "%{wks.location}/DampEngine/vendor/Glad/include"
 
     -- This defines ... in
     --./bin/ ... /{projectName}
@@ -23,7 +24,9 @@ workspace "OSRobotGame"
     group "Dependencies"
     	-- include "vendor/premake" CUSTOMIZATIONS (currently none)
     	include "DampEngine/vendor/GLFW"
+    	-- include "DampEngine/vendor/Glad"
     group ""    
 
     include "DampEngine"
     include "Application"
+    

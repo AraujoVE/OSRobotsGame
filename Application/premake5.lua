@@ -18,13 +18,25 @@ project "Application"
 		"%{wks.location}/DampEngine/vendor/spdlog/include"
 	}
 
-	libdirs {
-		"%{wks.location}/bin/" .. outputdir .. "/DampEngine"
-	}
+	-- libdirs {
+	-- 	"%{wks.location}/bin/" .. outputdir .. "/DampEngine"
+	-- }
 
 	links {
-		"DampEngine"
+		"DampEngine",
+		"GLFW"
 	}
+
+	filter "system:linux"
+		defines {
+			DE_SYSTEM_LINUX
+		}
+		
+		links {
+			"dl",
+			"pthread"
+		}
+
 
 	filter "system:windows"
 		systemversion "latest"
