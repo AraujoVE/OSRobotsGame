@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Events/Event.hpp"
+#include <DampEngine/Events/Event.hpp>
 
 #include <string>
 #include <functional>
 
 namespace DampEngine
 {
-
     struct WindowProps
     {
         std::string Title;
@@ -23,7 +22,9 @@ namespace DampEngine
     public:
         using EventCallbackFn = std::function<void(Event &)>;
 
-        virtual ~Window();
+        virtual ~Window() {}
+
+        virtual void OnUpdate() = 0;
 
         virtual unsigned GetWidth() = 0;
         virtual unsigned GetHeight() = 0;
@@ -37,6 +38,7 @@ namespace DampEngine
 
         // virtual void *GetNativeWindow() = 0;
 
+        //To be defined by Platform
         static Window *Create(const WindowProps &starting_props);
     };
 
