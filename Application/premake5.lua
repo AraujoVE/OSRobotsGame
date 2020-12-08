@@ -18,13 +18,10 @@ project "Application"
 		"%{wks.location}/DampEngine/vendor/spdlog/include"
 	}
 
-	-- libdirs {
-	-- 	"%{wks.location}/bin/" .. outputdir .. "/DampEngine"
-	-- }
-
 	links {
 		"DampEngine",
-		"GLFW"
+		"GLFW",
+		"Glad"
 	}
 
 	filter "system:linux"

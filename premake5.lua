@@ -24,7 +24,7 @@ workspace "OSRobotGame"
     group "Dependencies"
     	-- include "vendor/premake" CUSTOMIZATIONS (currently none)
     	include "DampEngine/vendor/GLFW"
-    	-- include "DampEngine/vendor/Glad"
+    	include "DampEngine/vendor/Glad"
     group ""    
 
     include "DampEngine"

@@ -5,22 +5,30 @@
 #include "DampEngine/Events/Event.hpp"
 #include "DampEngine/Events/KeyEvent.hpp"
 #include "DampEngine/Events/MouseMovedEvent.hpp"
+#include "DampEngine/Events/WindowEvent.hpp"
 
 #include "LinuxGLFWWindow.hpp"
 
-// #define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_NONE
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-// #include <glad/glad.h>
 
 #include <depch.hpp>
 namespace DampEngine
 {
-
     //Defines at "DampEngine/Core/Window.h" the Create method as being a LinuxGLFWWindow factory
     Window *Window::Create(const WindowProps &starting_props)
     {   
         DE_ENGINE_INFO("Linux System detected, creating LinuxGLFWWindow");
         return new LinuxGLFWWindow(starting_props);
+    }
+
+
+    void LinuxGLFWWindow::OnUpdate() {
+        glad_glClear(GL_COLOR_BUFFER_BIT);
+        glad_glClearColor(255, 0,0, 255);
+        glfwSwapBuffers(m_GLFWWindow);
+        glfwPollEvents();
     }
 
     //Number of windows created since the engine started,
@@ -43,109 +51,110 @@ namespace DampEngine
         // //Only initialize GFLW the fi    rst time
         if (s_GLFWWindowCount == 0)
         { 
-            DE_ENGINE_TRACE("calling glfwInit()");
             int success = glfwInit();
-            
-            DE_ASSERT((1 == 0), "sei la")
-            DE_ENGINE_TRACE("calling glfwInit()");
-
-            // DE_ASSERT(success, "Could not initialize GLFW");
+            DE_ASSERT(success, "Could not initialize GLFW");
         }
 
-        // m_GLFWWindow = glfwCreateWindow(m_Data.Props.Width, m_Data.Props.Height, m_Data.Props.Title.c_str(), nullptr, nullptr);
-        // DE_ASSERT(m_GLFWWindow != nullptr, "Could not create a GLFW window");
+        m_GLFWWindow = glfwCreateWindow(m_Data.Props.Width, m_Data.Props.Height, m_Data.Props.Title.c_str(), nullptr, nullptr);
+        DE_ASSERT(m_GLFWWindow != nullptr, "Could not create a GLFW window");
 
-        // s_GLFWWindowCount++;
+        glfwMakeContextCurrent(m_GLFWWindow);
+        gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+        glfwSetWindowUserPointer(m_GLFWWindow, &m_Data);
 
-        // glfwSetKeyCallback(m_GLFWWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
-        //     switch (action)
-        //     {
-        //         //GLFW_PRESS`, `GLFW_RELEASE` or `GLFW_REPEAT`
-        //         case GLFW_PRESS:
-        //             SendEventToWindow(window, KeyPressedEvent(key, 1));
-        //         break;
+        s_GLFWWindowCount++;
+
+        DE_ENGINE_TRACE("Setting GLFW event callbacks");
+
+        glfwSetKeyCallback(m_GLFWWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+            switch (action)
+            {
+                //GLFW_PRESS`, `GLFW_RELEASE` or `GLFW_REPEAT`
+                case GLFW_PRESS:
+                    SendEventToWindow(window, KeyPressedEvent(key, 1));
+                break;
             
-        //     default:
-        //         break;
-        //     }
-        //     // SendEventToWindow(window, )
-        // });
+            default:
+                break;
+            }
+            // SendEventToWindow(window, )
+        });
 
-        // glfwSetCharCallback(m_GLFWWindow, [](GLFWwindow *window, unsigned int codepoint) {
+        glfwSetCharCallback(m_GLFWWindow, [](GLFWwindow *window, unsigned int codepoint) {
 
-        // });
+        });
 
-        // // glfwSetCharModsCallback(m_GLFWWindow, [](GLFWwindow *window, unsigned int codepoint, int mods) {
-
-        // // });
-
-        // glfwSetCursorEnterCallback(m_GLFWWindow, [](GLFWwindow *window, int entered_or_left) {
+        // glfwSetCharModsCallback(m_GLFWWindow, [](GLFWwindow *window, unsigned int codepoint, int mods) {
 
         // });
 
-        // glfwSetCursorPosCallback(m_GLFWWindow, [](GLFWwindow *window, double xpos, double ypos) {
+        glfwSetCursorEnterCallback(m_GLFWWindow, [](GLFWwindow *window, int entered_or_left) {
+
+        });
+
+        glfwSetCursorPosCallback(m_GLFWWindow, [](GLFWwindow *window, double xpos, double ypos) {
+
+        });
+
+        // glfwSetDropCallback(m_GLFWWindow, [](GLFWwindow *window, double xpos, double ypos) {
 
         // });
 
-        // // glfwSetDropCallback(m_GLFWWindow, [](GLFWwindow *window, double xpos, double ypos) {
-
-        // // });
-
-        // // glfwSetJoystickCallback([](int joystick_id, int event) {
-
-        // // });
-
-        // // glfwSetJoystickUserPointer(m_GLFWWindow, [](GLFWwindow *window, int joystick_id, int event) {
-
-        // // });
-
-        // // glfwSetMonitorCallback(m_GLFWWindow, [](GLFWwindow *window, int joystick_id, int event) {
-
-        // // });
-
-        // // glfwSetMonitorUserPointer(m_GLFWWindow, [](GLFWwindow *window, int joystick_id, int event) {
-
-        // // });
-
-        // glfwSetMouseButtonCallback(m_GLFWWindow, [](GLFWwindow *window, int button, int action, int mods) {
+        // glfwSetJoystickCallback([](int joystick_id, int event) {
 
         // });
 
-        // glfwSetScrollCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
+        // glfwSetJoystickUserPointer(m_GLFWWindow, [](GLFWwindow *window, int joystick_id, int event) {
 
         // });
 
-        // glfwSetWindowCloseCallback(m_GLFWWindow, [](GLFWwindow *window) {
+        // glfwSetMonitorCallback(m_GLFWWindow, [](GLFWwindow *window, int joystick_id, int event) {
 
         // });
 
-        // // glfwSetWindowContentScaleCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
-
-        // // });
-
-        // glfwSetWindowFocusCallback(m_GLFWWindow, [](GLFWwindow *window, int focus) {
-        //     // 1 focused, 0 lost focus
-        // });
-
-        // glfwSetWindowIconifyCallback(m_GLFWWindow, [](GLFWwindow *window, int iconified) {
-        //     // 1 iconified, 0 restored
-        // });
-
-        // glfwSetWindowMaximizeCallback(m_GLFWWindow, [](GLFWwindow *window, int maximize) {
-        //     // 1 maximized, 0 restored
-        // });
-
-        // glfwSetWindowPosCallback(m_GLFWWindow, [](GLFWwindow *window, int xpos, int ypos) {
+        // glfwSetMonitorUserPointer(m_GLFWWindow, [](GLFWwindow *window, int joystick_id, int event) {
 
         // });
 
-        // // glfwSetWindowRefreshCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
+        glfwSetMouseButtonCallback(m_GLFWWindow, [](GLFWwindow *window, int button, int action, int mods) {
 
-        // // });
+        });
 
-        // glfwSetWindowSizeCallback(m_GLFWWindow, [](GLFWwindow *window, int width, int height) {
+        glfwSetScrollCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
+
+        });
+
+        glfwSetWindowCloseCallback(m_GLFWWindow, [](GLFWwindow *window) {
+            SendEventToWindow(window, WindowClosedEvent());
+        });
+
+        // glfwSetWindowContentScaleCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
 
         // });
+
+        glfwSetWindowFocusCallback(m_GLFWWindow, [](GLFWwindow *window, int focus) {
+            // 1 focused, 0 lost focus
+        });
+
+        glfwSetWindowIconifyCallback(m_GLFWWindow, [](GLFWwindow *window, int iconified) {
+            // 1 iconified, 0 restored
+        });
+
+        glfwSetWindowMaximizeCallback(m_GLFWWindow, [](GLFWwindow *window, int maximize) {
+            // 1 maximized, 0 restored
+        });
+
+        glfwSetWindowPosCallback(m_GLFWWindow, [](GLFWwindow *window, int xpos, int ypos) {
+
+        });
+
+        // glfwSetWindowRefreshCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
+
+        // });
+
+        glfwSetWindowSizeCallback(m_GLFWWindow, [](GLFWwindow *window, int width, int height) {
+
+        });
     } // LinuxGLFWWindow::InitWindowInGLFW()
 
 } // namespace DampEngine

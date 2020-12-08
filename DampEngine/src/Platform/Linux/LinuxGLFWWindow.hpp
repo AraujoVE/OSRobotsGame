@@ -13,16 +13,16 @@ namespace DampEngine
         {
             DE_ENGINE_DEBUG("LinuxGLFWWindow constructor called");
             m_Data.Props = starting_props;
+            m_Data.EventCallback = [](Event& e) {
+                DE_WARN("Event callback undefined, ignoring event: {0}", e);
+            };
 
             InitWindowInGLFW();
         }
 
         ~LinuxGLFWWindow() { }
 
-        void OnUpdate() override
-        {
-            DE_TRACE("Linux: OnUpdate() called");
-        }
+        void OnUpdate() override;
 
         inline unsigned GetHeight() override { return m_Data.Props.Height; }
         inline unsigned GetWidth() override { return m_Data.Props.Width; }

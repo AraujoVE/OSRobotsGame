@@ -23,13 +23,13 @@ project "DampEngine"
 	includedirs {
 		"src",
 		"vendor/spdlog/include",
-		"%{IncludeDir.GLFW}"
-		-- "%{IncludeDir.Glad}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 	}
 
 	links {
-		"GLFW"
-		-- "Glad",
+		"GLFW",
+		"Glad",
 		-- "opengl32.lib"
 	}
 
