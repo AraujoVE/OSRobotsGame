@@ -1,8 +1,5 @@
 #include "Event.hpp"
 
-#define DE_EVENT_SET_TYPE(EVTYPE) \
-    inline static DampEngine::EventType GetStaticEventType() { return DampEngine::EventType::EVTYPE; }
-
 namespace DampEngine
 {
 
@@ -11,7 +8,6 @@ namespace DampEngine
     protected:
         KeyEvent(int keyCode) : m_KeyCode(keyCode) {}
         //GetCategory => Input, KeyEvent
-        inline static EventType GetStaticEventType() = delete;
 
     protected:
         int m_KeyCode;
@@ -27,8 +23,10 @@ namespace DampEngine
 
         DE_EVENT_SET_TYPE(KeyPressed)
 
+        inline unsigned GetRepetitions() const { return m_Repetitions; }
+
     private:
-        unsigned int m_Repetitions;
+        const unsigned int m_Repetitions;
     };
 
     class KeyReleasedEvent : public KeyEvent

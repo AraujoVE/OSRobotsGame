@@ -2,23 +2,21 @@
 
 #include "DampEngine/Core/Base.hpp"
 
-#include <functional>
-
 namespace DampEngine
 {
-
     enum class EventType {
+        Invalid,
         //Key related
         KeyPressed, KeyReleased, KeyTyped, 
 
         //Mouse related
-        MouseEnterWindow, MouseLeaveWindow, MouseMoved,
+        MouseEnteredWindow, MouseLeftWindow, MouseMoved,
         MouseButtonPressed, MouseButtonReleased,
         MouseScrolled,
 
         //WindowRelated
-        WindowClose, WindowFocus, WindowBlur, 
-        WindowMinimize, WindowMaximize, WindowRestore,
+        WindowClosed, WindowFocused, WindowBlurred, 
+        WindowMinimized, WindowMaximized, WindowRestored,
         WindowMoved, WindowRefreshed, WindowResized, WindowContentScaled,
         
         //Fullscreen
@@ -47,19 +45,22 @@ namespace DampEngine
     class Event
     {
     protected:
-        explicit Event()
-        {
-            m_Handled = false;
-        }
+        explicit Event() {}
 
     public:
-        virtual ~Event() {}
         friend class EventDispatcher;
+        
+        virtual ~Event() {};
 
-        static EventType GetStaticEventType();
-        inline EventType GetEventType() const { return GetStaticEventType(); }
+        inline static EventType GetStaticEventType() { return EventType::Invalid; }
+        inline static const std::string GetStaticEventName() { return "Invalid"; }
+
+        virtual inline EventType GetEventType() const { return GetStaticEventType(); }
+        virtual inline std::string GetEventName() const { return GetStaticEventName(); } 
+        
         inline bool IsHandled() const { return m_Handled; }
 
+        virtual std::string ToString() const;
         // virtual EventCategory getEventCategory() = 0;
     private:
         bool m_Handled = false;
@@ -73,14 +74,18 @@ namespace DampEngine
         using EventCallbackFn = std::function<bool(E &)>;
 
         template<class E>
-        static void Dispatch(const Event& event, EventCallbackFn<E> onevent_fn) {
+        static void Dispatch(Event& event, EventCallbackFn<E> onevent_fn) {
             if (event.m_Handled) return;
 
-            if (event.GetEventType() == E::GetEventType()) {
-                bool handled = onevent_fn(event);
+            if (event.GetEventType() == E::GetStaticEventType()) {
+                bool handled = onevent_fn(*(E*)&event);
                 if (handled) event.m_Handled = true; 
             }
         }
     };
 
-} // namespace DampEngine
+} //namespace DampEngine
+
+std::ostream &operator<<(std::ostream &os, const DampEngine::Event &event);
+std::ostream &operator<<(std::ostream &os, const DampEngine::EventType &event_type);
+
