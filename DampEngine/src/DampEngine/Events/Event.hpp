@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Core/Base.hpp"
+#include "DampEngine/Core/Base.hpp"
+
+#include <functional>
 
 namespace DampEngine
 {
@@ -10,8 +12,8 @@ namespace DampEngine
         KeyPressed, KeyReleased, KeyTyped, 
 
         //Mouse related
-        MouseEnterWindow, MouseLeaveWindow,
-        MouseMoved, MouseButtonPressed, MouseButtonReleased,
+        MouseEnterWindow, MouseLeaveWindow, MouseMoved,
+        MouseButtonPressed, MouseButtonReleased,
         MouseScrolled,
 
         //WindowRelated
@@ -44,25 +46,39 @@ namespace DampEngine
 
     class Event
     {
+    protected:
+        explicit Event()
+        {
+            m_Handled = false;
+        }
+
     public:
+        virtual ~Event() {}
         friend class EventDispatcher;
-     
-        virtual EventType getEventType() const = 0;
+
+        static EventType GetStaticEventType();
+        inline EventType GetEventType() const { return GetStaticEventType(); }
+        inline bool IsHandled() const { return m_Handled; }
+
         // virtual EventCategory getEventCategory() = 0;
     private:
         bool m_Handled = false;
     };
 
-    template<class E>
     class EventDispatcher
     {
     public:
 
-        using EventCallbackFn = std::function<void(E &)>;
+        template<class E>
+        using EventCallbackFn = std::function<bool(E &)>;
 
-        static void Dispatch(const E& e, EventCallbackFn callback) {
-            if (e.getEventType() == E.getEventType()) {
-                callback(e);
+        template<class E>
+        static void Dispatch(const Event& event, EventCallbackFn<E> onevent_fn) {
+            if (event.m_Handled) return;
+
+            if (event.GetEventType() == E::GetEventType()) {
+                bool handled = onevent_fn(event);
+                if (handled) event.m_Handled = true; 
             }
         }
     };
