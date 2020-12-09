@@ -43,6 +43,11 @@ public:
     MyApplication(): DampEngine::Application({"OSRobotGame"}) {
         using namespace DampEngine;
     }
+    
+    void InitLayers() override {
+        m_LayerStack.PushOverlay(new DampEngine::ImGuiLayer());
+    }
+
 };
 
 DampEngine::Application *CreateApplication() {

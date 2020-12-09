@@ -3,9 +3,7 @@ project "DampEngine"
 	language "C++"
 	cppdialect "C++17"
 
-	-- platforms { 
-	-- 	"OpenGL"
-	-- }
+	
 
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
@@ -19,7 +17,13 @@ project "DampEngine"
 
 	files {
 		"src/DampEngine/**.cpp",
-		"src/DampEngine/**.hpp"
+		"src/DampEngine/**.hpp",
+		"src/ImGui/**.cpp",
+		"src/ImGui/**.hpp",
+
+		--TODO: separated section for OpenGL
+		"src/Platform/OpenGL/**.hpp",
+		"src/Platform/OpenGL/**.cpp",
 	}
 
 	includedirs {

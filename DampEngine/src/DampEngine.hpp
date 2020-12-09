@@ -25,6 +25,8 @@
 #include "DampEngine/Core/Log.hpp"
 #include "DampEngine/Events.hpp"
 
+#include "DampEngine/ImGui/ImGuiLayer.hpp"
+
 //----- ENTRY POINT -----//
 #include "DampEngine/Core/EntryPoint.hpp"
 

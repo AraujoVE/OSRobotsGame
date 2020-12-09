@@ -26,8 +26,8 @@ namespace DampEngine
 
         virtual void OnUpdate() = 0;
 
-        virtual unsigned GetWidth() = 0;
-        virtual unsigned GetHeight() = 0;
+        virtual unsigned GetWidth() const = 0;
+        virtual unsigned GetHeight() const = 0;
 
         virtual void SetEventCallback(const EventCallbackFn &callback) = 0;
 

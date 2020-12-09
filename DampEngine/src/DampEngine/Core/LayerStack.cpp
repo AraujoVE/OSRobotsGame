@@ -26,6 +26,7 @@ namespace DampEngine
 
     LayerStack::~LayerStack() {
         for (auto layer: m_LayerStack) {
+            layer->OnDetach();
             delete layer;
         }       
     }
@@ -37,7 +38,7 @@ namespace DampEngine
     }
 
     void LayerStack::OnEvent(Event &event) const {
-        DE_ENGINE_INFO("LayerStack received event {0}", event);
+        // DE_ENGINE_INFO("LayerStack received event {0}", event);
         for (auto layer: Util::reverse<std::vector<Layer*>>(m_LayerStack)) {
             if (event.IsHandled()) break;
             layer->OnEvent(event);
@@ -46,6 +47,7 @@ namespace DampEngine
 
     void LayerStack::PushOverlay(Layer *overlay) {
         m_LayerStack.emplace_back(overlay);
+        overlay->OnAttach();
     }
 
     void LayerStack::PopOverlay(Layer *overlay) {
@@ -54,6 +56,7 @@ namespace DampEngine
 
     void LayerStack::PushLayer(Layer *layer) {
         m_OverlayStartIt = m_LayerStack.emplace(m_OverlayStartIt, layer);
+        layer->OnAttach();
     }
 
     void LayerStack::PopLayer(Layer *layer) {

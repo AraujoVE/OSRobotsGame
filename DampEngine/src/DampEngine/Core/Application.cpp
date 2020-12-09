@@ -14,7 +14,7 @@ namespace DampEngine
 
     void Application::CreateWindow() {
         DE_TRACE("Issuing window creation (platform-dependent)");
-        m_Window = Window::Create(WindowProps());
+        m_Window = Window::Create(m_WindowStartingProps);
         DE_ASSERT(m_Window != nullptr, "Failed to create window");
 
         m_Window->SetEventCallback(DE_BIND_FN(Application::OnEvent));
@@ -22,11 +22,18 @@ namespace DampEngine
 
     void Application::Run()
     {
+        OnStart();
+
         CreateWindow();
+        InitLayers();
 
         while (m_Running) {
+            this->OnUpdate();
             m_Window->OnUpdate();
+            m_LayerStack.OnUpdate();
         }
+
+        OnStop();
     };
 
     void Application::Close()
@@ -36,7 +43,7 @@ namespace DampEngine
 
     void Application::OnEvent(Event &event)
     {
-        DE_ENGINE_TRACE("Application received event: {0}", event);
+        // DE_ENGINE_TRACE("Application received event: {0}", event);
         DE_DISPATCH_EVENT_BIND(Application, event, WindowClosed);
         DE_DISPATCH_EVENT_BIND(Application, event, WindowResized);
 
@@ -53,9 +60,9 @@ namespace DampEngine
         return true;
     }
     
-    inline Application& Application::Get() {
-        DE_ASSERT(s_Instance != nullptr, "Getting non-initialized window");
-        return *s_Instance;
+    inline Window& Application::GetWindow() const { 
+        DE_ASSERT(m_Window != nullptr, "There is no Window running :(");
+        return *m_Window; 
     }
 
     Application *Application::s_Instance = nullptr;

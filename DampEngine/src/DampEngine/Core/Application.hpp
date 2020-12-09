@@ -9,7 +9,7 @@
 
 namespace DampEngine
 {
-    class Application : IEventHandler
+    class Application : public IEventHandler
     {
     protected:
         explicit Application(const WindowProps& props = WindowProps("DampApplication"));
@@ -19,11 +19,12 @@ namespace DampEngine
         virtual void OnUpdate() {}
         virtual void OnStop() {}
 
-    public:
-        virtual ~Application() {}
-
         //Currently, the application is limited to only one window
         virtual void CreateWindow();
+        virtual void InitLayers() = 0;
+
+    public:
+        virtual ~Application() {}
 
         //Issue the application to setup everything and start gameloop
         void Run();
@@ -35,14 +36,17 @@ namespace DampEngine
         bool OnWindowClosed(WindowClosedEvent &event) override;
         bool OnWindowResized(WindowResizedEvent &event) override;
 
+        virtual Window& GetWindow() const;
+
         //Application Singleton
-        inline static Application& Get(); 
+        inline static Application &GetCurrent() { return *s_Instance; }
+
     protected:
         WindowProps m_WindowStartingProps;
         Window *m_Window;
         LayerStack m_LayerStack;
     private:
-        static Application *s_Instance; 
+        static Application *s_Instance;
         bool m_Running;
     };
 } // namespace DampEngine

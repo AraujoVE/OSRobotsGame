@@ -21,7 +21,8 @@ project "Application"
 	links {
 		"DampEngine",
 		"GLFW",
-		"Glad"
+		"Glad",
+		"ImGui"
 	}
 
 	filter "system:linux"

@@ -22,10 +22,11 @@ namespace DampEngine
 
 
     void LinuxGLFWWindow::OnUpdate() {
-        glad_glClear(GL_COLOR_BUFFER_BIT);
-        glad_glClearColor(255, 0,0, 255);
-        glfwSwapBuffers(m_GLFWWindow);
+        // glad_glClear(GL_COLOR_BUFFER_BIT);
+        // glad_glClearColor(255, 0,0, 255);
+
         glfwPollEvents();
+        glfwSwapBuffers(m_GLFWWindow);
     }
 
     //Number of windows created since the engine started,

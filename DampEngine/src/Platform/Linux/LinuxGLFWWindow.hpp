@@ -24,8 +24,8 @@ namespace DampEngine
 
         void OnUpdate() override;
 
-        inline unsigned GetHeight() override { return m_Data.Props.Height; }
-        inline unsigned GetWidth() override { return m_Data.Props.Width; }
+        inline unsigned GetHeight() const override { return m_Data.Props.Height; }
+        inline unsigned GetWidth() const override { return m_Data.Props.Width; }
 
         void SetEventCallback(const EventCallbackFn &callback) override
         {
