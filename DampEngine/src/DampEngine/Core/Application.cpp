@@ -11,7 +11,7 @@ namespace DampEngine
 
         DE_ENGINE_TRACE("Initializing application according to platform");
         InitPlatformSpecific();
-        m_Window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+        m_Window->SetEventCallback(DE_BIND_FN(Application::OnEvent));
     };
 
     void Application::Run()
@@ -28,18 +28,19 @@ namespace DampEngine
 
     void Application::OnEvent(Event &event)
     {
-        DE_ENGINE_TRACE("Received event: {0}", event);
-        EventDispatcher::Dispatch<WindowClosedEvent>(event, std::bind(&Application::OnWindowClose, this, std::placeholders::_1));
-        //FIXME: AAAAAA
-        // EventDispatcher::Dispatch<WindowClosedEvent>(event, [this](auto&&... args) -> decltype(auto) { return this->OnWindowClose(std::forward<decltype(args)>(args)...););
-    }
+        DE_ENGINE_TRACE("Application received event: {0}", event);
+        DE_DISPATCH_EVENT_BIND(Application, event, WindowClosed);
+        DE_DISPATCH_EVENT_BIND(Application, event, WindowResized);
 
-    bool Application::OnWindowClose(WindowClosedEvent &event)
+        m_LayerStack.OnEvent(event);
+    }   
+
+    bool Application::OnWindowClosed(WindowClosedEvent &event)
     {
         Close();
         return true;
     }
-    bool Application::OnWindowResize(WindowResizedEvent &event)
+    bool Application::OnWindowResized(WindowResizedEvent &event)
     {
         return true;
     }
