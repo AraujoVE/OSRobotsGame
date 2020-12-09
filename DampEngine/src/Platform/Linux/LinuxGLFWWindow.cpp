@@ -10,10 +10,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <depch.hpp>
+#include "depch.hpp"
 namespace DampEngine
 {
-    //Defines at "DampEngine/Core/Window.h" the Create method as being a LinuxGLFWWindow factory
+    //!IMPORTANT: Defines which class should be used for Window abstract class' static method Window::Create(...)
     Window *Window::Create(const WindowProps &starting_props)
     {   
         DE_ENGINE_INFO("Linux System detected, creating LinuxGLFWWindow");

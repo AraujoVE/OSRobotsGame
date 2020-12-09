@@ -1,7 +1,5 @@
 #pragma once
 
-#include "DampEngine/Core/Log.hpp"
-
 #define DE_ENGINE_DEBUG(...) DampEngine::Logger::GetEngineLogger()->debug(__VA_ARGS__) 
 #define DE_ENGINE_TRACE(...) DampEngine::Logger::GetEngineLogger()->trace(__VA_ARGS__) 
 #define DE_ENGINE_INFO(...) DampEngine::Logger::GetEngineLogger()->info(__VA_ARGS__) 

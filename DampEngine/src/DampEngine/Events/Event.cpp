@@ -1,3 +1,4 @@
+#include "DampEngine/Core/Base.hpp"
 #include "Event.hpp"
 
 #include "depch.hpp"

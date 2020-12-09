@@ -1,5 +1,4 @@
 #pragma once
-#include "DampEngine/Core/Macros.hpp"
 
 #include "DampEngine/Events/Event.hpp"
 

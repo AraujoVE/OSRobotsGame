@@ -1,4 +1,6 @@
-#include "Application.hpp"
+#include "DampEngine/Core/Base.hpp"
+
+#include "DampEngine/Core/Application.hpp"
 
 #include "depch.hpp"
 namespace DampEngine
@@ -8,14 +10,20 @@ namespace DampEngine
         DE_ENGINE_DEBUG("Application constructor called");
         DE_ASSERT((s_Instance == nullptr), "Application already instanced");
         Application::s_Instance = this;
-
-        DE_ENGINE_TRACE("Initializing application according to platform");
-        InitPlatformSpecific();
-        m_Window->SetEventCallback(DE_BIND_FN(Application::OnEvent));
     };
+
+    void Application::CreateWindow() {
+        DE_TRACE("Issuing window creation (platform-dependent)");
+        m_Window = Window::Create(WindowProps());
+        DE_ASSERT(m_Window != nullptr, "Failed to create window");
+
+        m_Window->SetEventCallback(DE_BIND_FN(Application::OnEvent));
+    }
 
     void Application::Run()
     {
+        CreateWindow();
+
         while (m_Running) {
             m_Window->OnUpdate();
         }
@@ -44,13 +52,12 @@ namespace DampEngine
     {
         return true;
     }
-
-    void Application::InitPlatformSpecific()
-    {
-        DE_ENGINE_DEBUG("Inside InitPlatformSpecific");
-        m_Window = Window::Create(WindowProps());
-    }
     
+    inline Application& Application::Get() {
+        DE_ASSERT(s_Instance != nullptr, "Getting non-initialized window");
+        return *s_Instance;
+    }
+
     Application *Application::s_Instance = nullptr;
     
 } // namespace DampEngine

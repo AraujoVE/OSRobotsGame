@@ -1,9 +1,9 @@
 #pragma once
 
-#include <DampEngine/Core/Base.hpp>
-#include <DampEngine/Core/Application.hpp>
+//This file is formatted as if it was an outsider (it really is to some extent though)
 
-#include "depch.hpp"
+#include <DampEngine.hpp>
+#include <DampEngine/Core/Macros/Log.hpp>
 
 //To be defined by client program
 extern DampEngine::Application *CreateApplication();

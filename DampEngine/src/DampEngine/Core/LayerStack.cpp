@@ -1,4 +1,4 @@
-
+#include "DampEngine/Core/Base.hpp"
 
 #include "LayerStack.hpp"
 #include "DampEngine/Events.hpp"

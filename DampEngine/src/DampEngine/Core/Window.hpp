@@ -1,6 +1,6 @@
 #pragma once
 
-#include <DampEngine/Events/Event.hpp>
+#include "DampEngine/Events/Event.hpp"
 
 #include <string>
 #include <functional>

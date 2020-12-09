@@ -1,6 +1,9 @@
 #pragma once
 
-#include "DampEngine/Core/Base.hpp"
+#include "DampEngine/Core/Macros/Events.hpp"
+
+#include <string>
+#include <functional>
 
 namespace DampEngine
 {
@@ -26,16 +29,16 @@ namespace DampEngine
         JoystickConnected, JoystickDisconnected
     };
 
-    enum class EventCategory {
-        Mouse           = BIT(1),
-        Keyboard        = BIT(2),
-        Joystick        = BIT(3),
+    // enum class EventCategory {
+    //     Mouse           = BIT(1),
+    //     Keyboard        = BIT(2),
+    //     Joystick        = BIT(3),
 
-        WindowTransform = BIT(4),
-        WindowInput     = BIT(5),
+    //     WindowTransform = BIT(4),
+    //     WindowInput     = BIT(5),
 
-        Monitor         = BIT(6)
-    };
+    //     Monitor         = BIT(6)
+    // };
 
     // enum class EventCategoryFilter {
     //     Input           = EventCategory::Mouse | EventCategory::Keyboard | EventCategory::Joystick,

@@ -33,23 +33,23 @@
 //     return 0;
 // }
 
-// #define __DE_NO_MACROS__
+#define DE_DEVELOP
 #include <DampEngine.hpp>
-#include <DampEngine/Core/EntryPoint.hpp>
 
 
-// class MyApplication : public DampEngine::Application
-// {
-// public:
-//     MyApplication(): DampEngine::Application("OSRobotsGame") {}
+class MyApplication : public DampEngine::Application
+{
+public:
+    MyApplication(): DampEngine::Application("OSRobotsGame") {}
 
-//     bool OnWindowClosed(DampEngine::WindowClosedEvent &event) override { return true; }
-//     bool OnWindowResized(DampEngine::WindowResizedEvent &event) override { return true; }
+    bool OnWindowClosed(DampEngine::WindowClosedEvent &event) override { return true; }
+    bool OnWindowResized(DampEngine::WindowResizedEvent &event) override { return true; }
 
-//     ~MyApplication() override {}
-// };
+    ~MyApplication() override {}
+};
 
 DampEngine::Application *CreateApplication() {
     DE_DEBUG("Creating application");
-    return new DampEngine::Application();
+
+    return new MyApplication();
 }
