@@ -5,7 +5,6 @@
 #include "DampEngine/Events/WindowEvents.hpp"
 #include "DampEngine/Core/LayerStack.hpp"
 
-#include <string>
 #include <functional>
 
 namespace DampEngine
@@ -13,7 +12,7 @@ namespace DampEngine
     class Application : IEventHandler
     {
     protected:
-        explicit Application(const std::string &name = "DampApplication");
+        explicit Application(const WindowProps& props = WindowProps("DampApplication"));
 
         //--- Client defined Hooks ---
         virtual void OnStart() {}
@@ -38,13 +37,12 @@ namespace DampEngine
 
         //Application Singleton
         inline static Application& Get(); 
-    private:
-        static Application *s_Instance; 
-        std::string m_Name;
-
-        bool m_Running;
-
+    protected:
+        WindowProps m_WindowStartingProps;
         Window *m_Window;
         LayerStack m_LayerStack;
+    private:
+        static Application *s_Instance; 
+        bool m_Running;
     };
 } // namespace DampEngine

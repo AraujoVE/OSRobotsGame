@@ -40,12 +40,9 @@
 class MyApplication : public DampEngine::Application
 {
 public:
-    MyApplication(): DampEngine::Application("OSRobotsGame") {}
-
-    bool OnWindowClosed(DampEngine::WindowClosedEvent &event) override { return true; }
-    bool OnWindowResized(DampEngine::WindowResizedEvent &event) override { return true; }
-
-    ~MyApplication() override {}
+    MyApplication(): DampEngine::Application({"OSRobotGame"}) {
+        using namespace DampEngine;
+    }
 };
 
 DampEngine::Application *CreateApplication() {

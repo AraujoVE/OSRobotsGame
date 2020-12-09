@@ -5,7 +5,7 @@
 #include "depch.hpp"
 namespace DampEngine
 {
-    Application::Application(const std::string &name) : m_Name(name)
+    Application::Application(const WindowProps& startingProps) : m_WindowStartingProps(startingProps)
     {
         DE_ENGINE_DEBUG("Application constructor called");
         DE_ASSERT((s_Instance == nullptr), "Application already instanced");
