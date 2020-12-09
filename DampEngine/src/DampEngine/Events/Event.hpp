@@ -66,6 +66,12 @@ namespace DampEngine
         bool m_Handled = false;
     };
 
+    class VBlankEvent : public Event {
+    public:
+        VBlankEvent(): Event() {}
+        std::string ToString() const override { return GetEventName(); };
+    };
+
     class EventDispatcher
     {
     public:
@@ -84,7 +90,7 @@ namespace DampEngine
         }
     };
 
-} //namespace DampEngine
+} //namespace DampEngine 
 
 std::ostream &operator<<(std::ostream &os, const DampEngine::Event &event);
 std::ostream &operator<<(std::ostream &os, const DampEngine::EventType &event_type);

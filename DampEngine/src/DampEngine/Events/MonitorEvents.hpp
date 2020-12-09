@@ -4,14 +4,14 @@
 
 namespace DampEngine
 {
-    class MonitorConnectedEvent : Event
+    class MonitorConnectedEvent : public Event
     {
     public:
         using Event::Event;
         DE_EVENT_SET_TYPE(MonitorConnected);
     };
 
-    class MonitorDisconnectedEvent : Event
+    class MonitorDisconnectedEvent : public Event
     {
     public:
         using Event::Event;

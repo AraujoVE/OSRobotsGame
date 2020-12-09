@@ -9,7 +9,8 @@ namespace DampEngine
     {
     protected:
         KeyEvent(int keyCode) : m_KeyCode(keyCode) {}
-        //GetCategory => Input, KeyEvent
+        
+        std::string ToString() const override { return GetEventName() + " Key: " + std::to_string(m_KeyCode); };
 
     protected:
         int m_KeyCode;
@@ -34,7 +35,7 @@ namespace DampEngine
     class KeyReleasedEvent : public KeyEvent
     {
     public:
-        using KeyEvent::KeyEvent;
+        KeyReleasedEvent(int keyCode): KeyEvent(keyCode) {}
 
         DE_EVENT_SET_TYPE(KeyReleased)
     };
@@ -42,7 +43,7 @@ namespace DampEngine
     class KeyTypedEvent : KeyEvent
     {
     public:
-        using KeyEvent::KeyEvent;
+        KeyTypedEvent(int keyCode): KeyEvent(keyCode) {}
 
         DE_EVENT_SET_TYPE(KeyTyped)
     };

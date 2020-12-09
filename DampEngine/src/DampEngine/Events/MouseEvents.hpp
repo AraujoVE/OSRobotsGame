@@ -9,6 +9,8 @@ namespace DampEngine
     protected:
         MouseButtonEvent(int button) : m_Button(button) {}
 
+        std::string ToString() const override { return GetEventName() + " Button: " + std::to_string(m_Button); }
+
     protected:
         int m_Button;
     };
@@ -16,47 +18,52 @@ namespace DampEngine
     class MouseButtonReleasedEvent : public MouseButtonEvent
     {
     public:
-        using MouseButtonEvent::MouseButtonEvent;
+        MouseButtonReleasedEvent(int button) : MouseButtonEvent(button) {}
         DE_EVENT_SET_TYPE(MouseButtonReleased);
     };
 
     class MouseButtonPressedEvent : public MouseButtonEvent
     {
     public:
-        using MouseButtonEvent::MouseButtonEvent;
+        MouseButtonPressedEvent(int button) : MouseButtonEvent(button) {}
         DE_EVENT_SET_TYPE(MouseButtonPressed);
     };
 
-    class MouseMovedEvent : Event
+    class MouseMovedEvent : public Event
     {
     public:
-        MouseMovedEvent() {}
+        MouseMovedEvent(float xPos, float yPos): m_xPos(xPos), m_yPos(yPos) {}
+
+        std::string ToString() const override { return GetEventName() + " New position: (x=" + std::to_string(m_xPos) + ", y=" +  std::to_string(m_yPos) + ")";}
 
         DE_EVENT_SET_TYPE(MouseMoved);
+    private:
+        float m_xPos, m_yPos; 
     };
 
-    class MouseEnteredWindowEvent : Event
+    class MouseEnteredWindowEvent : public VBlankEvent
     {
     public:
-        MouseEnteredWindowEvent() {}
-
         DE_EVENT_SET_TYPE(MouseEnteredWindow);
     };
 
-    class MouseLeftWindowEvent : Event
+    class MouseLeftWindowEvent : public VBlankEvent
     {
     public:
-        MouseLeftWindowEvent() {}
-
         DE_EVENT_SET_TYPE(MouseLeftWindow);
     };
 
-    class MouseScrolledEvent : Event
+    class MouseScrolledEvent : public Event
     {
     public:
-        MouseScrolledEvent() {}
+        MouseScrolledEvent(float xOffset, float yOffset): m_xOffset(xOffset), m_yOffset(yOffset) {}
+
+        std::string ToString() const override { return GetEventName() + " Offset: (x=" + std::to_string(m_xOffset) + ", y=" +  std::to_string(m_yOffset) + ")";}
 
         DE_EVENT_SET_TYPE(MouseScrolled);
+
+    private:
+        float m_xOffset, m_yOffset;
     };
 
 } // namespace DampEngine

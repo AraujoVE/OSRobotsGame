@@ -24,52 +24,55 @@ namespace DampEngine
     };
 
 
-    class WindowFocusedEvent : Event {
+    class WindowFocusedEvent : public VBlankEvent {
     public:
-        using Event::Event;
         DE_EVENT_SET_TYPE(WindowFocused);
     };
 
-    class WindowBlurredEvent : Event {
+    class WindowBlurredEvent : public VBlankEvent {
     public:
-        using Event::Event;
         DE_EVENT_SET_TYPE(WindowBlurred);
     };
 
-    class WindowMinimizedEvent : Event {
+    class WindowMinimizedEvent : public VBlankEvent {
     public:
-        using Event::Event;
         DE_EVENT_SET_TYPE(WindowMinimized);
     };
 
-    class WindowMaximizedEvent : Event {
+    class WindowMaximizedEvent : public VBlankEvent {
     public:
-        using Event::Event;
         DE_EVENT_SET_TYPE(WindowMaximized);
     };
 
-    class WindowRestoredEvent : Event {
+    class WindowRestoredEvent : public VBlankEvent {
     public:
-        using Event::Event;
         DE_EVENT_SET_TYPE(WindowRestored);
     };
 
-    class WindowMovedEvent : Event {
+    class WindowMovedEvent : public Event{
     public:
-        using Event::Event;
+        WindowMovedEvent(int xPos, int yPos): m_xPos(xPos), m_yPos(yPos) {}
         DE_EVENT_SET_TYPE(WindowMoved);
+    private:
+        int m_xPos, m_yPos;
     };
 
-    class WindowRefreshedEvent : Event {
+    class WindowRefreshedEvent : public Event {
     public:
         using Event::Event;
         DE_EVENT_SET_TYPE(WindowRefreshed);
     };
 
-    class WindowContentScaledEvent : Event {
+    class WindowContentScaledEvent : public Event {
     public:
-        using Event::Event;
+        WindowContentScaledEvent(float xScale, float yScale): m_xScale(xScale), m_yScale(yScale) {}
+
+        std::string ToString() const override { return GetEventName() + " Scale: (x=" + std::to_string(m_xScale) + ", y=" +  std::to_string(m_yScale) + ")";}
+
         DE_EVENT_SET_TYPE(WindowContentScaled);
+
+    private:
+        float m_xScale, m_yScale;
     };
 
 } // namespace DampEngine

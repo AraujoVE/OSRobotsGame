@@ -37,6 +37,8 @@ namespace DampEngine
         DE_ENGINE_ERROR("GLFW Error ({0}): {1}", error, description);
     }
 
+    #define DE_GLFW_CASE_SEND(_case, window, event) case _case: SendEventToWindow(window, event); break;  
+    #define DE_GLFW_CASE_DEFAULT(value) default: DE_ENGINE_ERROR("Unknown GLFW token: {1}", #value); break;
     inline void SendEventToWindow(GLFWwindow *&glfwWindow, Event &&event) {
         LinuxGLFWWindow::WindowData* window_data = (LinuxGLFWWindow::WindowData*) glfwGetWindowUserPointer(glfwWindow);
         window_data->EventCallback(event);
@@ -66,19 +68,13 @@ namespace DampEngine
         glfwSetKeyCallback(m_GLFWWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
             switch (action)
             {
-                //GLFW_PRESS`, `GLFW_RELEASE` or `GLFW_REPEAT`
-                case GLFW_PRESS:
-                    SendEventToWindow(window, KeyPressedEvent(key, 1));
-                break;
+                DE_GLFW_CASE_SEND(GLFW_PRESS, window, KeyPressedEvent(key, 0));
+                DE_GLFW_CASE_SEND(GLFW_RELEASE, window, KeyReleasedEvent(key));
+                DE_GLFW_CASE_SEND(GLFW_REPEAT, window, KeyPressedEvent(key, 1));
+                DE_GLFW_CASE_DEFAULT(action);
             
-            default:
-                break;
             }
             // SendEventToWindow(window, )
-        });
-
-        glfwSetCharCallback(m_GLFWWindow, [](GLFWwindow *window, unsigned int codepoint) {
-
         });
 
         // glfwSetCharModsCallback(m_GLFWWindow, [](GLFWwindow *window, unsigned int codepoint, int mods) {
@@ -86,11 +82,16 @@ namespace DampEngine
         // });
 
         glfwSetCursorEnterCallback(m_GLFWWindow, [](GLFWwindow *window, int entered_or_left) {
-
+            switch (entered_or_left)
+            {
+                DE_GLFW_CASE_SEND(GLFW_TRUE, window, MouseEnteredWindowEvent());
+                DE_GLFW_CASE_SEND(GLFW_FALSE, window, MouseLeftWindowEvent());
+                DE_GLFW_CASE_DEFAULT(entered_or_left);
+            }
         });
 
         glfwSetCursorPosCallback(m_GLFWWindow, [](GLFWwindow *window, double xpos, double ypos) {
-
+            SendEventToWindow(window, MouseMovedEvent(xpos, ypos));
         });
 
         // glfwSetDropCallback(m_GLFWWindow, [](GLFWwindow *window, double xpos, double ypos) {
@@ -105,6 +106,7 @@ namespace DampEngine
 
         // });
 
+
         // glfwSetMonitorCallback(m_GLFWWindow, [](GLFWwindow *window, int joystick_id, int event) {
 
         // });
@@ -114,35 +116,52 @@ namespace DampEngine
         // });
 
         glfwSetMouseButtonCallback(m_GLFWWindow, [](GLFWwindow *window, int button, int action, int mods) {
-
+            switch (action)
+            {
+                DE_GLFW_CASE_SEND(GLFW_PRESS, window, MouseButtonPressedEvent(button));
+                DE_GLFW_CASE_SEND(GLFW_RELEASE, window, MouseButtonReleasedEvent(button));
+                DE_GLFW_CASE_DEFAULT(action);
+            }
         });
 
         glfwSetScrollCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
-
+            SendEventToWindow(window, MouseScrolledEvent(xoffset, yoffset));
         });
 
         glfwSetWindowCloseCallback(m_GLFWWindow, [](GLFWwindow *window) {
             SendEventToWindow(window, WindowClosedEvent());
         });
 
-        // glfwSetWindowContentScaleCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
+        glfwSetWindowContentScaleCallback(m_GLFWWindow, [](GLFWwindow *window, float xscale, float yscale) {
+            SendEventToWindow(window, WindowContentScaledEvent(xscale, yscale));
+        });
 
-        // });
-
-        glfwSetWindowFocusCallback(m_GLFWWindow, [](GLFWwindow *window, int focus) {
-            // 1 focused, 0 lost focus
+        glfwSetWindowFocusCallback(m_GLFWWindow, [](GLFWwindow *window, int focus_or_blur) {
+            switch(focus_or_blur) {
+                DE_GLFW_CASE_SEND(GLFW_TRUE, window, WindowFocusedEvent());
+                DE_GLFW_CASE_SEND(GLFW_FALSE, window, WindowBlurredEvent());
+                DE_GLFW_CASE_DEFAULT(focus_or_blur);
+            }
         });
 
         glfwSetWindowIconifyCallback(m_GLFWWindow, [](GLFWwindow *window, int iconified) {
-            // 1 iconified, 0 restored
+            switch(iconified) {
+                DE_GLFW_CASE_SEND(GLFW_TRUE, window, WindowFocusedEvent());
+                DE_GLFW_CASE_SEND(GLFW_FALSE, window, WindowRestoredEvent());
+                DE_GLFW_CASE_DEFAULT(iconified);
+            }
         });
 
         glfwSetWindowMaximizeCallback(m_GLFWWindow, [](GLFWwindow *window, int maximize) {
-            // 1 maximized, 0 restored
+            switch(maximize) {
+                DE_GLFW_CASE_SEND(GLFW_TRUE, window, WindowFocusedEvent());
+                DE_GLFW_CASE_SEND(GLFW_FALSE, window, WindowRestoredEvent());
+                DE_GLFW_CASE_DEFAULT(maximize);
+            }
         });
 
         glfwSetWindowPosCallback(m_GLFWWindow, [](GLFWwindow *window, int xpos, int ypos) {
-
+            SendEventToWindow(window, WindowMovedEvent(xpos, ypos));
         });
 
         // glfwSetWindowRefreshCallback(m_GLFWWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
