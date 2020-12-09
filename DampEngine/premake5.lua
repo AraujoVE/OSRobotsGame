@@ -13,7 +13,9 @@ project "DampEngine"
 	pchheader "depch.hpp"
 	pchsource "src/depch.cpp"
 	
-	defines {}
+	defines {
+		DE_ENGINE_BUILD
+	}
 
 	files {
 		"src/DampEngine/**.cpp",
@@ -24,13 +26,15 @@ project "DampEngine"
 		"src",
 		"vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}"
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links {
 		"GLFW",
 		"Glad",
-		-- "opengl32.lib"
+		"ImGui"
+		-- "opengl32.lib" Windows?
 	}
 
 	filter "system:windows"

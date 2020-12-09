@@ -15,6 +15,7 @@ workspace "OSRobotGame"
 	IncludeDir = {}
 	IncludeDir["GLFW"] = "%{wks.location}/DampEngine/vendor/GLFW/include"
 	IncludeDir["Glad"] = "%{wks.location}/DampEngine/vendor/Glad/include"
+	IncludeDir["ImGui"] = "%{wks.location}/DampEngine/vendor/imgui"
 
     -- This defines ... in
     --./bin/ ... /{projectName}
@@ -25,6 +26,7 @@ workspace "OSRobotGame"
     	-- include "vendor/premake" CUSTOMIZATIONS (currently none)
     	include "DampEngine/vendor/GLFW"
     	include "DampEngine/vendor/Glad"
+    	include "DampEngine/vendor/imgui"
     group ""    
 
     include "DampEngine"
