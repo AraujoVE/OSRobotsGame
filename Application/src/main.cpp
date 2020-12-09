@@ -33,6 +33,7 @@
 //     return 0;
 // }
 
+// #define __DE_NO_MACROS__
 #include <DampEngine.hpp>
 #include <DampEngine/Core/EntryPoint.hpp>
 
@@ -42,8 +43,8 @@
 // public:
 //     MyApplication(): DampEngine::Application("OSRobotsGame") {}
 
-//     bool OnWindowClose(DampEngine::WindowClosedEvent &event) override { return true; }
-//     bool OnWindowResize(DampEngine::WindowResizedEvent &event) override { return true; }
+//     bool OnWindowClosed(DampEngine::WindowClosedEvent &event) override { return true; }
+//     bool OnWindowResized(DampEngine::WindowResizedEvent &event) override { return true; }
 
 //     ~MyApplication() override {}
 // };

@@ -1,11 +1,8 @@
-#include "DampEngine/Core/Assert.hpp"
+#include "DampEngine/Core/Macros.hpp"
 #include "DampEngine/Core/Window.hpp"
 #include "DampEngine/Core/Log.hpp"
 
-#include "DampEngine/Events/Event.hpp"
-#include "DampEngine/Events/KeyEvent.hpp"
-#include "DampEngine/Events/MouseMovedEvent.hpp"
-#include "DampEngine/Events/WindowEvent.hpp"
+#include "DampEngine/Events.hpp"
 
 #include "LinuxGLFWWindow.hpp"
 

@@ -1,16 +1,15 @@
 #pragma once
 
+#ifndef __DE_NO_MACROS__
+    #include "DampEngine/Core/Macros.hpp"
+#endif //!__DE_NO_MACROS__
+
 #include "DampEngine/Core/Application.hpp"
+
 #include "DampEngine/Core/Layer.hpp"
 #include "DampEngine/Core/Log.hpp"
-#include "DampEngine/Core/Assert.hpp"
 
-#include "DampEngine/Events/Event.hpp"
-#include "DampEngine/Events/KeyEvent.hpp"
-#include "DampEngine/Events/MouseButonEvent.hpp"
-#include "DampEngine/Events/MouseMovedEvent.hpp"
-#include "DampEngine/Events/MouseScrolledEvent.hpp"
-#include "DampEngine/Events/WindowEvent.hpp"
+#include "DampEngine/Events.hpp"
 
 // #ifdef  DE_SYSYEM_LINUX
 

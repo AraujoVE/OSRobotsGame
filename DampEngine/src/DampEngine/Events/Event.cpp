@@ -7,7 +7,7 @@ namespace DampEngine
         std::stringstream ss;
         //TODO: add proper display
         ss << GetStaticEventName();
-        DE_ENGINE_WARN("This event class, (EventType = {0}) haven't overwritten ToString()", GetEventName());
+        DE_ENGINE_WARN("class with EventType = {0} did not override properly ToString()", GetEventName());
         return ss.str();
     }
 } // namespace DampEngine

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Event.hpp"
 
 namespace DampEngine
@@ -39,6 +41,7 @@ namespace DampEngine
 
     class KeyTypedEvent : KeyEvent
     {
+    public:
         using KeyEvent::KeyEvent;
 
         DE_EVENT_SET_TYPE(KeyTyped)
