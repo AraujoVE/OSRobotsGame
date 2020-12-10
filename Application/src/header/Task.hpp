@@ -21,6 +21,7 @@ class Task{
         time_t lastUpdateTime;
         int timeUnits;
         int predictedTime;
+        time_t initTime; // time when task started
         int efficiency;
 
     public:
@@ -32,6 +33,7 @@ class Task{
         int getRobotsNo() const;
         int getPredictedTime() const;
         int getId() const;
+        time_t getInitTime() const;
         
         void setType(RobotFunctions::RobotFunction newType);
         void setPredictedTime(int newPredictedTime);

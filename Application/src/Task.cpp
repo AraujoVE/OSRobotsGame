@@ -25,6 +25,7 @@ void Task::initializeParameters(RobotFunctions::RobotFunction funct){
     type = funct;
     robotsNo = 0;
     lastUpdateTime = time(0);
+    initTime = time(0);
     efficiency = 1;
     timeUnits = TIME_STEP * (INIT_TIME_STEP + (std::rand()%9));
     predictedTime = 0;
@@ -48,6 +49,11 @@ int Task::getPredictedTime() const {
 }
 int Task::getId() const {
     return id;
+}
+
+
+time_t Task::getInitTime() const {
+    return initTime;
 }
 
 

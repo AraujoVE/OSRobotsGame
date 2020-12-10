@@ -1,4 +1,5 @@
 #include "header/VillageStats.hpp"
+#include "header/RobotFunctions.hpp"
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
@@ -118,3 +119,8 @@ void VillageStats::calcNewPop() {
     std::cout << "New population: " << population << std::endl;
 }
 
+
+// ======================== ADD FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
+void addTaskResources(RobotFunctions taskType, time_t taskInitTime, int noRobots) {
+    return;
+}

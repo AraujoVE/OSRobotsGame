@@ -17,7 +17,7 @@ class RobotsManagement{
         int efficiency;
         int prodCost;
         VillageStats *villageStats;
-        std::vector<std::map<int,Task>> *tasks;
+        std::vector<std::map<int,Task>> *tasks; // TODO: change std::vector to array with fixed length (we know how many tasks we have)
 
     public:
         RobotsManagement();
@@ -28,6 +28,7 @@ class RobotsManagement{
         int getFreeRobots() const;
         int getEfficiency() const;
         int getProdCost() const;
+        std::vector<std::map<int, Task>> getTasks() const;
 
         void setTotRobots(int newTotRobots);
         void setFreeRobots(int newFreeRobots);

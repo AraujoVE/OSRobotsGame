@@ -32,5 +32,6 @@ class VillageStats{
 
         void initializeStats();
         void calcNewPop();
+        void addTaskResources(RobotFunctions, time_t, int);
 };
 #endif
