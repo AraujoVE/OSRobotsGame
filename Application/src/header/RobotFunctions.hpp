@@ -1,11 +1,9 @@
 #pragma once
 
-namespace RobotFunctions {
-    enum RobotFunction {
-        PROTECTION,
-        RESOURCE_GATHERING,
-        HUNT,
-        MEDICINE,
-        CONSTRUCTION,
-    };
-}
+enum class RobotFunction{
+    PROTECTION,
+    RESOURCE_GATHERING,
+    HUNT,
+    MEDICINE,
+    CONSTRUCTION
+};

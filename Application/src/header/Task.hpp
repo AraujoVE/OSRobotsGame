@@ -15,7 +15,7 @@ class Task{
         const int INIT_TIME_STEP = 2;
 
         static int lastId;
-        RobotFunctions::RobotFunction type;
+        RobotFunction::RobotFunction type;
         int robotsNo;
         int id;
         time_t lastUpdateTime;
@@ -25,17 +25,17 @@ class Task{
         int efficiency;
 
     public:
-        Task(RobotFunctions::RobotFunction funct);
-        void initializeParameters(RobotFunctions::RobotFunction funct);
+        Task(RobotFunction::RobotFunction funct);
+        void initializeParameters(RobotFunction::RobotFunction funct);
         ~Task();
 
-        RobotFunctions::RobotFunction getType() const;
+        RobotFunction::RobotFunction getType() const;
         int getRobotsNo() const;
         int getPredictedTime() const;
         int getId() const;
         time_t getInitTime() const;
         
-        void setType(RobotFunctions::RobotFunction newType);
+        void setType(RobotFunction::RobotFunction newType);
         void setPredictedTime(int newPredictedTime);
         void setRobotsNo(int newRobotsNo);
         

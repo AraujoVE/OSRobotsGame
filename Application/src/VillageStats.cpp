@@ -121,6 +121,6 @@ void VillageStats::calcNewPop() {
 
 
 // ======================== ADD FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
-void addTaskResources(RobotFunctions taskType, time_t taskInitTime, int noRobots) {
+void addTaskResources(RobotFunction taskType, time_t taskInitTime, int noRobots) {
     return;
 }

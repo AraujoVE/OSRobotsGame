@@ -1,6 +1,8 @@
 #ifndef VILLAGE_STATS
 #define VILLAGE_STATS
 
+#include "RobotFunctions.hpp"
+
 class VillageStats{
     private:
         const int MAX_STAT_VALUE = 5; // each village stat is between 0 and 6 (included)
@@ -32,6 +34,6 @@ class VillageStats{
 
         void initializeStats();
         void calcNewPop();
-        void addTaskResources(RobotFunctions, time_t, int);
+        void addTaskResources(RobotFunction, time_t, int);
 };
 #endif

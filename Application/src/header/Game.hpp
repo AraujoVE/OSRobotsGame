@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SDL.hpp"
+// #include "SDL.hpp"
 
 #include "Game.fwd.hpp"
-#include "GameGraphics.fwd.hpp"
+// #include "GameGraphics.fwd.hpp"
 
 #include "VillageStats.hpp"
 #include "RobotsManagement.hpp"
