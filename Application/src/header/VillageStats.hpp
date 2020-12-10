@@ -2,6 +2,7 @@
 #define VILLAGE_STATS
 
 #include "RobotFunctions.hpp"
+#include <ctime>
 
 class VillageStats{
     private:

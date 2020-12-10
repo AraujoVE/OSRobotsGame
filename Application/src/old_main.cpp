@@ -1,5 +1,7 @@
 // #include "header/SDL.hpp"
 
+#ifdef  UNSET_PLEASE_HELP
+
 #include "header/VillageStats.hpp"
 #include "header/RobotsManagement.hpp"
 #include "header/Game.hpp"
@@ -49,8 +51,8 @@ void gameLoop(Game* game, VillageStats * village, RobotsManagement * robotsMng) 
         village->calcNewPop();
 
         // Check if game is over
-        if(isGameOver(village, robotsMng))
-            return; // game is over (in the future display a "Game Over message" here)
+        // if(isGameOver(village, robotsMng))
+        //     return; // game is over (in the future display a "Game Over message" here)
 
         // game->getRenderer()->renderGame();
 
@@ -93,3 +95,5 @@ int main(void){
     startGame();
     return 0;
 }
+
+#endif  //UNSET_PLEASE_HELP

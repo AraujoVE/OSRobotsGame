@@ -107,26 +107,26 @@ bool RobotsManagement::destroyRobot(){
     return false;
 }
 
-void RobotsManagement::createTask(RobotFunction::RobotFunction funct){
+void RobotsManagement::createTask(RobotFunction funct){
     //Cria nova task com o id Incrementado
     Task newTask(funct);
-    tasks->at(funct).insert({newTask.getId(),newTask});
+    tasks->at((int)funct).insert({newTask.getId(),newTask});
 }
 
 bool RobotsManagement::moveRobot(Task choosenTask,int robotNo){
-    RobotFunction::RobotFunction funct = choosenTask.getType();
+    RobotFunction funct = choosenTask.getType();
     int id = choosenTask.getId();
     if(!robotNo) return true; //Mover 0 robos para a task não muda nada
     if(robotNo > 0 && freeRobots - robotNo <= 0) return false; // Não é possível adicionar mais robôs do que se tem livre
-    else if(robotNo < 0 && tasks->at(funct).at(id).getRobotsNo() + robotNo < 0) return false; //Não é possível remover mais robos de uma task do que ela possui
-    else if(tasks->at(funct).find(id) == tasks->at(funct).end()) return false; //Não é possível mover robôs para uma task inexistente
+    else if(robotNo < 0 && tasks->at((int)funct).at(id).getRobotsNo() + robotNo < 0) return false; //Não é possível remover mais robos de uma task do que ela possui
+    else if(tasks->at((int)funct).find(id) == tasks->at((int)funct).end()) return false; //Não é possível mover robôs para uma task inexistente
 
     //Decrementa os robôs livres
     freeRobots -= robotNo;
 
     //Move ou remove robotNo robôs da task
-    int oldRobotsNo = tasks->at(funct).at(id).getRobotsNo();
-    tasks->at(funct).at(id).setRobotsNo(oldRobotsNo + robotNo);
+    int oldRobotsNo = tasks->at((int)funct).at(id).getRobotsNo();
+    tasks->at((int)funct).at(id).setRobotsNo(oldRobotsNo + robotNo);
 
     return true;
 }

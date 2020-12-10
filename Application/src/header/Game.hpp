@@ -12,7 +12,7 @@
 //         return true;
 //     return false;
 // }
-
+class GameGraphics;
 class Game {
 private:
     VillageStats *villageStats;
