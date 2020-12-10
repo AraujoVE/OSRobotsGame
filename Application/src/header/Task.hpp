@@ -11,36 +11,45 @@
 
 class Task{
     private:
-        const int TIME_STEP = 30;
-        const int INIT_TIME_STEP = 2;
+        const static int TIME_STEP = 10;
+        const static int INIT_TIME_STEP = 2;
+        const static int MAX_TIME_STEPS = 10;
+        const static int MIN_REWARD = 2;
+        const static int REWARD_RNG = 3;
+        constexpr static float FAILURE_TAX = 0.8;
 
         static int lastId;
+        int id;
         RobotFunction type;
         int robotsNo;
-        int id;
+        int progressLength;
+        int curProgress;
         time_t lastUpdateTime;
+        time_t remainingTime;
         int timeUnits;
         int predictedTime;
-        time_t initTime; // time when task started
-        int efficiency;
+        int rewardTax;
+        float gainedGoods;
 
     public:
         Task(RobotFunction funct);
         void initializeParameters(RobotFunction funct);
         ~Task();
 
+        int getId() const;
         RobotFunction getType() const;
         int getRobotsNo() const;
-        int getPredictedTime() const;
-        int getId() const;
-        time_t getInitTime() const;
-        
-        void setType(RobotFunction newType);
-        void setPredictedTime(int newPredictedTime);
+        int getProgressLength() const;
+        int getCurProgress() const;
+        time_t getLastUpdate() const;
+        time_t getRemainingTime() const;
+
         void setRobotsNo(int newRobotsNo);
+        bool updateTask();
         
-        void efficiencyUpdate(int newEfficiency);
-        bool updatePredictedTime(int newEfficiency,int newRobotsNo);
+        int calcLostRobots();
+        float calcGainedGoods();
+        
         void createThread();
         void deleteThread();
 };

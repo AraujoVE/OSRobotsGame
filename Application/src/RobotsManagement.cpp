@@ -16,10 +16,8 @@ RobotsManagement::RobotsManagement(){
 void RobotsManagement::initializeStats(){
     totRobots = 1;
     freeRobots = 1;
-    efficiency = 1;
     prodCost = 1;
     villageStats = NULL;
-    tasks = NULL;
 }
 
 RobotsManagement::~RobotsManagement(){}
@@ -34,10 +32,6 @@ int RobotsManagement::getTotRobots() const {
 
 int RobotsManagement::getFreeRobots() const {
     return freeRobots;
-}
-
-int RobotsManagement::getEfficiency() const {
-    return efficiency;
 }
 
 int RobotsManagement::getProdCost() const {
@@ -55,17 +49,6 @@ void RobotsManagement::setFreeRobots(int newFreeRobots){
     freeRobots = newFreeRobots;
 }
 
-void RobotsManagement::setEfficiency(int newEfficiency){
-    //Itera em cada funcao possivel para os robos
-    for(std::map<int,Task>& funct : *tasks){
-        //E se itera em cada robo de dada função
-        for(std::pair<const int,Task>& task : funct){
-            //Faz o update de atributos seus que são gatilhados pela alteração da eficiência
-            task.second.efficiencyUpdate(newEfficiency);
-        }
-    }
-    efficiency = newEfficiency;
-}
 
 void RobotsManagement::setProdCost(int newProdCost){
     prodCost = newProdCost;
@@ -75,33 +58,29 @@ void RobotsManagement::setVillageStats(VillageStats *newVillageStats){
     villageStats = newVillageStats;
 }
 
-void RobotsManagement::setTasks(std::vector<std::map<int,Task>> *newTasks){
-    tasks = newTasks;
-}
 
 
-
-bool RobotsManagement::createRobot(){
+bool RobotsManagement::createRobots(int no){
     int curResources = villageStats->getResources();
     
     //Calcula se existe dinheiro o suficiente para criar um robô
-    if(curResources >= prodCost){
+    if(curResources >= prodCost*no){
         //Decrementa dos recursos o custo de produção do robô
-        villageStats->setResources(curResources - prodCost);
+        villageStats->setResources(curResources - prodCost*no);
         //Incrementa o número total e o número de robôs livres    
-        totRobots++;
-        freeRobots++;
+        totRobots += no;
+        freeRobots += no;
         return true;
     }
     return false;
 }
 
-bool RobotsManagement::destroyRobot(){
+bool RobotsManagement::destroyRobots(int no){
     //Verifica se é possível destruir robôs
-    if(totRobots && freeRobots){
+    if(totRobots >= no && freeRobots >= no){
         //Decrementa o número total e o número de robôs livres    
-        totRobots--;
-        freeRobots--;
+        totRobots -= no;
+        freeRobots -= no;
         return true;
     }
     return false;
@@ -110,23 +89,49 @@ bool RobotsManagement::destroyRobot(){
 void RobotsManagement::createTask(RobotFunction funct){
     //Cria nova task com o id Incrementado
     Task newTask(funct);
-    tasks->at((int)funct).insert({newTask.getId(),newTask});
+    tasks[(int)funct].insert({newTask.getId(),newTask});
+
+    tasks[(int)funct].insert({newTask.getId(),newTask});
 }
 
-bool RobotsManagement::moveRobot(Task choosenTask,int robotNo){
+bool RobotsManagement::endTask(Task &curTask){
+    if(!curTask.updateTask()){
+        moveRobot(curTask,-1*curTask.getRobotsNo());
+        destroyRobots(curTask.calcLostRobots());
+        villageStats->increaseStat(curTask.getType(),curTask.calcGainedGoods(),1);
+
+        return true;
+    }
+    return false;
+}
+
+void RobotsManagement::updateTasks(){
+    bool finishedTask = false;
+    for(std::map<int,Task>& funct : tasks){
+        //E se itera em cada robo de dada função
+        std::map<int, Task>::iterator itr = funct.begin();
+        while (itr != funct.end()) {
+            if (endTask(itr->second)) itr = funct.erase(itr);
+            else ++itr;
+        }        
+    } 
+}
+
+//This must go into a semaphore
+bool RobotsManagement::moveRobot(Task &choosenTask,int robotsNo){
     RobotFunction funct = choosenTask.getType();
     int id = choosenTask.getId();
-    if(!robotNo) return true; //Mover 0 robos para a task não muda nada
-    if(robotNo > 0 && freeRobots - robotNo <= 0) return false; // Não é possível adicionar mais robôs do que se tem livre
-    else if(robotNo < 0 && tasks->at((int)funct).at(id).getRobotsNo() + robotNo < 0) return false; //Não é possível remover mais robos de uma task do que ela possui
-    else if(tasks->at((int)funct).find(id) == tasks->at((int)funct).end()) return false; //Não é possível mover robôs para uma task inexistente
+    if(!robotsNo) return true; //If no robots are add or removed, nothing to do
+    if(robotsNo > 0 && freeRobots < robotsNo) return false; // Can't add robots to a task if there are not enough free robots 
+    else if(robotsNo < 0 && choosenTask.getRobotsNo() + robotsNo < 0) return false; //Can't remove robots from a task if there are not enough robots in the given task
+    else if(tasks[(int)funct].find(id) == tasks[(int)funct].end()) return false; //Can't move or remove robots from an inexistent task. 
 
-    //Decrementa os robôs livres
-    freeRobots -= robotNo;
+    //Incremen or decrement the number of free robots
+    freeRobots -= robotsNo;
 
-    //Move ou remove robotNo robôs da task
-    int oldRobotsNo = tasks->at((int)funct).at(id).getRobotsNo();
-    tasks->at((int)funct).at(id).setRobotsNo(oldRobotsNo + robotNo);
+    //Add or remove a robot from a given task
+    int oldRobotsNo = tasks[(int)funct].at(id).getRobotsNo();
+    tasks[(int)funct].at(id).setRobotsNo(oldRobotsNo + robotsNo);
 
     return true;
 }

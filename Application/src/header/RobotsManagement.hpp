@@ -12,12 +12,12 @@
 class RobotsManagement{
 
     private:
+        static const int MAX_TASK_TYPES = 5;
         int totRobots;
         int freeRobots;
-        int efficiency;
         int prodCost;
         VillageStats *villageStats;
-        std::vector<std::map<int,Task>> *tasks; // TODO: change std::vector to array with fixed length (we know how many tasks we have)
+        std::map<int,Task> tasks[MAX_TASK_TYPES];
 
     public:
         RobotsManagement();
@@ -26,20 +26,20 @@ class RobotsManagement{
 
         int getTotRobots() const;
         int getFreeRobots() const;
-        int getEfficiency() const;
         int getProdCost() const;
-        std::vector<std::map<int, Task>> getTasks() const;
+        std::map<int, Task>* getTasks() const;
 
         void setTotRobots(int newTotRobots);
         void setFreeRobots(int newFreeRobots);
-        void setEfficiency(int newEfficiency);
         void setProdCost(int newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
         void setTasks(std::vector<std::map<int, Task>> *newTasks);
 
-        bool createRobot();
-        bool destroyRobot();
-        void createTask(RobotFunction funct);
-        bool moveRobot(Task choosenTask,int robotNo);
+        bool createRobots(int);
+        bool destroyRobots(int);
+        void createTask(RobotFunction);
+        void updateTasks();
+        bool moveRobot(Task &,int);
+        bool endTask(Task&);
 };
 #endif

@@ -5,6 +5,7 @@
 #include <iostream>
 
 // ======================== GETS/SETS ========================
+//Each set must enter in the semaphore
 int VillageStats::getFood() const {
     return food;
 }
@@ -124,3 +125,40 @@ void VillageStats::calcNewPop() {
 void addTaskResources(RobotFunction taskType, time_t taskInitTime, int noRobots) {
     return;
 }
+
+void VillageStats::increaseStat(RobotFunction type,int increase,float multTax){
+    if(type == RobotFunction::PROTECTION){
+        this->setDefenses((int)((float)(defenses)*multTax) + increase);
+    }
+    if(type == RobotFunction::HUNT){
+        this->setFood((int)((float)(food)*multTax) + increase);
+    }
+    if(type == RobotFunction::MEDICINE){
+        this->setHealth((int)((float)(health)*multTax) + increase);
+    }
+    if(type == RobotFunction::CONSTRUCTION){
+        this->setStructures((int)((float)(structures)*multTax) + increase);
+    }
+    if(type == RobotFunction::RESOURCE_GATHERING){
+        this->setResources((int)((float)(resources)*multTax) + increase);
+    }
+};
+
+void VillageStats::decreaseStats(){
+    //!FIXME: [marcuscastelo] I've noticed division between ints in a multiplication factor calculation, please check if it's correct
+
+    int randLoss = 0;
+    int maxLoss,minLoss;
+
+    static RobotFunction functions[] = { RobotFunction::PROTECTION, RobotFunction::HUNT, RobotFunction::MEDICINE, RobotFunction::CONSTRUCTION, RobotFunction::RESOURCE_GATHERING };
+    float min_max_factors [] = { population/defenses, population/food, population/health, population/structures, population/resources };
+
+    for (int i = 0; i < sizeof(functions)/sizeof(RobotFunction); i++)
+    {
+        maxLoss =  (int) MAX_LOSS * min_max_factors[i];
+        minLoss =  (int) MIN_LOSS * min_max_factors[i];
+        randLoss = (int) (100 - maxLoss) + rand()%(maxLoss - minLoss + 1);
+        increaseStat((RobotFunction)i,0,rand()%randLoss);
+    }
+}
+

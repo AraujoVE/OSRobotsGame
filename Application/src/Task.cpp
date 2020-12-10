@@ -20,21 +20,41 @@ Task::Task(RobotFunction funct){
 
 Task::~Task() {}
 
+float Task::calcGainedGoods(){
+    return (pow((float)curProgress,2)/(float)progressLength) * (float)rewardTax;
+}
+
+int Task::calcLostRobots(){
+    int progress = (int)(FAILURE_TAX * 100 * ((float)curProgress/(float)progressLength));
+    int randomLost = 1 + std::rand()%100;
+    float lostRobots = 0;
+
+    if(progress > randomLost) lostRobots = (float)robotsNo * (((float)(progress - randomLost))/100.0);
+
+    return (int)lostRobots;
+}
+
 void Task::initializeParameters(RobotFunction funct){
     id = ++lastId; 
     type = funct;
     robotsNo = 0;
+    progressLength = TIME_STEP * (INIT_TIME_STEP + (std::rand()%MAX_TIME_STEPS));
+    curProgress = 0;
     lastUpdateTime = time(0);
-    initTime = time(0);
-    efficiency = 1;
+    remainingTime = -1;
+    gainedGoods = 0;
+    rewardTax = MIN_REWARD + (std::rand()%REWARD_RNG);
+
     timeUnits = TIME_STEP * (INIT_TIME_STEP + (std::rand()%9));
     predictedTime = 0;
     createThread();
 }
 
 
-
-//Gets de cada um dos parâmetros
+//Gets of each parameter
+int Task::getId() const{
+    return id;
+}
 
 RobotFunction Task::getType() const{
     return type;
@@ -44,65 +64,39 @@ int Task::getRobotsNo() const {
     return robotsNo;
 }
 
-int Task::getPredictedTime() const {
-    return predictedTime;
-}
-int Task::getId() const {
-    return id;
+int Task::getProgressLength() const {
+    return progressLength;
 }
 
+int Task::getCurProgress() const{
+    return curProgress;
+}
 
-time_t Task::getInitTime() const {
-    return initTime;
+time_t Task::getLastUpdate() const {
+    return lastUpdateTime;
+}
+
+time_t Task::getRemainingTime() const{
+    return remainingTime;
 }
 
 
-//Sets de cada um dos parâmetros
 
-void Task::setType(RobotFunction newType){
-    type = newType;
-}
-
-void Task::setPredictedTime(int newPredictedTime){
-    predictedTime = newPredictedTime;
-}
-
+//Set of number of robots
 void Task::setRobotsNo(int newRobotsNo){
-    updatePredictedTime(efficiency,newRobotsNo);
     robotsNo = newRobotsNo;
 }
-
-
-void Task::efficiencyUpdate(int newEfficiency){
-    updatePredictedTime(newEfficiency,robotsNo);
-}
-
-
-
-//Retorna false para quando o PredictedTime da tarefa se torna 0, caso contrário apenas muda os atributos necessários
-bool Task::updatePredictedTime(int newEfficiency,int newRobotsNo){
+bool Task::updateTask(){
     time_t curTime = time(0);
-    //timeVar simboliza teoricamente quantas unidades de progresso foram geradas entre o momento atual e 
-    //o momento da última atualização, isso se dá pelo produto dos termos abaixo.
-    int timeVar = (efficiency) * (robotsNo) * (curTime - lastUpdateTime);
+    int oldProgress = curProgress;
+    int progress = curProgress + (lastUpdateTime - curTime)*robotsNo;
+    curProgress = progress > progressLength ? progressLength : progress;
+    remainingTime =  !robotsNo ? -1 : (progressLength - curProgress)/robotsNo;
 
-    //Time units ou tem seu valor reduzido de timeVar ou se fosse dar <=0 vai para 0.
-    timeUnits -= (timeVar >= timeUnits ? timeUnits : timeVar);
-
-    //A futura eficiência e o futuro número de robos são utilizados para predizer quando será o time_t em que tal task vai ocorrer
-    predictedTime = (timeUnits <= 0 ? 0 : curTime + (time_t)((timeUnits) / ((newEfficiency) * (newRobotsNo))) );
-    
-    //Ultimo update
     lastUpdateTime = curTime;
+    return remainingTime != 0; 
 
-    if(timeUnits <= 0 ){
-        //Para finalizar a thread dessa task
-        deleteThread();
-        return false;
-    }
-    return true;
 }
-
 
 //TODO: Implmentar a criação e destruição da thread e como ela funciona
 

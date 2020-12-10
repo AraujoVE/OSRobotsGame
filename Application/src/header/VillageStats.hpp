@@ -6,6 +6,8 @@
 
 class VillageStats{
     private:
+        const int MIN_LOSS = 5;
+        const int MAX_LOSS = 10;
         const int MAX_STAT_VALUE = 5; // each village stat is between 0 and 6 (included)
         const int INIT_POP_VALUE = 1000;
         const int INIT_RESOURCES_VALUE = 100;
@@ -32,6 +34,9 @@ class VillageStats{
         void setStructures(int);
         void setDefenses(int);
         void setResources(int);
+
+        void increaseStat(RobotFunction,int,float);
+        void decreaseStats();
 
         void initializeStats();
         void calcNewPop();
