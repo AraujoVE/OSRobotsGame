@@ -39,9 +39,7 @@ void Task::initializeParameters(RobotFunction funct){
     lastUpdateTime = time(0);
     remainingTime = -1;
     gainedGoods = 0;
-    rewardTax = MIN_REWARD + (std::rand()%REWARD_RNG);
-
-    timeUnits = TIME_STEP * (INIT_TIME_STEP + (std::rand()%9));
+    rewardMultiplier = MIN_REWARD + (std::rand()%REWARD_RANGE);
     predictedTime = 0;
     createThread();
 }
@@ -91,7 +89,7 @@ bool Task::updateTask(){
     int progress = curProgress + (lastUpdateTime - curTime)*robotsNo;
     curProgress = progress > progressLength ? progressLength : progress;
     remainingTime =  !robotsNo ? -1 : (progressLength - curProgress)/robotsNo;
-    gainedGoods = (pow((float)curProgress,2)/(float)progressLength) * (float)rewardTax;
+    gainedGoods = (pow((float)curProgress,2)/(float)progressLength) * (float)rewardMultiplier;
     lastUpdateTime = curTime;
     return remainingTime != 0; 
 

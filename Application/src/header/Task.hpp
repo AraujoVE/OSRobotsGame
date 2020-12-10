@@ -15,7 +15,7 @@ class Task{
         const static int INIT_TIME_STEP = 2;
         const static int MAX_TIME_STEPS = 10;
         const static int MIN_REWARD = 2;
-        const static int REWARD_RNG = 3;
+        const static int REWARD_RANGE = 3;
         constexpr static float FAILURE_TAX = 0.8;
 
         static int lastId;
@@ -28,7 +28,7 @@ class Task{
         time_t remainingTime;
         int timeUnits;
         int predictedTime;
-        int rewardTax;
+        int rewardMultiplier;
         float gainedGoods;
 
     public:

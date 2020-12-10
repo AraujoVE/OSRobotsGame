@@ -116,10 +116,7 @@ void VillageStats::calcNewPop() {
 }
 
 
-// ======================== ADD FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
-void addTaskResources(RobotFunction taskType, time_t taskInitTime, int noRobots) {
-    return;
-}
+// ======================== ADD/REMOVE FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
 
 //Increase in stats due to a task completion
 void VillageStats::increaseStat(int type,int increase){
@@ -137,7 +134,7 @@ void VillageStats::decreaseStats(){
         minMaxFact = population/baseStats[i];
         //The population per current stat ratio afects how much product will be lost
         maxLoss = (int) MAX_LOSS * minMaxFact;
-        minLoss = (int) MIN_LOSS * minMaxFact;
+        minLoss = (int) MIN_LOSS * minMaxFact; 
         // A value in range [100 - maxLoss,100 - minLoss] 
         randVal = (100 - maxLoss) + rand()%(maxLoss - minLoss + 1);
         //set new value
