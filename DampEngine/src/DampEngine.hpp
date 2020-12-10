@@ -23,7 +23,11 @@
 #include "DampEngine/Core/Layer.hpp"
 #include "DampEngine/Core/Window.hpp"
 #include "DampEngine/Core/Log.hpp"
+
 #include "DampEngine/Events.hpp"
+
+#include "DampEngine/Core/KeyCodes.hpp"
+#include "DampEngine/Core/Input.hpp"
 
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
 
