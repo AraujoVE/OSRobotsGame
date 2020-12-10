@@ -20,10 +20,6 @@ Task::Task(RobotFunction funct){
 
 Task::~Task() {}
 
-float Task::calcGainedGoods(){
-    return (pow((float)curProgress,2)/(float)progressLength) * (float)rewardTax;
-}
-
 int Task::calcLostRobots(){
     int progress = (int)(FAILURE_TAX * 100 * ((float)curProgress/(float)progressLength));
     int randomLost = 1 + std::rand()%100;
@@ -31,7 +27,7 @@ int Task::calcLostRobots(){
 
     if(progress > randomLost) lostRobots = (float)robotsNo * (((float)(progress - randomLost))/100.0);
 
-    return (int)lostRobots;
+    return (int)lostRobots <= robotsNo ? (int)lostRobots : robotsNo;
 }
 
 void Task::initializeParameters(RobotFunction funct){
@@ -80,19 +76,22 @@ time_t Task::getRemainingTime() const{
     return remainingTime;
 }
 
-
+float Task::getGainedGoods() const{
+    return gainedGoods;
+}
 
 //Set of number of robots
 void Task::setRobotsNo(int newRobotsNo){
     robotsNo = newRobotsNo;
 }
+
 bool Task::updateTask(){
     time_t curTime = time(0);
     int oldProgress = curProgress;
     int progress = curProgress + (lastUpdateTime - curTime)*robotsNo;
     curProgress = progress > progressLength ? progressLength : progress;
     remainingTime =  !robotsNo ? -1 : (progressLength - curProgress)/robotsNo;
-
+    gainedGoods = (pow((float)curProgress,2)/(float)progressLength) * (float)rewardTax;
     lastUpdateTime = curTime;
     return remainingTime != 0; 
 

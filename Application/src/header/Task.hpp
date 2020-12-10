@@ -43,12 +43,12 @@ class Task{
         int getCurProgress() const;
         time_t getLastUpdate() const;
         time_t getRemainingTime() const;
+        float getGainedGoods() const;
 
         void setRobotsNo(int newRobotsNo);
         bool updateTask();
         
         int calcLostRobots();
-        float calcGainedGoods();
         
         void createThread();
         void deleteThread();

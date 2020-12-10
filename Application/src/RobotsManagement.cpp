@@ -90,21 +90,21 @@ void RobotsManagement::createTask(RobotFunction funct){
     //Cria nova task com o id Incrementado
     Task newTask(funct);
     tasks[(int)funct].insert({newTask.getId(),newTask});
-
-    tasks[(int)funct].insert({newTask.getId(),newTask});
 }
 
 bool RobotsManagement::endTask(Task &curTask){
     if(!curTask.updateTask()){
+        int lostRobots = curTask.calcLostRobots();
         moveRobot(curTask,-1*curTask.getRobotsNo());
-        destroyRobots(curTask.calcLostRobots());
-        villageStats->increaseStat(curTask.getType(),curTask.calcGainedGoods(),1);
+        destroyRobots(lostRobots);
+        villageStats->increaseStat((int)curTask.getType(),(int)curTask.getGainedGoods());
 
         return true;
     }
     return false;
 }
 
+//This method is probably useless once each task will have a thread  
 void RobotsManagement::updateTasks(){
     bool finishedTask = false;
     for(std::map<int,Task>& funct : tasks){
@@ -117,21 +117,17 @@ void RobotsManagement::updateTasks(){
     } 
 }
 
-//This must go into a semaphore
 bool RobotsManagement::moveRobot(Task &choosenTask,int robotsNo){
-    RobotFunction funct = choosenTask.getType();
-    int id = choosenTask.getId();
     if(!robotsNo) return true; //If no robots are add or removed, nothing to do
     if(robotsNo > 0 && freeRobots < robotsNo) return false; // Can't add robots to a task if there are not enough free robots 
     else if(robotsNo < 0 && choosenTask.getRobotsNo() + robotsNo < 0) return false; //Can't remove robots from a task if there are not enough robots in the given task
-    else if(tasks[(int)funct].find(id) == tasks[(int)funct].end()) return false; //Can't move or remove robots from an inexistent task. 
+    else if(tasks[(int)choosenTask.getType()].find(choosenTask.getId()) == tasks[(int)choosenTask.getType()].end()) return false; //Can't move or remove robots from an inexistent task. 
 
-    //Incremen or decrement the number of free robots
-    freeRobots -= robotsNo;
+    //Incrementa or decrement the number of free robots
+    this->setFreeRobots(freeRobots - robotsNo);
 
     //Add or remove a robot from a given task
-    int oldRobotsNo = tasks[(int)funct].at(id).getRobotsNo();
-    tasks[(int)funct].at(id).setRobotsNo(oldRobotsNo + robotsNo);
+    choosenTask.setRobotsNo(choosenTask.getRobotsNo() + robotsNo);
 
     return true;
 }

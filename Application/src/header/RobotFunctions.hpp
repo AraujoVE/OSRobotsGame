@@ -1,9 +1,9 @@
 #pragma once
 
 enum class RobotFunction{
-    PROTECTION = 0,
-    HUNT,
+    HUNT = 0,
     MEDICINE,
     CONSTRUCTION,
+    PROTECTION,
     RESOURCE_GATHERING
 };
