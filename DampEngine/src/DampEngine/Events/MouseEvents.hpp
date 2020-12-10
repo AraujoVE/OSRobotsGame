@@ -9,6 +9,8 @@ namespace DampEngine
     protected:
         MouseButtonEvent(int button) : m_Button(button) {}
 
+        inline int GetButton() const { return m_Button; }
+
         std::string ToString() const override { return GetEventName() + " Button: " + std::to_string(m_Button); }
 
     protected:
@@ -19,6 +21,9 @@ namespace DampEngine
     {
     public:
         MouseButtonReleasedEvent(int button) : MouseButtonEvent(button) {}
+
+        using MouseButtonEvent::GetButton;
+
         DE_EVENT_SET_TYPE(MouseButtonReleased);
     };
 
@@ -26,6 +31,9 @@ namespace DampEngine
     {
     public:
         MouseButtonPressedEvent(int button) : MouseButtonEvent(button) {}
+
+        using MouseButtonEvent::GetButton;
+
         DE_EVENT_SET_TYPE(MouseButtonPressed);
     };
 
@@ -35,6 +43,9 @@ namespace DampEngine
         MouseMovedEvent(float xPos, float yPos): m_xPos(xPos), m_yPos(yPos) {}
 
         std::string ToString() const override { return GetEventName() + " New position: (x=" + std::to_string(m_xPos) + ", y=" +  std::to_string(m_yPos) + ")";}
+
+        inline float GetXPos() const { return m_xPos; } 
+        inline float GetYPos() const { return m_yPos; }
 
         DE_EVENT_SET_TYPE(MouseMoved);
     private:
@@ -59,6 +70,9 @@ namespace DampEngine
         MouseScrolledEvent(float xOffset, float yOffset): m_xOffset(xOffset), m_yOffset(yOffset) {}
 
         std::string ToString() const override { return GetEventName() + " Offset: (x=" + std::to_string(m_xOffset) + ", y=" +  std::to_string(m_yOffset) + ")";}
+
+        inline float GetXOffset() const { return m_xOffset; } 
+        inline float GetYOffset() const { return m_yOffset; }
 
         DE_EVENT_SET_TYPE(MouseScrolled);
 

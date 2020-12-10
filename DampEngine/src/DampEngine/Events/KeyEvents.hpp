@@ -10,6 +10,8 @@ namespace DampEngine
     protected:
         KeyEvent(int keyCode) : m_KeyCode(keyCode) {}
         
+        inline int GetKeyEvent() const { return m_KeyCode; }
+
         std::string ToString() const override { return GetEventName() + " Key: " + std::to_string(m_KeyCode); };
 
     protected:
