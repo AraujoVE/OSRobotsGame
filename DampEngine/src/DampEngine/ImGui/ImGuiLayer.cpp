@@ -7,7 +7,6 @@
 #include "imgui.h"
 #include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
 
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 

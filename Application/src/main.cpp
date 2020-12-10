@@ -6,7 +6,7 @@ public:
     MyApplication(): DampEngine::Application({"OSRobotGame"}) {
     }
     
-    void InitLayers() override {
+    virtual void InitLayers() override {
         m_LayerStack.PushOverlay(new DampEngine::ImGuiLayer());
     }
 

@@ -22,19 +22,18 @@ namespace DampEngine
 
         ~LinuxGLFWWindow() { }
 
-        void OnUpdate() override;
+        virtual void OnUpdate() override;
 
-        void *GetNativeWindow() const override;
+        virtual void *GetNativeWindow() const override;
 
-        inline unsigned GetHeight() const override { return m_Data.Props.Height; }
-        inline unsigned GetWidth() const override { return m_Data.Props.Width; }
+        virtual inline unsigned GetHeight() const override { return m_Data.Props.Height; }
+        virtual inline unsigned GetWidth() const override { return m_Data.Props.Width; }
 
-        void SetEventCallback(const EventCallbackFn &callback) override
+        virtual void SetEventCallback(const EventCallbackFn &callback) override
         {
             m_Data.EventCallback = callback;
         }
 
-        // void *GetNativeWindow() override {}
     private:
         void InitWindowInGLFW();
         friend void SendEventToWindow(GLFWwindow *&glfwWindow, Event &&event);

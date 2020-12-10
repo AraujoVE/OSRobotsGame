@@ -9,7 +9,7 @@ namespace DampEngine
     public:
         using Event::Event;
 
-        std::string ToString() const override {
+        virtual std::string ToString() const override {
             return GetEventName();
         }
 
@@ -74,7 +74,7 @@ namespace DampEngine
     public:
         WindowContentScaledEvent(float xScale, float yScale): m_xScale(xScale), m_yScale(yScale) {}
 
-        std::string ToString() const override { return GetEventName() + " Scale: (x=" + std::to_string(m_xScale) + ", y=" +  std::to_string(m_yScale) + ")";}
+        virtual std::string ToString() const override { return GetEventName() + " Scale: (x=" + std::to_string(m_xScale) + ", y=" +  std::to_string(m_yScale) + ")";}
 
         DE_EVENT_SET_TYPE(WindowContentScaled);
 

@@ -11,7 +11,7 @@ namespace DampEngine
 
         inline int GetButton() const { return m_Button; }
 
-        std::string ToString() const override { return GetEventName() + " Button: " + std::to_string(m_Button); }
+        virtual std::string ToString() const override { return GetEventName() + " Button: " + std::to_string(m_Button); }
 
     protected:
         int m_Button;
@@ -42,7 +42,7 @@ namespace DampEngine
     public:
         MouseMovedEvent(float xPos, float yPos): m_xPos(xPos), m_yPos(yPos) {}
 
-        std::string ToString() const override { return GetEventName() + " New position: (x=" + std::to_string(m_xPos) + ", y=" +  std::to_string(m_yPos) + ")";}
+        virtual std::string ToString() const override { return GetEventName() + " New position: (x=" + std::to_string(m_xPos) + ", y=" +  std::to_string(m_yPos) + ")";}
 
         inline float GetXPos() const { return m_xPos; } 
         inline float GetYPos() const { return m_yPos; }
@@ -69,7 +69,7 @@ namespace DampEngine
     public:
         MouseScrolledEvent(float xOffset, float yOffset): m_xOffset(xOffset), m_yOffset(yOffset) {}
 
-        std::string ToString() const override { return GetEventName() + " Offset: (x=" + std::to_string(m_xOffset) + ", y=" +  std::to_string(m_yOffset) + ")";}
+        virtual std::string ToString() const override { return GetEventName() + " Offset: (x=" + std::to_string(m_xOffset) + ", y=" +  std::to_string(m_yOffset) + ")";}
 
         inline float GetXOffset() const { return m_xOffset; } 
         inline float GetYOffset() const { return m_yOffset; }

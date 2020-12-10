@@ -72,7 +72,8 @@ namespace DampEngine
         VBlankEvent() : Event() {
 
         }
-        std::string ToString() const override { return GetEventName(); };
+        
+        virtual std::string ToString() const override { return GetEventName(); };
     };
 
     class EventDispatcher

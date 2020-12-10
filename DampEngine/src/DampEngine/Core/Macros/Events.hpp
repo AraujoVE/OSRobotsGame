@@ -7,8 +7,8 @@
 #define DE_EVENT_SET_TYPE(type) \
     inline static EventType GetStaticEventType() { return EventType:: type; }; \
     inline static const std::string GetStaticEventName() { return #type; } \
-    inline EventType GetEventType() const override { return type ## Event::GetStaticEventType(); } \
-    inline std::string GetEventName() const override { return type ## Event::GetStaticEventName(); } 
+    inline virtual EventType GetEventType() const override { return type ## Event::GetStaticEventType(); } \
+    inline virtual std::string GetEventName() const override { return type ## Event::GetStaticEventName(); } 
 
 
 

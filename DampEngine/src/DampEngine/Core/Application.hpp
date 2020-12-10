@@ -32,7 +32,7 @@ namespace DampEngine
         void OnEvent(Event& event);
 
         //Other event handlers can also be defined according to IEventHandler's virtual functions
-        bool OnWindowClosed(WindowClosedEvent &event) override;
+        virtual bool OnWindowClosed(WindowClosedEvent &event) override;
         
         void Close();
 
