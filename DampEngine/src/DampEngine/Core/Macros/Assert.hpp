@@ -9,8 +9,8 @@
 
 #define DE_GET_MACRO_NAME_3(arg1, arg2, arg3, macro, ...) macro
 
-#define DE_ASSERT_3(type, check, message, param) { if (!(check))  CAT_EVAL(CAT_EVAL(DE, _), ERROR) (message, DE_INTERNAL_STRIP_PARENTHESIS param); }
-#define DE_ASSERT_2(type, check, message) { if (!(check))  CAT_EVAL(CAT_EVAL(DE, _), ERROR)(message); }
+#define DE_ASSERT_3(type, check, message, param) { if (!(check))  CAT(CAT(DE, _), ERROR) (message, DE_INTERNAL_STRIP_PARENTHESIS param); }
+#define DE_ASSERT_2(type, check, message) { if (!(check))  CAT(CAT(DE, _), ERROR)(message); }
 #define DE_ASSERT_1(type, check) DE_ASSERT_3(type, check, "Assertion failed: '{0}'", (#check) )
 
 

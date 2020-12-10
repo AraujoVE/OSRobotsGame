@@ -8,16 +8,17 @@
 
 #define EMPTY()
 
-#define EVAL(...) EVAL1024(__VA_ARGS__)
-#define EVAL1024(...) EVAL512(EVAL512(__VA_ARGS__))
-#define EVAL512(...) EVAL256(EVAL256(__VA_ARGS__))
-#define EVAL256(...) EVAL128(EVAL128(__VA_ARGS__))
-#define EVAL128(...) EVAL64(EVAL64(__VA_ARGS__))
-#define EVAL64(...) EVAL32(EVAL32(__VA_ARGS__))
-#define EVAL32(...) EVAL16(EVAL16(__VA_ARGS__))
-#define EVAL16(...) EVAL8(EVAL8(__VA_ARGS__))
-#define EVAL8(...) EVAL4(EVAL4(__VA_ARGS__))
-#define EVAL4(...) EVAL2(EVAL2(__VA_ARGS__))
+#define EVAL(...) EVAL12(__VA_ARGS__)
+#define EVAL12(...) EVAL11(EVAL11(__VA_ARGS__))
+#define EVAL11(...) EVAL10(EVAL10(__VA_ARGS__))
+#define EVAL10(...) EVAL9(EVAL9(__VA_ARGS__))
+#define EVAL9(...) EVAL8(EVAL8(__VA_ARGS__))
+#define EVAL8(...) EVAL7(EVAL7(__VA_ARGS__))
+#define EVAL7(...) EVAL6(EVAL6(__VA_ARGS__))
+#define EVAL6(...) EVAL5(EVAL5(__VA_ARGS__))
+#define EVAL5(...) EVAL4(EVAL4(__VA_ARGS__))
+#define EVAL4(...) EVAL3(EVAL3(__VA_ARGS__))
+#define EVAL3(...) EVAL2(EVAL2(__VA_ARGS__))
 #define EVAL2(...) EVAL1(EVAL1(__VA_ARGS__))
 #define EVAL1(...) __VA_ARGS__
 
@@ -27,8 +28,8 @@
 #define IS_PROBE(...) SECOND(__VA_ARGS__, 0)
 #define PROBE() ~, 1
 
-#define CAT(a,b) a ## b
-#define CAT_EVAL(a,b) CAT(a,b)
+#define CAT(a,...) PRIMITIVE_CAT(a, __VA_ARGS__)
+#define PRIMITIVE_CAT(a,...) a ## __VA_ARGS__
 
 
 #define NOT(x) IS_PROBE(CAT(_NOT_, x))
@@ -47,14 +48,5 @@
 
 #define HAS_ARGS(...) BOOL(FIRST(_END_OF_ARGUMENTS_ __VA_ARGS__)())
 #define _END_OF_ARGUMENTS_() 0
-
-#define MAP(m, first, ...)           \
-  m(first)                           \
-  IF_ELSE(HAS_ARGS(__VA_ARGS__))(    \
-    DEFER2(_MAP)()(m, __VA_ARGS__)   \
-  )(                                 \
-    /* Do nothing, just terminate */ \
-  )
-#define _MAP() MAP
 
 #define STRINGFY(x) #x

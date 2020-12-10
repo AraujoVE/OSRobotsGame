@@ -19,7 +19,7 @@ namespace DampEngine
         virtual void OnUpdate() {}
         virtual void OnStop() {}
 
-        //Currently, the application is limited to only one window
+        //Currently, the engine is limited to only one window per application
         virtual void CreateWindow();
         virtual void InitLayers() = 0;
 
@@ -29,12 +29,12 @@ namespace DampEngine
         //Issue the application to setup everything and start gameloop
         void Run();
 
-        void Close();
-        void OnEvent(Event &event);
+        void OnEvent(Event& event);
 
         //Other event handlers can also be defined according to IEventHandler's virtual functions
         bool OnWindowClosed(WindowClosedEvent &event) override;
-        bool OnWindowResized(WindowResizedEvent &event) override;
+        
+        void Close();
 
         virtual Window& GetWindow() const;
 

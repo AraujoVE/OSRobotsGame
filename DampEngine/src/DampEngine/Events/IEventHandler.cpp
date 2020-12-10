@@ -54,29 +54,29 @@ namespace DampEngine
 
     
     void IEventHandler::OnEvent(Event &event) {
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, KeyPressed);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, KeyReleased);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, KeyTyped);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseEnteredWindow);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseLeftWindow);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseMoved);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseButtonPressed);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseButtonReleased);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseScrolled);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowClosed);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowFocused);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowBlurred);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowMinimized);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowMaximized);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowRestored);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowMoved);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowRefreshed);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowResized);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowContentScaled);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, MonitorConnected);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, MonitorDisconnected);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, JoystickConnected);
-            DE_DISPATCH_EVENT_BIND(IEventHandler, event, JoystickDisconnected);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, KeyPressed);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, KeyReleased);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, KeyTyped);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseEnteredWindow);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseLeftWindow);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseMoved);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseButtonPressed);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseButtonReleased);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, MouseScrolled);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowClosed);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowFocused);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowBlurred);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowMinimized);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowMaximized);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowRestored);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowMoved);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowRefreshed);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowResized);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, WindowContentScaled);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, MonitorConnected);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, MonitorDisconnected);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, JoystickConnected);
+        DE_DISPATCH_EVENT_BIND(IEventHandler, event, JoystickDisconnected);
     }
 } // namespace DampEngine
     

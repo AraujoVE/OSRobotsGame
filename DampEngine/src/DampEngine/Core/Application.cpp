@@ -43,11 +43,17 @@ namespace DampEngine
 
     void Application::OnEvent(Event &event)
     {
-        // DE_ENGINE_TRACE("Application received event: {0}", event);
-        DE_DISPATCH_EVENT_BIND(Application, event, WindowClosed);
-        DE_DISPATCH_EVENT_BIND(Application, event, WindowResized);
+        // #define DISPATCH(event_type) DE_DISPATCH_EVENT_BIND(Application, event, event_type);
+        
+        // //!Important: Dispatch the current event to all possible IEventHandler virtual methods (which may be implemented by derived Applications and Layers ) 
+        // MAP(DISPATCH, DE_INTERNAL_EVENT_DEFINITIONS());
+
+        // #undef DISPATCH  
+        
+        IEventHandler::OnEvent(event);
 
         m_LayerStack.OnEvent(event);
+
     }   
 
     bool Application::OnWindowClosed(WindowClosedEvent &event)
@@ -55,11 +61,7 @@ namespace DampEngine
         Close();
         return true;
     }
-    bool Application::OnWindowResized(WindowResizedEvent &event)
-    {
-        return true;
-    }
-    
+
     inline Window& Application::GetWindow() const { 
         DE_ASSERT(m_Window != nullptr, "There is no Window running :(");
         return *m_Window; 
