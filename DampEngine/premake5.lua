@@ -33,7 +33,8 @@ project "DampEngine"
 		"vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"${IncludeDir.glm}"
 	}
 
 	links {

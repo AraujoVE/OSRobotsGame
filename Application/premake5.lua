@@ -15,7 +15,8 @@ project "Application"
 
 	includedirs {
 		"%{wks.location}/DampEngine/src",
-		"%{wks.location}/DampEngine/vendor/spdlog/include"
+		"%{wks.location}/DampEngine/vendor/spdlog/include",
+		"${IncludeDir.glm}"
 	}
 
 	links {

@@ -7,3 +7,6 @@
 [submodule "imgui-cherno"]
 	path = DampEngine/vendor/imgui
 	url = https://github.com/TheCherno/imgui
+[submodule "DampEngine/vendor/glm"]
+	path = DampEngine/vendor/glm
+	url = https://github.com/g-truc/glm

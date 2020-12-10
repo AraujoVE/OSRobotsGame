@@ -1,5 +1,7 @@
 #include <DampEngine.hpp>
 
+#include <glm/glm.hpp>
+
 class MyApplication : public DampEngine::Application
 {
 public:
@@ -12,9 +14,6 @@ public:
 
     virtual void OnUpdate() override {
 
-        auto[x, y] = DampEngine::Input::GetMousePos();
-
-        DE_INFO("MousePos: {0},{0} :)", x, y);
     }
 
 };

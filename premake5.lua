@@ -16,7 +16,8 @@ workspace "OSRobotGame"
 	IncludeDir = {}
 	IncludeDir["GLFW"] = "%{wks.location}/DampEngine/vendor/GLFW/include"
 	IncludeDir["Glad"] = "%{wks.location}/DampEngine/vendor/Glad/include"
-	IncludeDir["ImGui"] = "%{wks.location}/DampEngine/vendor/imgui"
+    IncludeDir["ImGui"] = "%{wks.location}/DampEngine/vendor/imgui"
+    IncludeDir["glm"] = "%{wks.location}/DampEngine/vendor/glm/glm"
 
     -- This defines ... in
     --./bin/ ... /{projectName}
