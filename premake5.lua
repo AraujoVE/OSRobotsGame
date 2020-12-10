@@ -1,6 +1,7 @@
 workspace "OSRobotGame"
     architecture "x64"
     startproject "Application"
+
     
     configurations { 
         "Debug", 

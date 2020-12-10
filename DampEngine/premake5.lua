@@ -2,6 +2,7 @@ project "DampEngine"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
+	staticruntime "on"
 
 	
 
@@ -12,7 +13,8 @@ project "DampEngine"
 	pchsource "src/depch.cpp"
 	
 	defines {
-		DE_ENGINE_BUILD
+		"DE_ENGINE_BUILD",
+		"GLFW_INCLUDE_NONE"
 	}
 
 	files {
