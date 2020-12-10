@@ -36,7 +36,7 @@ namespace DampEngine
         // virtual void SetVSync(bool enabled) = 0;
         // virtual bool IsVSync() const = 0;
 
-        // virtual void *GetNativeWindow() = 0;
+        virtual void *GetNativeWindow() const = 0;
 
         //To be defined by Platform
         static Window *Create(const WindowProps &starting_props);

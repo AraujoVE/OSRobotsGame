@@ -24,6 +24,8 @@ namespace DampEngine
 
         void OnUpdate() override;
 
+        void *GetNativeWindow() const override;
+
         inline unsigned GetHeight() const override { return m_Data.Props.Height; }
         inline unsigned GetWidth() const override { return m_Data.Props.Width; }
 

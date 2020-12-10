@@ -6,7 +6,10 @@
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include "imgui.h"
 #include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
+
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 namespace DampEngine
 {
@@ -48,7 +51,7 @@ namespace DampEngine
         io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
         io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
-        ImGui_ImplOpenGL3_Init("#version 130");        
+        ImGui_ImplOpenGL3_Init("#version 410");        
 
     }
 
@@ -74,6 +77,20 @@ namespace DampEngine
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+
+    bool ImGuiLayer::OnWindowResized(WindowResizedEvent &event) {
+        DE_DEBUG("Resized");
+
+        ImGuiIO &io = ImGui::GetIO();
+        io.DisplaySize = ImVec2{(float)event.GetWidth(), (float)event.GetHeight()};
+
+        DE_ASSERT((int)event.GetWidth() * (int)event.GetHeight() > 0, "unsigned overflow");
+        glViewport(0,0, event.GetWidth(), event.GetHeight());
+
+        return false;
+
+    } 
+    
 
     void ImGuiLayer::OnDetach()
     {

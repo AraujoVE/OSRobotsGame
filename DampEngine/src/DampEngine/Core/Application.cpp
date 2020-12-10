@@ -3,6 +3,10 @@
 #include "DampEngine/Core/Application.hpp"
 
 #include "depch.hpp"
+
+//!THINK HOW TO MAKE THIS IMPLEMENTATION DEPENDENT
+#include <glad/glad.h>
+
 namespace DampEngine
 {
     Application::Application(const WindowProps& startingProps) : m_WindowStartingProps(startingProps)
@@ -28,9 +32,14 @@ namespace DampEngine
         InitLayers();
 
         while (m_Running) {
+            glad_glClearColor(0x1, 0x00, 0x00, 255);
+            glad_glClear(GL_COLOR_BUFFER_BIT);
+
             this->OnUpdate();
-            m_Window->OnUpdate();
+            
             m_LayerStack.OnUpdate();
+
+            m_Window->OnUpdate();
         }
 
         OnStop();

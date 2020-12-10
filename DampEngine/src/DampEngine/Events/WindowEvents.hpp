@@ -19,8 +19,15 @@ namespace DampEngine
     class WindowResizedEvent : public Event
     {
     public:
-        using Event::Event;
+        WindowResizedEvent(unsigned width, unsigned height): m_Width(width), m_Height(height) {}
         DE_EVENT_SET_TYPE(WindowResized);
+
+        inline unsigned GetWidth() const { return m_Width; }
+        inline unsigned GetHeight() const { return m_Height; }
+
+    private:
+        unsigned m_Width, m_Height;
+
     };
 
 

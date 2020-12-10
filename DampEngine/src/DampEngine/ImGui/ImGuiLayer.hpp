@@ -8,9 +8,14 @@ namespace DampEngine
     {
     public:
         ImGuiLayer();
+
         void OnAttach() override;
         void OnUpdate() override;
         void OnDetach() override;
+        
+        //IEventHandler callbacks
+        bool OnWindowResized(WindowResizedEvent &event) override;
+        
         ~ImGuiLayer();
     };
 

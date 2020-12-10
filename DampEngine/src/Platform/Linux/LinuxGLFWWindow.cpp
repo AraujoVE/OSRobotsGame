@@ -6,9 +6,10 @@
 
 #include "LinuxGLFWWindow.hpp"
 
+
 #define GLFW_INCLUDE_NONE
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 #include "depch.hpp"
 namespace DampEngine
@@ -20,11 +21,11 @@ namespace DampEngine
         return new LinuxGLFWWindow(starting_props);
     }
 
+    void *LinuxGLFWWindow::GetNativeWindow() const {
+        return m_GLFWWindow;
+    }
 
     void LinuxGLFWWindow::OnUpdate() {
-        // glad_glClear(GL_COLOR_BUFFER_BIT);
-        // glad_glClearColor(255, 0,0, 255);
-
         glfwPollEvents();
         glfwSwapBuffers(m_GLFWWindow);
     }
@@ -59,7 +60,9 @@ namespace DampEngine
         DE_ASSERT(m_GLFWWindow != nullptr, "Could not create a GLFW window");
 
         glfwMakeContextCurrent(m_GLFWWindow);
+        
         gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+        
         glfwSetWindowUserPointer(m_GLFWWindow, &m_Data);
 
         s_GLFWWindowCount++;
@@ -170,7 +173,7 @@ namespace DampEngine
         // });
 
         glfwSetWindowSizeCallback(m_GLFWWindow, [](GLFWwindow *window, int width, int height) {
-
+            SendEventToWindow(window, WindowResizedEvent(width, height));
         });
     } // LinuxGLFWWindow::InitWindowInGLFW()
 
