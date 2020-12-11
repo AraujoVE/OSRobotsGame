@@ -24,15 +24,12 @@ namespace DampEngine
 
         virtual void OnUpdate() override;
 
-        virtual void *GetNativeWindow() const override;
+        inline virtual void *GetNativeWindow() const override { return m_GLFWWindow; }
 
         virtual inline unsigned GetHeight() const override { return m_Data.Props.Height; }
         virtual inline unsigned GetWidth() const override { return m_Data.Props.Width; }
 
-        virtual void SetEventCallback(const EventCallbackFn &callback) override
-        {
-            m_Data.EventCallback = callback;
-        }
+        inline virtual void SetEventCallback(const EventCallbackFn &callback) override { m_Data.EventCallback = callback; }
 
     private:
         void InitWindowInGLFW();
@@ -46,5 +43,7 @@ namespace DampEngine
 
         WindowData m_Data;
         GLFWwindow *m_GLFWWindow;
+
+        GraphicsContext *m_Context;
     };
 } // namespace DampEngine

@@ -2,6 +2,8 @@
 
 #include "DampEngine/Events/Event.hpp"
 
+#include "DampEngine/Renderer/GraphicsContext.hpp"
+
 #include <string>
 #include <functional>
 
@@ -38,8 +40,11 @@ namespace DampEngine
 
         virtual void *GetNativeWindow() const = 0;
 
+
         //To be defined by Platform
         static Window *Create(const WindowProps &starting_props);
+        
+   
     };
 
 } // namespace DampEngine

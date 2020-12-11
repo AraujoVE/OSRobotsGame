@@ -6,9 +6,9 @@
 
 #include "LinuxGLFWWindow.hpp"
 
+#include "Platform/OpenGL/OpenGLGraphicsContext.hpp"
 
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
 
 #include "depch.hpp"
 namespace DampEngine
@@ -16,17 +16,8 @@ namespace DampEngine
     //!IMPORTANT: Defines which class should be used for Window abstract class' static method Window::Create(...)
     Window *Window::Create(const WindowProps &starting_props)
     {   
-        DE_ENGINE_INFO("Linux System detected, creating LinuxGLFWWindow");
+        DE_ENGINE_INFO("Linux System chosen, creating LinuxGLFWWindow");
         return new LinuxGLFWWindow(starting_props);
-    }
-
-    void *LinuxGLFWWindow::GetNativeWindow() const {
-        return m_GLFWWindow;
-    }
-
-    void LinuxGLFWWindow::OnUpdate() {
-        glfwPollEvents();
-        glfwSwapBuffers(m_GLFWWindow);
     }
 
     //Number of windows created since the engine started,
@@ -38,6 +29,7 @@ namespace DampEngine
         DE_ENGINE_ERROR("GLFW Error ({0}): {1}", error, description);
     }
 
+    //Some macros and function to avoid code repetition
     #define DE_GLFW_CASE_SEND(_case, window, event) case _case: SendEventToWindow(window, event); break;  
     #define DE_GLFW_CASE_DEFAULT(value) default: DE_ENGINE_ERROR("Unknown GLFW token: {1}", #value); break;
     inline void SendEventToWindow(GLFWwindow *&glfwWindow, Event &&event) {
@@ -58,15 +50,16 @@ namespace DampEngine
         m_GLFWWindow = glfwCreateWindow(m_Data.Props.Width, m_Data.Props.Height, m_Data.Props.Title.c_str(), nullptr, nullptr);
         DE_ASSERT(m_GLFWWindow != nullptr, "Could not create a GLFW window");
 
-        glfwMakeContextCurrent(m_GLFWWindow);
-        
-        gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        
-        glfwSetWindowUserPointer(m_GLFWWindow, &m_Data);
+        m_Context = new OpenGLGraphicsContext(m_GLFWWindow);
+        m_Context->Init();
 
+
+        glfwSetWindowUserPointer(m_GLFWWindow, &m_Data);
         s_GLFWWindowCount++;
 
         DE_ENGINE_TRACE("Setting GLFW event callbacks");
+
+        #pragma region GLFW Callbacks
 
         glfwSetKeyCallback(m_GLFWWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
             switch (action)
@@ -174,6 +167,19 @@ namespace DampEngine
         glfwSetWindowSizeCallback(m_GLFWWindow, [](GLFWwindow *window, int width, int height) {
             SendEventToWindow(window, WindowResizedEvent(width, height));
         });
+
+        #pragma endregion
+    
     } // LinuxGLFWWindow::InitWindowInGLFW()
 
+    void LinuxGLFWWindow::OnUpdate() {
+        glfwPollEvents();
+        m_Context->SwapBuffers();
+    }
+
+
 } // namespace DampEngine
+
+//FIXME: not sure if undef is needed
+#undef DE_GLFW_CASE_SEND
+#undef DE_GLFW_CASE_DEFAULT
