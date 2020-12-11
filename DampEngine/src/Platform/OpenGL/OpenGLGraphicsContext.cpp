@@ -1,6 +1,7 @@
 #include "depch.hpp"
 #include "OpenGLGraphicsContext.hpp"
 
+#include "DampEngine/Core/Base.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>

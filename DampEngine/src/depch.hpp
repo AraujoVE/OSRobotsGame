@@ -3,5 +3,3 @@
 
 #include <sstream>
 #include <iostream>
-
-#include "DampEngine/Core/Base.hpp"
