@@ -22,8 +22,9 @@ namespace DampEngine
         void OnEvent(Event &) const;
 
         ~LayerStack();
+
     private:
-        std::vector<Layer*> m_LayerStack;
-        std::vector<Layer*>::iterator m_OverlayStartIt;
-    };    
+        std::vector<Layer *> m_LayerStack;
+        unsigned int m_OverlayStartIndex = 0;
+    };
 } // namespace DampEngine
