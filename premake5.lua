@@ -2,7 +2,7 @@ workspace "OSRobotGame"
     architecture "x64"
     startproject "Application"
 
-    
+
     configurations { 
         "Debug", 
         "Release", 
@@ -33,4 +33,14 @@ workspace "OSRobotGame"
 
     include "DampEngine"
     include "Application"
+
+    filter { "system:linux", "configurations:Debug" }
+
+        buildoptions {
+            "-Wall",
+            "-Wno-unknown-pragmas",
+            "-Wno-error=unused-value",
+            "-Wno-error=unused-variable",
+            "-Werror",
+        }
     

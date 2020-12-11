@@ -12,7 +12,7 @@ namespace DampEngine
     Application::Application(const WindowProps& startingProps) : m_WindowStartingProps(startingProps)
     {
         DE_ENGINE_DEBUG("Application constructor called");
-        DE_ASSERT((s_Instance == nullptr), "Application already instanced");
+        DE_ASSERT((s_Instance == nullptr), "Application already instanced (currently only one is allowed)");
         Application::s_Instance = this;
     };
 

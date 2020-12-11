@@ -77,6 +77,8 @@ namespace DampEngine
 
         // });
 
+        glfwSetErrorCallback(GLFWErrorCallback);
+
         glfwSetCursorEnterCallback(m_GLFWWindow, [](GLFWwindow *window, int entered_or_left) {
             switch (entered_or_left)
             {
