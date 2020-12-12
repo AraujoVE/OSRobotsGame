@@ -59,6 +59,8 @@ project "DampEngine"
 		files {
 			"src/Platform/Linux/**.cpp",
 			"src/Platform/Linux/**.hpp",
+			"src/Platform/OpenGL/**.hpp",
+			"src/Platform/OpenGL/**.hpp",
 		}
 
 		links {

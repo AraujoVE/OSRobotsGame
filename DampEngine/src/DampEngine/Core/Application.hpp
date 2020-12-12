@@ -7,6 +7,11 @@
 
 #include <functional>
 
+//TODO: remove Temporary
+#include "DampEngine/Renderer/Buffers/VertexArray.hpp"
+#include "DampEngine/Renderer/Buffers/VertexBuffer.hpp"
+#include "DampEngine/Renderer/Buffers/IndicesBuffer.hpp"
+
 namespace DampEngine
 {
     class Application : public IEventHandler
@@ -48,5 +53,6 @@ namespace DampEngine
     private:
         static Application *s_Instance;
         bool m_Running;
+
     };
 } // namespace DampEngine
