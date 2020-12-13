@@ -15,8 +15,6 @@ namespace Application
         virtual void ImGuiDescription() override;
 
     private:
-        std::unique_ptr<Task> m_Task;
-
         std::unique_ptr<FunctionWindow> m_FunctionWindow;
     };
 }

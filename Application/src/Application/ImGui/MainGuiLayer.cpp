@@ -13,8 +13,6 @@ namespace Application
     {
         ImGuiWindowFlags windowFlags = ImGuiBackendFlags_None;
 
-        DE_INFO("Task id={0} has {1} robots", m_Task->getId(), m_Task->getRobotsNo());
-
         windowFlags |= ImGuiWindowFlags_NoMove;
         windowFlags |= ImGuiWindowFlags_NoTitleBar;
         windowFlags |= ImGuiWindowFlags_NoResize;
