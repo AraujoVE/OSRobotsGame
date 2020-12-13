@@ -1,20 +1,22 @@
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
 using namespace DampEngine;
 
-#include "Windows/FunctionWindow.hpp"
-#include "header/Task.hpp"
+#include "Application/ImGui/Windows/FunctionWindow.hpp"
+#include "Application/header/Task.hpp"
 #include <memory>
-
-class MainGuiLayer final : public ImGuiLayer
+namespace Application
 {
-public:
-    MainGuiLayer();
+    class MainGuiLayer final : public ImGuiLayer
+    {
+    public:
+        MainGuiLayer();
 
-private:
-    virtual void ImGuiDescription() override;
+    private:
+        virtual void ImGuiDescription() override;
 
-private:
-    std::unique_ptr<Task> m_Task;
+    private:
+        std::unique_ptr<Task> m_Task;
 
-    std::unique_ptr<FunctionWindow> m_FunctionWindow;
-};
+        std::unique_ptr<FunctionWindow> m_FunctionWindow;
+    };
+}

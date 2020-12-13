@@ -5,11 +5,14 @@
 // #include "RobotsManagement.hpp"
 // #include "VillageStats.hpp"
 // #include <vector>
-//#include <map> 
+//#include <map>
 #include <ctime>
 //#include <iostream>
 
-class Task{
+namespace Application
+{
+    class Task
+    {
     private:
         const static int TIME_STEP = 10;
         const static int INIT_TIME_STEP = 2;
@@ -47,10 +50,12 @@ class Task{
 
         void setRobotsNo(int newRobotsNo);
         bool updateTask();
-        
+
         int calcLostRobots();
-        
+
         void createThread();
         void deleteThread();
-};
+    };
+
+} // namespace Application
 #endif

@@ -5,11 +5,13 @@
 #include "Task.hpp"
 #include "VillageStats.hpp"
 #include <vector>
-#include <map> 
+#include <map>
 #include <ctime>
 
-
-class RobotsManagement{
+namespace Application
+{
+    class RobotsManagement
+    {
 
     private:
         static const int MAX_TASK_TYPES = 5;
@@ -17,7 +19,7 @@ class RobotsManagement{
         int freeRobots;
         int prodCost;
         VillageStats *villageStats;
-        std::map<int,Task> tasks[MAX_TASK_TYPES];
+        std::map<int, Task> tasks[MAX_TASK_TYPES];
 
     public:
         RobotsManagement();
@@ -27,7 +29,7 @@ class RobotsManagement{
         int getTotRobots() const;
         int getFreeRobots() const;
         int getProdCost() const;
-        std::map<int, Task>* getTasks() const;
+        std::map<int, Task> *getTasks() const;
 
         void setTotRobots(int newTotRobots);
         void setFreeRobots(int newFreeRobots);
@@ -39,7 +41,8 @@ class RobotsManagement{
         bool destroyRobots(int);
         void createTask(RobotFunction);
         void updateTasks();
-        bool moveRobot(Task &,int);
-        bool endTask(Task&);
-};
+        bool moveRobot(Task &, int);
+        bool endTask(Task &);
+    };
+} // namespace Application
 #endif

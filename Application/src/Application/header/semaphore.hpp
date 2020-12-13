@@ -2,17 +2,21 @@
 #include <mutex>
 #include <condition_variable>
 #include <iostream>
-        
-class Semaphore {
+
+namespace Application
+{
+    class Semaphore
+    {
     private:
         std::mutex mtx;
         std::condition_variable conditionVar;
         int count = 0; // initialize as locked
 
-public:
-    Semaphore(int);
-    
-    void notify(int);
-    void wait(int);
-    bool tryWait(int);
-};
+    public:
+        Semaphore(int);
+
+        void notify(int);
+        void wait(int);
+        bool tryWait(int);
+    };
+} // namespace Application

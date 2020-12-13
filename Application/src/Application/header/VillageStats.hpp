@@ -4,7 +4,10 @@
 #include "RobotFunctions.hpp"
 #include <ctime>
 
-class VillageStats{
+namespace Application
+{
+    class VillageStats
+    {
     private:
         static const int BASE_STATS_NO = 5;
         const int MIN_LOSS = 5;
@@ -12,7 +15,7 @@ class VillageStats{
         const int MAX_STAT_VALUE = 5; // each village stat is between 0 and 5 (included)
         const int INIT_POP_VALUE = 1000;
         const int INIT_RESOURCES_VALUE = 100;
-        int baseStats[BASE_STATS_NO];/*
+        int baseStats[BASE_STATS_NO]; /*
             defenses;
             food;
             health;
@@ -24,10 +27,7 @@ class VillageStats{
             &VillageStats::setHealth,
             &VillageStats::setStructures,
             &VillageStats::setDefenses,
-            &VillageStats::setResources
-        };
-
-
+            &VillageStats::setResources};
 
         int population; // if population reaches zero, the game is over -> pop calculated based on other village stats
     public:
@@ -45,13 +45,14 @@ class VillageStats{
         void setStructures(int);
         void setDefenses(int);
         void setResources(int);
-        void setStat(int,int);
+        void setStat(int, int);
 
-        void increaseStat(int,int);
+        void increaseStat(int, int);
         void decreaseStats();
 
         void initializeStats();
         void calcNewPop();
         void addTaskResources(RobotFunction, time_t, int);
-};
+    };
+} // namespace Application
 #endif

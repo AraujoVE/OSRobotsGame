@@ -2,22 +2,29 @@
 
 #include "ImGui/MainGuiLayer.hpp"
 
-class MyApplication : public DampEngine::Application
+namespace Application
 {
-public:
-    MyApplication(): DampEngine::Application({"OSRobotGame"}) {
-    }
+    class MyApplication : public DampEngine::Application
+    {
+    public:
+        MyApplication() : DampEngine::Application({"OSRobotGame"})
+        {
+        }
 
-    virtual void InitLayers() override {
-        m_LayerStack.PushOverlay(new MainGuiLayer());
-    }
+        virtual void InitLayers() override
+        {
+            m_LayerStack.PushOverlay(new MainGuiLayer());
+        }
 
-    virtual void OnUpdate() override {
+        virtual void OnUpdate() override
+        {
+        }
+    };
 
-    }
 
-};
+} // namespace Application
 
-DampEngine::Application *CreateApplication() {
-    return new MyApplication();
+DampEngine::Application *CreateApplication()
+{
+    return new Application::MyApplication();
 }
