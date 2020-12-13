@@ -13,10 +13,14 @@ namespace DampEngine
         virtual void OnUpdate() final;
         virtual void OnDetach() override;
 
-        void Begin();
-        void End();
+        
         
         ~ImGuiLayer();
+    protected:
+        virtual void ImGuiDescription();
+    private:
+        void Begin();
+        void End();
     };
 
 } // namespace DampEngine

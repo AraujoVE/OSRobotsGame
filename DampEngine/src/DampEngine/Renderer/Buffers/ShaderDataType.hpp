@@ -28,6 +28,7 @@ namespace DampEngine
         case ShaderDataType::Float1:
             return 1;
         case ShaderDataType::Float2:
+
             return 2;
         case ShaderDataType::Float3:
             return 3;
@@ -51,6 +52,7 @@ namespace DampEngine
             return 1;
         }
         DE_ASSERT(false, "Uknown ShaderDataType!");
+        return 0;
     }
 
     unsigned ShaderDataTypeSize(ShaderDataType type)

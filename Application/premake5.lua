@@ -15,11 +15,14 @@ project "Application"
 	defines {}
 
 	includedirs {
+		"src/",
 		"%{wks.location}/DampEngine/src",
 		"%{wks.location}/DampEngine/vendor/spdlog/include",
-		"${IncludeDir.glm}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}"
 	}
 
+	
 	links {
 		"DampEngine",
 		"GLFW",

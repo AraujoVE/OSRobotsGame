@@ -50,16 +50,11 @@ namespace DampEngine
         ImGui_ImplOpenGL3_Init("#version 410");
     }
 
-    //TODO: remove (how?)
     void ImGuiLayer::OnUpdate()
     {
-        Begin();
-
-        static bool show = true;
-        ImGui::ShowDemoWindow(&show);
-        
-        End();
-        
+        this->Begin();
+        this->ImGuiDescription();
+        this->End();
     }
 
     void ImGuiLayer::OnDetach()
@@ -92,6 +87,10 @@ namespace DampEngine
         }
     }
 
+    void ImGuiLayer::ImGuiDescription() {
+        static bool show = true;
+        ImGui::ShowDemoWindow(&show);
+    }
 
     ImGuiLayer::~ImGuiLayer()
     {

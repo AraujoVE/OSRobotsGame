@@ -1,6 +1,6 @@
 #include <DampEngine.hpp>
 
-#include <glm/glm.hpp>
+#include "ImGui/MainGuiLayer.hpp"
 
 class MyApplication : public DampEngine::Application
 {
@@ -9,7 +9,7 @@ public:
     }
 
     virtual void InitLayers() override {
-        m_LayerStack.PushOverlay(new DampEngine::ImGuiLayer());
+        m_LayerStack.PushOverlay(new MainGuiLayer());
     }
 
     virtual void OnUpdate() override {
