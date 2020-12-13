@@ -18,7 +18,7 @@ namespace DampEngine
 
         inline bool IsEnabled() { return m_Enabled; }
 
-        virtual ~Layer() {}
+        virtual ~Layer() = default;
     private:
         inline void Enable() { m_Enabled = true; }
         inline void Disable() { m_Enabled = false; }

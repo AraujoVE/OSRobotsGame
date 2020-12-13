@@ -9,13 +9,13 @@ namespace DampEngine
     public:
         ImGuiLayer();
 
-        virtual void OnAttach() override;
+        virtual void OnAttach() final;
         virtual void OnUpdate() final;
-        virtual void OnDetach() override;
+        virtual void OnDetach() final;
 
         
         
-        ~ImGuiLayer();
+        virtual ~ImGuiLayer() override;
     protected:
         virtual void ImGuiDescription();
     private:
