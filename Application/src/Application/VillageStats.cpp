@@ -137,27 +137,33 @@ namespace Application
     // ======================== ADD/REMOVE FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
 
     //Increase in stats due to a task completion
-    void VillageStats::increaseStat(int type, int increase)
+    void VillageStats::changeStat(int type, int increase)
     {
-        (this->*(setStatsFuncts[type]))(baseStats[type] + increase);
+        //Valor relativo
+        //Inicio semaforo do stat "i" : isso deve ficar fora
+        int oldValue = baseStats[type];
+        (this->*(setStatsFuncts[type]))(oldValue + increase);
+        //Fim do semáforo do stat "i" : isso deve ficar fora
     }
 
     //The stats are decreased
-    void VillageStats::decreaseStats()
+    void VillageStats::decayStats()
     {
         int randVal, maxLoss, minLoss;
         float minMaxFact;
 
         for (int i = 0; i < BASE_STATS_NO - 1; i++)
         {
-            minMaxFact = population / baseStats[i];
+            //Inicio semaforo do stat "i"
+            minMaxFact = (float)population / (float)baseStats[i];
             //The population per current stat ratio afects how much product will be lost
             maxLoss = (int)MAX_LOSS * minMaxFact;
             minLoss = (int)MIN_LOSS * minMaxFact;
             // A value in range [100 - maxLoss,100 - minLoss]
             randVal = (100 - maxLoss) + rand() % (maxLoss - minLoss + 1);
-            //set new value
+            //set new absolut value 
             (this->*(setStatsFuncts[i]))((int)(baseStats[i] * ((float)randVal / 100.0)));
+            //Fim do semaforo do stat "i"
         }
     }
 

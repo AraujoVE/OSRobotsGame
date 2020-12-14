@@ -73,6 +73,7 @@ namespace Application
         if (curResources >= prodCost * no)
         {
             //Decrementa dos recursos o custo de produção do robô
+            //Mudar para changeStats
             villageStats->setResources(curResources - prodCost * no);
             //Incrementa o número total e o número de robôs livres
             totRobots += no;
@@ -109,7 +110,7 @@ namespace Application
             int lostRobots = curTask.calcLostRobots();
             moveRobot(curTask, -1 * curTask.getRobotsNo());
             destroyRobots(lostRobots);
-            villageStats->increaseStat((int)curTask.getType(), (int)curTask.getGainedGoods());
+            villageStats->changeStat((int)curTask.getType(), (int)curTask.getGainedGoods());
 
             return true;
         }

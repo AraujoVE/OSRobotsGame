@@ -17,7 +17,7 @@ namespace Application
         static const int MAX_TASK_TYPES = 5;
         int totRobots;
         int freeRobots;
-        int prodCost;
+        int prodCost; //TODO: Implementation to change this value
         VillageStats *villageStats;
         std::map<int, Task> tasks[MAX_TASK_TYPES];
 
