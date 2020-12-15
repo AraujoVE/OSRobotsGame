@@ -1,9 +1,11 @@
 #include "header/VillageStats.hpp"
 #include "header/RobotFunctions.hpp"
+#include "header/RobotFunctions.hpp"
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
-#include "header/RobotFunctions.hpp"
+#include <stdlib.h>
+#include <unistd.h>
 
 namespace Application
 {
@@ -79,7 +81,11 @@ namespace Application
     VillageStats::VillageStats()
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
+        
         initializeStats();
+        initializeAvenues();
+
+        pthread_create(&decayThread, NULL, runDecay, this);
 
         return;
     }
@@ -93,45 +99,14 @@ namespace Application
         return;
     }
 
-    // ======================== CALCULATE NEW POPULATION ========================
-    void VillageStats::calcNewPop()
-    {
-        int threshold = MAX_STAT_VALUE / 2;
-        int maxPopVariation = 151;
-
-        auto calcPop = [=](int par) {
-            if (par > threshold)
-                return (par - threshold) * (std::rand() % maxPopVariation);
-            else
-                return -((1 + threshold - par) * (std::rand() % maxPopVariation));
-        };
-
-        for (int i = 0; i < BASE_STATS_NO - 1; i++)
-        {
-            population += calcPop(baseStats[i]);
+    void VillageStats::initializeAvenues() {
+        for (int i = 0; i < BASE_STATS_NO; i++) {
+            avenue[i] = new Avenue(baseStats[i]);
+            pthread_create(&consumers[i], NULL, runConsumer, avenue[i]);
         }
 
-        //     if (food > threshold)
-        //         population += (food-threshold)*(std::rand() % maxPopVariation);
-        //     else
-        //         population -= (1+threshold-food)*(std::rand() % maxPopVariation);
-
-        //     if (health > threshold)
-        //         population += (health-threshold)*(std::rand() % maxPopVariation);
-        //     else
-        //         population -= (1+threshold-health)*(std::rand() % maxPopVariation);
-
-        //     if (defenses > threshold)
-        //         population += (defenses-threshold)*(std::rand() % maxPopVariation);
-        //     else
-        //         population -= (1+threshold-defenses)*(std::rand() % maxPopVariation);
-
-        //     if (structures > threshold)
-        //         population += (structures-threshold)*(std::rand() % maxPopVariation);
-        //     else
-        //         population -= (1+threshold-structures)*(std::rand() % maxPopVariation);
-
-        std::cout << "New population: " << population << std::endl;
+        avenue[POPULATION_INDEX] = new Avenue(population);
+        pthread_create(&consumers[POPULATION_INDEX], NULL, runConsumer, avenue[POPULATION_INDEX]);
     }
 
     // ======================== ADD/REMOVE FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
@@ -139,32 +114,50 @@ namespace Application
     //Increase in stats due to a task completion
     void VillageStats::changeStat(int type, int increase)
     {
-        //Valor relativo
-        //Inicio semaforo do stat "i" : isso deve ficar fora
-        int oldValue = baseStats[type];
-        (this->*(setStatsFuncts[type]))(oldValue + increase);
-        //Fim do semáforo do stat "i" : isso deve ficar fora
+        avenue[type]->producer(increase);
     }
 
     //The stats are decreased
-    void VillageStats::decayStats()
+    void VillageStats::decayStats ()
     {
         int randVal, maxLoss, minLoss;
+        int currPopValue;
+        int deltaPop;
         float minMaxFact;
 
-        for (int i = 0; i < BASE_STATS_NO - 1; i++)
-        {
-            //Inicio semaforo do stat "i"
-            minMaxFact = (float)population / (float)baseStats[i];
-            //The population per current stat ratio afects how much product will be lost
-            maxLoss = (int)MAX_LOSS * minMaxFact;
-            minLoss = (int)MIN_LOSS * minMaxFact;
-            // A value in range [100 - maxLoss,100 - minLoss]
-            randVal = (100 - maxLoss) + rand() % (maxLoss - minLoss + 1);
-            //set new absolut value 
-            (this->*(setStatsFuncts[i]))((int)(baseStats[i] * ((float)randVal / 100.0)));
-            //Fim do semaforo do stat "i"
+        while (true) {
+            currPopValue = avenue[POPULATION_INDEX]->getValue();
+            for (int i = 0; i < BASE_STATS_NO - 1; i++) {
+                avenue[i]->down();
+
+                minMaxFact = (float)currPopValue / (float)baseStats[i];
+                //The population per current stat ratio afects how much product will be lost
+                maxLoss = (int)MAX_LOSS * minMaxFact;
+                minLoss = (int)MIN_LOSS * minMaxFact;
+                // A value in range [100 - maxLoss,100 - minLoss]
+                randVal = (100 - maxLoss) + rand() % (maxLoss - minLoss + 1);
+                //set new absolut value 
+                (this->*(setStatsFuncts[i]))((int)(baseStats[i] * ((float)randVal / 100.0)));
+
+                avenue[i]->up();
+            }
+
+            //IMPLEMENTA AQUI O CALCULO DE POPULACAO
+            //deltaPop = ...
+
+            // avenue[POPULATION_INDEX].producer(deltaPop);
+            sleep(1);
         }
+    }
+
+    void *runDecay (void *decayFuncObject) {
+        VillageStats *village = (VillageStats*) decayFuncObject;
+        village->decayStats();
+    }
+
+    void *runConsumer (void *consumerObject) {
+        Avenue *avenue = (Avenue*) consumerObject;
+        avenue->consumer();
     }
 
 } // namespace Application
