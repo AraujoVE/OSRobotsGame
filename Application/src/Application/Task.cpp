@@ -14,7 +14,7 @@ namespace Application
     TaskID Task::s_NextID = 0;
 
     //Inicialização e destruição de classe
-    Task::Task(RobotFunction funct)
+    Task::Task(RobotFunction funct, OnFinishedCallback onFinishedCallback) : m_OnFinishedCallback(onFinishedCallback)
     {
         // use current time as seed for random generator
         std::srand(std::time(nullptr));

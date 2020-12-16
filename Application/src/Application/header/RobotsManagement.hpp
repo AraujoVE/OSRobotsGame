@@ -35,6 +35,7 @@ namespace Application
         const std::unordered_map<TaskID, Task*> &getTasks(RobotFunction function) const;
         Task &findTask(TaskID taskID) const;
 
+        void onTaskCompleted(TaskID completedTaskID);
         void setTotRobots(int newTotRobots);
         void setFreeRobots(int newFreeRobots);
         void setProdCost(int newProdCost);

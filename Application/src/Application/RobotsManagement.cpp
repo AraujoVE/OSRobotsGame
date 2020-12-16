@@ -114,10 +114,15 @@ namespace Application
         return false;
     }
 
+    void RobotsManagement::onTaskCompleted(TaskID completedTaskID) {
+        //TODO: AraujoVE logic
+    }
+
     void RobotsManagement::createTask(RobotFunction funct)
     {
         //Cria nova task com o id Incrementado
-        Task *newTask = new Task(funct);
+        Task *newTask = new Task(funct, std::bind(RobotsManagement::onTaskCompleted, this, std::placeholders::_1));
+
         tasks[(int)funct][newTask->getId()] = newTask;
     }
 

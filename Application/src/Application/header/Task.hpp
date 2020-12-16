@@ -8,6 +8,7 @@
 //#include <map>
 #include <ctime>
 //#include <iostream>
+#include <functional>
 
 namespace Application
 {
@@ -15,6 +16,9 @@ namespace Application
 
     class Task
     {
+    public:
+        using OnFinishedCallback = std::function<void(TaskID)>;
+
     private:
         const static int TIME_STEP = 10;
         const static int INIT_TIME_STEP = 2;
@@ -37,8 +41,11 @@ namespace Application
         int rewardMultiplier;
         float gainedGoods;
 
+        OnFinishedCallback m_OnFinishedCallback;
+
     public:
-        Task(RobotFunction funct);
+
+        Task(RobotFunction funct, OnFinishedCallback onFinishedCallback);
         void initializeParameters(RobotFunction funct);
         ~Task();
 

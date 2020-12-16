@@ -25,7 +25,7 @@ namespace Application
             IGWindow::SetNextSize(200, 100);
 
 
-canCreateNewTask ? (int)ImGuiButtonFlags_None : (int)ImGuiButtonFlags_Disabled            Task& task = m_RobotsManagement.findTask(m_TaskID);
+            Task& task = m_RobotsManagement.findTask(m_TaskID);
 
             ImGui::Begin("Task", NULL, m_WindowFlags);
             {
