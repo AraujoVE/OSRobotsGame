@@ -11,7 +11,7 @@ namespace DampEngine
     public:
         LinuxGLFWWindow(const WindowProps &starting_props)
         {
-            DE_ENGINE_DEBUG("LinuxGLFWWindow constructor called");
+            DE_ENGINE_TRACE("Creating Linux GLFW Window");
             m_Data.Props = starting_props;
             m_Data.EventCallback = [](Event& e) {
                 DE_CRITICAL("Event callback undefined, ignoring event: {0}", e);

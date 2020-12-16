@@ -39,16 +39,16 @@ namespace DampEngine
 
     void LinuxGLFWWindow::InitWindowInGLFW()
     {
-        DE_ENGINE_INFO("Initializing GLFW definitions for Linux Window");
-        // //Only initialize GFLW the fi    rst time
+        DE_ENGINE_INFO("Initializing GLFW for Linux Window");
+        //Only initialize GFLW the first time
         if (s_GLFWWindowCount == 0)
         { 
             int success = glfwInit();
-            DE_ASSERT(success, "Could not initialize GLFW");
+            DE_ENGINE_ASSERT(success, "Could not initialize GLFW");
         }
 
         m_GLFWWindow = glfwCreateWindow(m_Data.Props.Width, m_Data.Props.Height, m_Data.Props.Title.c_str(), nullptr, nullptr);
-        DE_ASSERT(m_GLFWWindow != nullptr, "Could not create a GLFW window");
+        DE_ENGINE_ASSERT(m_GLFWWindow != nullptr, "Could not create a GLFW window");
 
         m_Context = new OpenGLGraphicsContext(m_GLFWWindow);
         m_Context->Init();
@@ -56,8 +56,6 @@ namespace DampEngine
 
         glfwSetWindowUserPointer(m_GLFWWindow, &m_Data);
         s_GLFWWindowCount++;
-
-        DE_ENGINE_TRACE("Setting GLFW event callbacks");
 
         #pragma region GLFW Callbacks
 
@@ -70,7 +68,6 @@ namespace DampEngine
                 DE_GLFW_CASE_DEFAULT(action);
             
             }
-            // SendEventToWindow(window, )
         });
 
         // glfwSetCharModsCallback(m_GLFWWindow, [](GLFWwindow *window, unsigned int codepoint, int mods) {

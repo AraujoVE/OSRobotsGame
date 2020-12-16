@@ -11,14 +11,14 @@ namespace DampEngine
     OpenGLGraphicsContext::OpenGLGraphicsContext(GLFWwindow *windowHandle)
         :m_WindowHandle(windowHandle)
     {
-        DE_ASSERT(windowHandle != nullptr, "Window handle is null");
+        DE_ENGINE_ASSERT(windowHandle != nullptr, "Window handle is null");
     }
 
     void OpenGLGraphicsContext::Init()
     {  
         glfwMakeContextCurrent(m_WindowHandle);
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        DE_ASSERT(status, "Failed to initialize Glad");
+        DE_ENGINE_ASSERT(status, "Failed to initialize Glad");
     }
 
     void OpenGLGraphicsContext::SwapBuffers()

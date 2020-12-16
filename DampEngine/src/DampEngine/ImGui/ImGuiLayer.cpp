@@ -20,7 +20,6 @@ namespace DampEngine
     {
 
         IMGUI_CHECKVERSION();
-        DE_ENGINE_DEBUG("ImGuiLayer::OnAttach()");
 
         ImGui::CreateContext();
 

@@ -26,7 +26,7 @@ std::ostream &operator<<(std::ostream &os, const DampEngine::EventType &event_ty
         
     };
 
-    DE_ASSERT(sizeof(EventTypeStr)/sizeof(std::string) > (unsigned)event_type)
+    DE_ENGINE_ASSERT(sizeof(EventTypeStr)/sizeof(std::string) > (unsigned)event_type)
     os << EventTypeStr[(int)event_type];
 
 

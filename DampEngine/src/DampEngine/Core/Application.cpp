@@ -13,15 +13,14 @@ namespace DampEngine
 {
     Application::Application(const WindowProps& startingProps) : m_WindowStartingProps(startingProps)
     {
-        DE_ENGINE_DEBUG("Application constructor called");
-        DE_ASSERT((s_Instance == nullptr), "Application already instanced (currently only one is allowed)");
+        DE_ENGINE_ASSERT((s_Instance == nullptr), "Application already instanced (currently only one is allowed)");
         Application::s_Instance = this;
     };
 
     void Application::CreateWindow() {
-        DE_TRACE("Issuing window creation (platform-dependent)");
+        DE_ENGINE_TRACE("Issuing window creation (platform-dependent)");
         m_Window = Window::Create(m_WindowStartingProps);
-        DE_ASSERT(m_Window != nullptr, "Failed to create window");
+        DE_ENGINE_ASSERT(m_Window != nullptr, "Failed to create window");
 
         m_Window->SetEventCallback(DE_BIND_FN(Application::OnEvent));
     }
@@ -74,7 +73,7 @@ namespace DampEngine
     }
 
     inline Window& Application::GetWindow() const { 
-        DE_ASSERT(m_Window != nullptr, "There is no Window running :(");
+        DE_ENGINE_ASSERT(m_Window != nullptr, "There is no Window running :(");
         return *m_Window; 
     }
 

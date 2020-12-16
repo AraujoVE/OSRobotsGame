@@ -51,7 +51,7 @@ namespace DampEngine
         case ShaderDataType::Bool:
             return 1;
         }
-        DE_ASSERT(false, "Uknown ShaderDataType!");
+        DE_ENGINE_ASSERT(false, "Uknown ShaderDataType!");
         return 0;
     }
 
@@ -85,7 +85,7 @@ namespace DampEngine
             return 1;
         }
 
-        DE_ASSERT(false, "Uknown ShaderDataType!");
+        DE_ENGINE_ASSERT(false, "Uknown ShaderDataType!");
         return 0;
     }
 

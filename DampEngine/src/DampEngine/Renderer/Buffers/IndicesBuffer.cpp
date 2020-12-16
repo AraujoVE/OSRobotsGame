@@ -13,7 +13,7 @@ namespace DampEngine
             case RenderingAPI::OpenGL: return new OpenGLIndicesBuffer();
         }
 
-        DE_ASSERT(false, "Unkown Renering API!");
+        DE_ENGINE_ASSERT(false, "Unkown Renering API!");
         return 0;
     }
 } // namespace DampEngine

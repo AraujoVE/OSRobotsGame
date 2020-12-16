@@ -15,7 +15,7 @@ namespace DampEngine
             CASE_OPENGL : return new OpenGLVertexArray();
         }
 
-        DE_ASSERT(false, "Unkown Renering API!");
+        DE_ENGINE_ASSERT(false, "Unkown Renering API!");
         return 0;
     }
 
