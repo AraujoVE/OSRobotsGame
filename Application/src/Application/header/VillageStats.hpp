@@ -12,17 +12,17 @@ namespace Application
     {
     private:
         static const int BASE_STATS_NO = 5;
-        const int ON_ATTACK_MULTIPLIER = 2.0;
-        const float POP_INCREASE_TAX = 1.1;
-        const int POP_PER_CONSTRUCTION = 5;
-        const int INIT_POP_VALUE = 1000;
-        const int INIT_STAT_VALUE = 500;
-        const float ON_ATTACK_DECAY_TAX = 0.6;
-        const float NORMAL_DECAY_TAX = 0.9;
-        const int ATTACK_FREQUENCY = 5;
-        const int INIT_RESOURCES_VALUE = 100;
-        const int POPULATION_INDEX = BASE_STATS_NO;
-        const float TAX_REDUCT = 0.5;
+        const static int ON_ATTACK_MULTIPLIER = 2.0;
+        constexpr static float POP_INCREASE_TAX = 1.1;
+        const static int POP_PER_CONSTRUCTION = 5;
+        const static int INIT_POP_VALUE = 1000;
+        const static int INIT_STAT_VALUE = 500;
+        constexpr static float ON_ATTACK_DECAY_TAX = 0.6;
+        constexpr static float NORMAL_DECAY_TAX = 0.9;
+        const static int ATTACK_FREQUENCY = 5;
+        const static int INIT_RESOURCES_VALUE = 100;
+        const static int POPULATION_INDEX = BASE_STATS_NO;
+        constexpr static float TAX_REDUCT = 0.5;
         bool onAttack;
         float statTax;
         int maxPop;

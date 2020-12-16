@@ -2,8 +2,6 @@
 
 #include <string>
 
-#define RBF_STR(x) #x
-
 namespace Application
 {
     enum class RobotFunction : short
@@ -16,12 +14,10 @@ namespace Application
     };
 
     const std::string RobotFunctionString[] = {
-        RBF_STR(HUNT),
-        RBF_STR(MEDICINE),
-        RBF_STR(CONSTRUCTION),
-        RBF_STR(PROTECTION),
-        RBF_STR(RESOURCE_GATHERING)
+        "PROTECTION",
+        "HUNT",
+        "MEDICINE",
+        "CONSTRUCTION",
+        "RESOURCE_GATHERIN"
     };      
 }
-
-#undef RBF_STR

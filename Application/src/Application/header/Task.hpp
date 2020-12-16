@@ -28,7 +28,7 @@ namespace Application
         constexpr static float FAILURE_TAX = 0.8;
 
         static TaskID s_NextID;
-
+            
         int id;
         RobotFunction type;
         int robotsNo;
