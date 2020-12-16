@@ -27,17 +27,17 @@ namespace Application
         float statTax;
         int maxPop;
 
-        const int MIN_LOSS[BASE_STATS_NO - 1] = {
-            0.05,
-            0.05,
-            0.05,
-            0.025,
+        const float MIN_LOSS[BASE_STATS_NO - 1] = {
+            0.05f,
+            0.05f,
+            0.05f,
+            0.025f,
         };
-        const int MAX_LOSS[BASE_STATS_NO - 1] = {
-            0.5,
-            0.25,
-            0.25,
-            0.125,
+        const float MAX_LOSS[BASE_STATS_NO - 1] = {
+            0.5f,
+            0.25f,
+            0.25f,
+            0.125f,
         };
         int baseStats[BASE_STATS_NO];/*
             defenses;

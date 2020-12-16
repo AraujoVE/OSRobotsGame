@@ -121,14 +121,14 @@ namespace Application
     void RobotsManagement::updateTasks()
     {
         bool finishedTask = false;
-        for (std::map<int, Task> &funct : tasks)
+        for (int functIdx = 0; functIdx < FUNCTION_QTY; functIdx++)
         {
             //E se itera em cada robo de dada função
-            std::map<int, Task>::iterator itr = funct.begin();
-            while (itr != funct.end())
+            std::map<TaskID, Task>::iterator itr = tasks[functIdx].begin();
+            while (itr != tasks[functIdx].end())
             {
                 if (endTask(itr->second))
-                    itr = funct.erase(itr);
+                    itr = tasks[functIdx].erase(itr);
                 else
                     ++itr;
             }

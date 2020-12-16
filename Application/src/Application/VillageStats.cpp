@@ -187,8 +187,7 @@ namespace Application
         avenue->consumer();
         return NULL;
     }
-
-// namespace Application
+} // namespace Application
 /*
 
         HUNT = 0,
