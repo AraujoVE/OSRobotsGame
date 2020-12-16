@@ -8,10 +8,10 @@ namespace Application
 {
     enum class RobotFunction : short
     {
-        HUNT = 0,
+        PROTECTION = 0,
+        HUNT,
         MEDICINE,
         CONSTRUCTION,
-        PROTECTION,
         RESOURCE_GATHERING
     };
 

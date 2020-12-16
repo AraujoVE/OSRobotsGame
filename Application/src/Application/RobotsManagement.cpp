@@ -67,14 +67,14 @@ namespace Application
 
     bool RobotsManagement::createRobots(int no)
     {
-        int curResources = villageStats->getResources();
+        int curResources = villageStats->getStat((int)RobotFunction::RESOURCE_GATHERING);
 
         //Calcula se existe dinheiro o suficiente para criar um robô
         if (curResources >= prodCost * no)
         {
             //Decrementa dos recursos o custo de produção do robô
             //Mudar para changeStats
-            villageStats->setResources(curResources - prodCost * no);
+            villageStats->changeStat((int)RobotFunction::RESOURCE_GATHERING,-1*prodCost*no);
             //Incrementa o número total e o número de robôs livres
             totRobots += no;
             freeRobots += no;
