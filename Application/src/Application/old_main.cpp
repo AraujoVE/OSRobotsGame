@@ -9,25 +9,6 @@
 #include <iostream>
 #include <exception>
 
-// SDL_Window *initSDLAndCreateMainWindow() {
-//     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-//         throw std::runtime_error(std::string("error initializing SDL:") + SDL_GetError());
-//     }
-//     SDL_Window* window = SDL_CreateWindow("Teste", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 1000, 0);
-//     if (window == nullptr) { throw std::runtime_error("Unable to create SDL Window"); }
-
-//     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
-//     if (renderer == nullptr) { throw std::runtime_error("Unable to create SDL Renderer"); }
-
-
-//     //Paint it all black
-//     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-//     SDL_RenderClear(renderer);
-//     SDL_RenderPresent(renderer);
-//     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
-//     return window;
-// }
 
 void gameLoop(Game* game, VillageStats * village, RobotsManagement * robotsMng) {
     

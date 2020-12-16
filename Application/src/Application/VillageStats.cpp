@@ -153,11 +153,13 @@ namespace Application
     void *runDecay (void *decayFuncObject) {
         VillageStats *village = (VillageStats*) decayFuncObject;
         village->decayStats();
+        return NULL;
     }
 
     void *runConsumer (void *consumerObject) {
         Avenue *avenue = (Avenue*) consumerObject;
         avenue->consumer();
+        return NULL;
     }
 
 } // namespace Application

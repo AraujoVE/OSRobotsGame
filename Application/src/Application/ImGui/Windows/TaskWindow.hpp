@@ -1,4 +1,4 @@
-#include "Window.hpp"
+#include "IGWindow.hpp"
 
 #include "imgui.h"
 
@@ -7,19 +7,19 @@
 #include "Application/header/Task.hpp"
 namespace Application
 {
-    class TaskWindow final : public Window
+    class TaskWindow final : public Application::IGWindow
     {
     public:
         TaskWindow(std::shared_ptr<Task> task)
-            : Window(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize),
+            : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize),
               m_Task(task)
         {
         }
 
         virtual void Render() override
         {
-            Window::SetNextPos(300, 80);
-            Window::SetNextSize(200, 100);
+            IGWindow::SetNextPos(300, 80);
+            IGWindow::SetNextSize(200, 100);
 
             auto task = m_Task.lock();
 

@@ -4,10 +4,15 @@
 #include "DampEngine/Core/Macros/Log.hpp"
 namespace Application
 {
-    MainGuiLayer::MainGuiLayer()
-    {
-        m_FunctionWindow.reset(new FunctionWindow(RobotFunction::PROTECTION));
-    }
+    MainGuiLayer::MainGuiLayer(GameSave &gameSave)
+            : m_GameSave(gameSave)
+        {
+            m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::HUNT);
+            m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::MEDICINE);
+            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::CONSTRUCTION);
+            m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::PROTECTION);
+            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::RESOURCE_GATHERING);
+        }
 
     void MainGuiLayer::ImGuiDescription()
     {
@@ -28,5 +33,11 @@ namespace Application
             ImGui::Text("Status");
         }
         ImGui::End();
+
+            for (int i = 0; i < RobotsManagement::FUNCTION_QTY; i++)
+            {
+                m_FunctionWindows[i]->Render();
+            }        
+
     }
 } // namespace Application

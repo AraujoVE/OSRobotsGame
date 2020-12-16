@@ -41,6 +41,7 @@ workspace "OSRobotGame"
             "-Wno-unknown-pragmas",
             "-Wno-error=unused-value",
             "-Wno-error=unused-variable",
+            "-Wno-error=unused-but-set-variable",
             "-Werror",
         }
     

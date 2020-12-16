@@ -12,16 +12,19 @@ namespace Application
 {
     class RobotsManagement
     {
+    public:
+        static const int FUNCTION_QTY = 5;
+        static const int MAX_TASKS_PER_FUNCTION = 5;
 
     private:
-        static const int MAX_TASK_TYPES = 5;
         int totRobots;
         int freeRobots;
         int prodCost; //TODO: Implementation to change this value
         VillageStats *villageStats;
-        std::map<int, Task> tasks[MAX_TASK_TYPES];
+        std::map<TaskID, Task> tasks[FUNCTION_QTY];
 
     public:
+        
         RobotsManagement();
         void initializeStats();
         ~RobotsManagement();

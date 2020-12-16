@@ -11,8 +11,8 @@
 
 namespace Application
 {
+    TaskID Task::s_NextID = 0;
 
-    int Task::lastId = -1;
     //Inicialização e destruição de classe
     Task::Task(RobotFunction funct)
     {
@@ -37,7 +37,7 @@ namespace Application
 
     void Task::initializeParameters(RobotFunction funct)
     {
-        id = ++lastId;
+        id = s_NextID++;
         type = funct;
         robotsNo = 0;
         progressLength = TIME_STEP * (INIT_TIME_STEP + (std::rand() % MAX_TIME_STEPS));
@@ -51,7 +51,7 @@ namespace Application
     }
 
     //Gets of each parameter
-    int Task::getId() const
+    TaskID Task::getId() const
     {
         return id;
     }

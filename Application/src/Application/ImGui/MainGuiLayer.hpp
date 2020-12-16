@@ -2,19 +2,26 @@
 using namespace DampEngine;
 
 #include "Application/ImGui/Windows/FunctionWindow.hpp"
+
 #include "Application/header/Task.hpp"
-#include <memory>
+#include "Application/header/GameSave.hpp"
+#include "Application/header/RobotFunctions.hpp"
+
+#include <vector>
+#include <functional>
+
 namespace Application
 {
     class MainGuiLayer final : public ImGuiLayer
     {
     public:
-        MainGuiLayer();
+        MainGuiLayer(GameSave &gameSave);
 
     private:
         virtual void ImGuiDescription() override;
 
     private:
-        std::unique_ptr<FunctionWindow> m_FunctionWindow;
+        GameSave &m_GameSave;
+        FunctionWindow* m_FunctionWindows[RobotsManagement::FUNCTION_QTY];
     };
-}
+} // namespace Application

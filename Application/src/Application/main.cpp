@@ -11,16 +11,26 @@ namespace Application
         {
         }
 
+        virtual void OnStart() override
+        {
+        }
+
         virtual void InitLayers() override
         {
-            m_LayerStack.PushOverlay(new MainGuiLayer());
+            m_LayerStack.PushOverlay(new MainGuiLayer(m_GameSave));
         }
 
         virtual void OnUpdate() override
         {
         }
-    };
 
+        virtual void OnStop() override
+        {
+        }
+
+    private:
+        GameSave m_GameSave;
+    };
 
 } // namespace Application
 

@@ -11,6 +11,8 @@
 
 namespace Application
 {
+    using TaskID = unsigned long int;
+
     class Task
     {
     private:
@@ -21,7 +23,8 @@ namespace Application
         const static int REWARD_RANGE = 3;
         constexpr static float FAILURE_TAX = 0.8;
 
-        static int lastId;
+        static TaskID s_NextID;
+
         int id;
         RobotFunction type;
         int robotsNo;
@@ -39,7 +42,7 @@ namespace Application
         void initializeParameters(RobotFunction funct);
         ~Task();
 
-        int getId() const;
+        TaskID getId() const;
         RobotFunction getType() const;
         int getRobotsNo() const;
         int getProgressLength() const;
@@ -56,6 +59,5 @@ namespace Application
         void createThread();
         void deleteThread();
     };
-
 } // namespace Application
 #endif
