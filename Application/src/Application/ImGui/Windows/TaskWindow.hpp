@@ -5,6 +5,9 @@
 #include <memory>
 #include <vector>
 #include "Application/header/Task.hpp"
+
+#include "DampEngine/Core/Macros.hpp"
+
 namespace Application
 {
     class TaskWindow final : public Application::IGWindow
@@ -21,11 +24,12 @@ namespace Application
             IGWindow::SetNextPos(300, 80);
             IGWindow::SetNextSize(200, 100);
 
-            const Task& task = m_RobotsManagement.getTasks(m_F)[m_TaskID];
+
+canCreateNewTask ? (int)ImGuiButtonFlags_None : (int)ImGuiButtonFlags_Disabled            Task& task = m_RobotsManagement.findTask(m_TaskID);
 
             ImGui::Begin("Task", NULL, m_WindowFlags);
             {
-                int currRobotsNo = task->getRobotsNo();
+                int currRobotsNo = task.getRobotsNo();
                 int deltaRobots = 0;
                 ImGui::Text("Task 1");
                 ImGui::SameLine(60);
@@ -34,7 +38,7 @@ namespace Application
                 ImGui::SameLine(30);
                 deltaRobots += ImGui::Button("+");
                 if (deltaRobots != 0)
-                    task->setRobotsNo(currRobotsNo + deltaRobots);
+                    task.setRobotsNo(currRobotsNo + deltaRobots);
             }
             ImGui::End();
         }

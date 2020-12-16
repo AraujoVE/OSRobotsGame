@@ -21,7 +21,7 @@ namespace Application
         int freeRobots;
         int prodCost; //TODO: Implementation to change this value
         VillageStats *villageStats;
-        std::unordered_map<TaskID, Task> tasks[FUNCTION_QTY];
+        std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
 
     public:
         
@@ -32,8 +32,8 @@ namespace Application
         int getTotRobots() const;
         int getFreeRobots() const;
         int getProdCost() const;
-        const std::unordered_map<TaskID, Task> &getTasks(RobotFunction function) const;
-        Task &RobotsManagement::findTask(TaskID taskID) const;
+        const std::unordered_map<TaskID, Task*> &getTasks(RobotFunction function) const;
+        Task &findTask(TaskID taskID) const;
 
         void setTotRobots(int newTotRobots);
         void setFreeRobots(int newFreeRobots);

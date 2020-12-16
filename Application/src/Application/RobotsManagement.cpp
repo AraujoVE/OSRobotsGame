@@ -6,6 +6,7 @@
 #include <ctime>
 #include <iostream>
 #include <iterator>
+#include <stdexcept>
 
 //Inicialização e destruição da classe
 namespace Application
@@ -43,18 +44,20 @@ namespace Application
         return prodCost;
     }
 
-    inline const std::unordered_map<TaskID, Task> &RobotsManagement::getTasks(RobotFunction function) const {
+    inline const std::unordered_map<TaskID, Task*> &RobotsManagement::getTasks(RobotFunction function) const {
         return tasks[(int)function];
     }
 
-    inline Task &RobotsManagement::findTask(TaskID taskID) const {
+    Task &RobotsManagement::findTask(TaskID taskID) const {
         for (int i = 0; i < FUNCTION_QTY; i++)
         {
             auto searchRes = tasks[i].find(taskID);
             if (searchRes != tasks[i].end()) {
-                return searchRes->second;
+                return *(Task*)searchRes->second;
             }
         }
+
+        throw std::logic_error("Task not found");
     }
     
 
@@ -114,8 +117,8 @@ namespace Application
     void RobotsManagement::createTask(RobotFunction funct)
     {
         //Cria nova task com o id Incrementado
-        Task newTask(funct);
-        tasks[(int)funct].insert({newTask.getId(), newTask});
+        Task *newTask = new Task(funct);
+        tasks[(int)funct][newTask->getId()] = newTask;
     }
 
     bool RobotsManagement::endTask(Task &curTask)
@@ -139,10 +142,10 @@ namespace Application
         for (int functIdx = 0; functIdx < FUNCTION_QTY; functIdx++)
         {
             //E se itera em cada robo de dada função
-            std::unordered_map<TaskID, Task>::iterator itr = tasks[functIdx].begin();
+            std::unordered_map<TaskID, Task*>::iterator itr = tasks[functIdx].begin();
             while (itr != tasks[functIdx].end())
             {
-                if (endTask(itr->second))
+                if (endTask(*itr->second))
                     itr = tasks[functIdx].erase(itr);
                 else
                     ++itr;
