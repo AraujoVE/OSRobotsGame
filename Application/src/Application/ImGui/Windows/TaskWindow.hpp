@@ -10,9 +10,9 @@ namespace Application
     class TaskWindow final : public Application::IGWindow
     {
     public:
-        TaskWindow(std::shared_ptr<Task> task)
+        TaskWindow(RobotsManagement& robotsManagement, TaskID taskID)
             : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize),
-              m_Task(task)
+            m_RobotsManagement(robotsManagement), m_TaskID(taskID)
         {
         }
 
@@ -21,7 +21,7 @@ namespace Application
             IGWindow::SetNextPos(300, 80);
             IGWindow::SetNextSize(200, 100);
 
-            auto task = m_Task.lock();
+            const Task& task = m_RobotsManagement.getTasks(m_F)[m_TaskID];
 
             ImGui::Begin("Task", NULL, m_WindowFlags);
             {
@@ -40,6 +40,7 @@ namespace Application
         }
 
     private:
-        std::weak_ptr<Task> m_Task;
+        RobotsManagement &m_RobotsManagement;
+        TaskID m_TaskID;
     };
 } // namespace Application

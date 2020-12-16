@@ -39,7 +39,7 @@ namespace DampEngine
         //Other event handlers can also be defined according to IEventHandler's virtual functions
         virtual bool OnWindowClosed(WindowClosedEvent &event) override;
         
-        void Close();
+        void Stop();
 
         virtual Window& GetWindow() const;
 

@@ -32,13 +32,15 @@ namespace Application
         int getTotRobots() const;
         int getFreeRobots() const;
         int getProdCost() const;
-        std::map<int, Task> *getTasks() const;
+        const std::map<TaskID, Task> &getTasks(RobotFunction function) const;
+        Task &RobotsManagement::findTask(TaskID taskID) const;
 
         void setTotRobots(int newTotRobots);
         void setFreeRobots(int newFreeRobots);
         void setProdCost(int newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
-        void setTasks(std::vector<std::map<int, Task>> *newTasks);
+        //TODO: determine if it will be in fact allowed to set tasks
+        // void setTasks(std::vector<std::map<int, Task>> *newTasks);
 
         bool createRobots(int);
         bool destroyRobots(int);

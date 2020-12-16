@@ -42,8 +42,11 @@ namespace Application
             }
             ImGui::End();
 
-            //TODO: make m_RobotsManagement return the task ID, to keep track internally
-            if (createNewTaskIssued) m_RobotsManagement.createTask(m_Function);
+            if (createNewTaskIssued) {
+                //TODO: make m_RobotsManagement return the task ID, to keep track internally
+                // m_RobotsManagement.createTask(m_Function);
+                m_TaskWindows.push_back(new TaskWindow())
+            }
         }
     private:
         RobotFunction m_Function;

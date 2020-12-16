@@ -39,7 +39,7 @@ namespace DampEngine
 
     void LinuxGLFWWindow::InitWindowInGLFW()
     {
-        DE_ENGINE_INFO("Initializing GLFW for Linux Window");
+        DE_ENGINE_TRACE("Initializing GLFW for Linux Window");
         //Only initialize GFLW the first time
         if (s_GLFWWindowCount == 0)
         { 

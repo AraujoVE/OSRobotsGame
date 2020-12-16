@@ -4,10 +4,7 @@
 
 #include "depch.hpp"
 
-//!THINK HOW TO MAKE THIS IMPLEMENTATION DEPENDENT
 #include <glad/glad.h>
-
-
 
 namespace DampEngine
 {
@@ -27,27 +24,44 @@ namespace DampEngine
 
     void Application::Run()
     {
+        DE_INFO("Starting Application");
+
+        DE_TRACE("Calling Application::OnStart hook");
         OnStart();
 
+        DE_TRACE("Requesting Window creation");
         CreateWindow();
+
+        DE_TRACE("Initializing Layers");
         InitLayers();
 
+        DE_INFO("Initialization completed successfully!");
+        DE_TRACE("Entering application main loop");
         while (m_Running) {
             glad_glClearColor(0.1f, 0.1f, 0.1f, 1.f);
             glad_glClear(GL_COLOR_BUFFER_BIT);
 
+            // DE_TRACE("Calling Application::OnUpdate hook");
             this->OnUpdate();
             
+            // DE_TRACE("Calling LayerStack::OnUpdate hook");
             m_LayerStack.OnUpdate();
 
+            // DE_TRACE("Calling Window::OnUpdate hook");
             m_Window->OnUpdate();
         }
+        DE_INFO("Stopping application...");
 
+
+        DE_TRACE("Calling Application::OnStop hook");
         OnStop();
+
+        DE_INFO("Application stopped.");
     };
 
-    void Application::Close()
+    void Application::Stop()
     {
+        DE_INFO("Application stop requested");
         m_Running = false;
     }
 
@@ -68,7 +82,7 @@ namespace DampEngine
 
     bool Application::OnWindowClosed(WindowClosedEvent &event)
     {
-        Close();
+        Stop();
         return true;
     }
 

@@ -43,6 +43,21 @@ namespace Application
         return prodCost;
     }
 
+    inline const std::map<TaskID, Task> &RobotsManagement::getTasks(RobotFunction function) const {
+        return tasks[(int)function];
+    }
+
+    inline Task &RobotsManagement::findTask(TaskID taskID) const {
+        for (int i = 0; i < FUNCTION_QTY; i++)
+        {
+            auto searchRes = tasks[i].find(taskID);
+            if (searchRes != tasks[i].end()) {
+                return searchRes->second;
+            }
+        }
+    }
+    
+
     //Sets de cada um dos parâmetros
 
     void RobotsManagement::setTotRobots(int newTotRobots)
