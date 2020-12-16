@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "DampEngine/Core/Macros.hpp"
+
 namespace Application
 {
 
@@ -174,6 +176,11 @@ namespace Application
 
             sleep(1);
         }
+    }
+
+    void VillageStats::decayResources(int,int,float&) 
+    {
+        DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
     }
 
     void *runDecay (void *decayFuncObject) {
