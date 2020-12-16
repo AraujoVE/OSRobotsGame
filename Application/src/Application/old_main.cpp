@@ -16,7 +16,7 @@ void gameLoop(Game* game, VillageStats * village, RobotsManagement * robotsMng) 
     {   
         // Check if any task is completed (don't now if this should be in main)
         // Maybe we could use something that orders the tasks...
-        for (std::map<int, Task> tasksMap : robotsMng->getTasks()) {
+        for (std::unordered_map<int, Task> tasksMap : robotsMng->getTasks()) {
             for (auto const& taskInfo : tasksMap) {
                 if (taskInfo.second.getPredictedTime() <= time(0)) { // check if task has already finished
                     printf("[*] Task with ID %d (category: %d) has finished!\n", taskInfo.first, taskInfo.second.getType());

@@ -5,7 +5,7 @@
 #include "Task.hpp"
 #include "VillageStats.hpp"
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <ctime>
 
 namespace Application
@@ -21,7 +21,7 @@ namespace Application
         int freeRobots;
         int prodCost; //TODO: Implementation to change this value
         VillageStats *villageStats;
-        std::map<TaskID, Task> tasks[FUNCTION_QTY];
+        std::unordered_map<TaskID, Task> tasks[FUNCTION_QTY];
 
     public:
         
@@ -32,7 +32,7 @@ namespace Application
         int getTotRobots() const;
         int getFreeRobots() const;
         int getProdCost() const;
-        const std::map<TaskID, Task> &getTasks(RobotFunction function) const;
+        const std::unordered_map<TaskID, Task> &getTasks(RobotFunction function) const;
         Task &RobotsManagement::findTask(TaskID taskID) const;
 
         void setTotRobots(int newTotRobots);
@@ -40,7 +40,7 @@ namespace Application
         void setProdCost(int newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
         //TODO: determine if it will be in fact allowed to set tasks
-        // void setTasks(std::vector<std::map<int, Task>> *newTasks);
+        // void setTasks(std::vector<std::unordered_map<int, Task>> *newTasks);
 
         bool createRobots(int);
         bool destroyRobots(int);

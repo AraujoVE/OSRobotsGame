@@ -43,7 +43,7 @@ namespace Application
         return prodCost;
     }
 
-    inline const std::map<TaskID, Task> &RobotsManagement::getTasks(RobotFunction function) const {
+    inline const std::unordered_map<TaskID, Task> &RobotsManagement::getTasks(RobotFunction function) const {
         return tasks[(int)function];
     }
 
@@ -139,7 +139,7 @@ namespace Application
         for (int functIdx = 0; functIdx < FUNCTION_QTY; functIdx++)
         {
             //E se itera em cada robo de dada função
-            std::map<TaskID, Task>::iterator itr = tasks[functIdx].begin();
+            std::unordered_map<TaskID, Task>::iterator itr = tasks[functIdx].begin();
             while (itr != tasks[functIdx].end())
             {
                 if (endTask(itr->second))
