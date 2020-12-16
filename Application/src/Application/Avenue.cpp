@@ -20,14 +20,13 @@ void Avenue::producer (int value) {
     items.push(value);
 
     pthread_mutex_unlock(&mutex);
-    sem_wait(&full);
+    sem_post(&full);
 }
 
 void Avenue::consumer () {
     while (true) {
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
-        
         attr += items.front();
         items.pop();
 
@@ -35,7 +34,7 @@ void Avenue::consumer () {
             attr = 0;
 
         pthread_mutex_unlock(&mutex);
-        sem_wait(&empty);
+        sem_post(&empty);
     }
 }
 

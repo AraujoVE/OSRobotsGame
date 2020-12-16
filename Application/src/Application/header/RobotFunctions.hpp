@@ -3,10 +3,10 @@ namespace Application
 {
     enum class RobotFunction
     {
-        HUNT = 0,
+        PROTECTION = 0,
+        HUNT,
         MEDICINE,
         CONSTRUCTION,
-        PROTECTION,
         RESOURCE_GATHERING
     };
 }

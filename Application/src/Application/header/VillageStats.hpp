@@ -12,12 +12,33 @@ namespace Application
     {
     private:
         static const int BASE_STATS_NO = 5;
-        const int MIN_LOSS = 5;
-        const int MAX_LOSS = 10;
-        const int MAX_STAT_VALUE = 5; // each village stat is between 0 and 5 (included)
+        const int ON_ATTACK_MULTIPLIER = 2.0;
+        const float POP_INCREASE_TAX = 1.1;
+        const int POP_PER_CONSTRUCTION = 5;
         const int INIT_POP_VALUE = 1000;
+        const int INIT_STAT_VALUE = 500;
+        const float ON_ATTACK_DECAY_TAX = 0.6;
+        const float NORMAL_DECAY_TAX = 0.9;
+        const int ATTACK_FREQUENCY = 5;
         const int INIT_RESOURCES_VALUE = 100;
         const int POPULATION_INDEX = BASE_STATS_NO;
+        const float TAX_REDUCT = 0.5;
+        bool onAttack;
+        float statTax;
+        int maxPop;
+
+        const int MIN_LOSS[BASE_STATS_NO - 1] = {
+            0.05,
+            0.05,
+            0.05,
+            0.025,
+        };
+        const int MAX_LOSS[BASE_STATS_NO - 1] = {
+            0.5,
+            0.25,
+            0.25,
+            0.125,
+        };
         int baseStats[BASE_STATS_NO];/*
             defenses;
             food;
@@ -26,53 +47,53 @@ namespace Application
             resources;
         */
 
-        Avenue *avenue[BASE_STATS_NO+1];
+        Avenue *avenueVS[BASE_STATS_NO+1];
         pthread_t decayThread;
         pthread_t consumers[BASE_STATS_NO+1];
 
-        void (VillageStats::*setStatsFuncts[BASE_STATS_NO])(int) = {
-            &VillageStats::setFood,
-            &VillageStats::setHealth,
-            &VillageStats::setStructures,
-            &VillageStats::setDefenses,
-            &VillageStats::setResources
+        void (VillageStats::*decayStatsFuncts[BASE_STATS_NO])(int,int,float&) = {
+            &VillageStats::decayFood,
+            &VillageStats::decayHealth,
+            &VillageStats::decayStructures,
+            &VillageStats::decayDefenses,
+            &VillageStats::decayResources
         };
 
-        int (VillageStats::*getStatsFuncts[BASE_STATS_NO])() const = {
-            &VillageStats::getFood,
-            &VillageStats::getHealth,
-            &VillageStats::getStructures,
-            &VillageStats::getDefenses,
-            &VillageStats::getResources
-        };
+
 
         int population; // if population reaches zero, the game is over -> pop calculated based on other village stats
         //TODO: Aumentar e Diminuir tamanho da população
 
-        void initializeAvenues();
+        void initializeVSAvenues();
 
     public:
         VillageStats();
 
-        int getFood() const;
-        int getHealth() const;
-        int getStructures() const;
-        int getDefenses() const;
-        int getResources() const;
+        float calcReduction(float,float);
+        float calcRatio(int);
+        float adjustStatsLimits(int,float,float,bool);
+
+
+        void decayStat(int,int);
+
+        void decayFood(int,int,float&);
+        void decayHealth(int,int,float&);
+        void decayStructures(int,int,float&);
+        void decayDefenses(int,int,float&);
+        void decayResources(int,int,float&);
+
+        void decayPopulation();
+
+
+
+        int getStat(int) const;
         int getPopulation() const;
 
-        void setFood(int);
-        void setHealth(int);
-        void setStructures(int);
-        void setDefenses(int);
-        void setResources(int);
-        void setStat(int, int);
-
+        void setStat(int,float);
         void changeStat(int, int);
         void decayStats();
 
         void initializeStats();
-        void calcNewPop();
         void addTaskResources(RobotFunction, time_t, int);
     };
 
