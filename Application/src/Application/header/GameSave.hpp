@@ -16,17 +16,21 @@ namespace Application
     {
     private:
         std::unique_ptr<VillageStats> villageStats;
-        std::unique_ptr<RobotsManagement> robotManagement;
+        std::unique_ptr<RobotsManagement> robotsManagement;
 
     public:
-        GameSave(){}
-        ~GameSave(){}
+        GameSave()
+        {
+            villageStats.reset(new VillageStats());
+            robotsManagement.reset(new RobotsManagement());
+        }
+        ~GameSave() {}
 
         void loadGame();
         void saveGame() const;
 
-        inline VillageStats &getVillageStats() const  { return *villageStats; }
-        inline RobotsManagement &getRobotManagement() const  { return *robotManagement; }
+        inline VillageStats &getVillageStats() const { return *villageStats; }
+        inline RobotsManagement &getRobotsManagement() const { return *robotsManagement; }
     };
 
 } // namespace Application

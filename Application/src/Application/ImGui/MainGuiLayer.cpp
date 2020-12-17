@@ -5,14 +5,16 @@
 namespace Application
 {
     MainGuiLayer::MainGuiLayer(GameSave &gameSave)
-            : m_GameSave(gameSave)
-        {
-            m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::HUNT);
-            m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::MEDICINE);
-            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::CONSTRUCTION);
-            m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::PROTECTION);
-            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.getRobotManagement(), RobotFunction::RESOURCE_GATHERING);
-        }
+        : m_GameSave(gameSave)
+    {
+        m_StatusWindow = new StatusWindow(gameSave.getVillageStats());
+
+        m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::HUNT);
+        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::MEDICINE);
+        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::CONSTRUCTION);
+        m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::PROTECTION);
+        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
+    }
 
     void MainGuiLayer::ImGuiDescription()
     {
@@ -34,10 +36,11 @@ namespace Application
         }
         ImGui::End();
 
-            for (int i = 0; i < RobotsManagement::FUNCTION_QTY; i++)
-            {
-                m_FunctionWindows[i]->Render();
-            }        
+        for (int i = 0; i < RobotsManagement::FUNCTION_QTY; i++)
+        {
+            m_FunctionWindows[i]->Render();
+        }
 
+        m_StatusWindow->Render();
     }
 } // namespace Application

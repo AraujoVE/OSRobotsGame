@@ -21,7 +21,8 @@ namespace Application
         }
 
         virtual void OnUpdate() override
-        {
+        { 
+            DE_DEBUG("Fora de UI, Population = {0}", m_GameSave.getVillageStats().getPopulation());
         }
 
         virtual void OnStop() override

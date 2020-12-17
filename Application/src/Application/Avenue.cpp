@@ -1,8 +1,8 @@
 #include "header/Avenue.hpp"
 
 Avenue::Avenue (int &attr) {
-    sem_init(&empty, 1, 0);
-    sem_init(&full, 1, FULL_N);
+    sem_init(&empty, 1, FULL_N);
+    sem_init(&full, 1, 0);
     pthread_mutex_init(&mutex, NULL);
     this->attr = attr;
 }

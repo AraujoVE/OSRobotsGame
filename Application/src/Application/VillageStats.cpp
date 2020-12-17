@@ -15,12 +15,12 @@ namespace Application
     // ======================== GETS/SETS ========================
     //Each set must enter in the semaphore
     int VillageStats::getStat(int statType) const{
-        return avenueVS[statType]->getValue();
+        return statType;
     }
 
     int VillageStats::getPopulation() const
     {
-        return avenueVS[POPULATION_INDEX]->getValue();
+        return population;
     }
 
     // ======================== CONSTRUCTOR / INITIALIZE VILLAGES STATS ========================
@@ -30,7 +30,7 @@ namespace Application
         
         initializeStats();
         initializeVSAvenues();
-
+    
         pthread_create(&decayThread, NULL, runDecay, this);
 
         return;
@@ -161,19 +161,24 @@ namespace Application
 
 
     //The stats are decreased
-    void VillageStats::decayStats ()
+    void VillageStats::decayStats()
     {
-        int it = 0;
+        // int it = 0;
         while (true) {
             avenueVS[POPULATION_INDEX]->down();
 
-            for(int i =0;i<BASE_STATS_NO - 1;i++) decayStat(it,i);
-            decayPopulation();
+            // for(int i =0;i<BASE_STATS_NO - 1;i++) decayStat(it,i);
+            // decayPopulation();
+
+            population -= 100;
+            DE_TRACE("Decrementando, Population = {0}", population);
+            DE_TRACE("Decrementando, getPopulation() = {0}", getPopulation());
 
             avenueVS[POPULATION_INDEX]->up();
 
-            it = (it+1)==ATTACK_FREQUENCY ? 0 : it+1;
+            // it = (it+1)==ATTACK_FREQUENCY ? 0 : it+1;
 
+            //TODO: fixed time (adjusting for lag)
             sleep(1);
         }
     }

@@ -2,6 +2,7 @@
 using namespace DampEngine;
 
 #include "Application/ImGui/Window/FunctionWindow.hpp"
+#include "Application/ImGui/Window/StatusWindow.hpp"
 
 #include "Application/header/Task.hpp"
 #include "Application/header/GameSave.hpp"
@@ -22,6 +23,7 @@ namespace Application
 
     private:
         GameSave &m_GameSave;
+        StatusWindow* m_StatusWindow;
         FunctionWindow* m_FunctionWindows[RobotsManagement::FUNCTION_QTY];
     };
 } // namespace Application
