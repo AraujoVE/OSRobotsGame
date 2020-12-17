@@ -10,7 +10,7 @@ class Avenue {
     private:
         sem_t empty, full;
         pthread_mutex_t mutex;
-        int attr;
+        int &attr;
         std::queue<int> items;
 
     public:

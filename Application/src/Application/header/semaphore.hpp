@@ -1,3 +1,5 @@
+#pragma once
+
 // Custom semahpore class using mutex and conditional variable -> there's a <semaphore> lib for C++20
 #include <mutex>
 #include <condition_variable>

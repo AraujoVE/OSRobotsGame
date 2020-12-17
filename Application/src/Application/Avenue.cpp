@@ -1,10 +1,11 @@
 #include "header/Avenue.hpp"
 
-Avenue::Avenue (int &attr) {
+#include "DampEngine/Core/Macros.hpp"
+
+Avenue::Avenue (int &attr): attr(attr) {
     sem_init(&empty, 1, FULL_N);
     sem_init(&full, 1, 0);
     pthread_mutex_init(&mutex, NULL);
-    this->attr = attr;
 }
 
 Avenue::~Avenue () {
@@ -24,6 +25,7 @@ void Avenue::producer (int value) {
 }
 
 void Avenue::consumer () {
+    DE_TRACE("(Avenue) Spawnei Consumer");
     while (true) {
         sem_wait(&full);
         pthread_mutex_lock(&mutex);

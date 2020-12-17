@@ -10,7 +10,7 @@ namespace Application
 {
     class VillageStats
     {
-    private:
+    public:
         static const int BASE_STATS_NO = 5;
         const static int ON_ATTACK_MULTIPLIER = 2.0;
         constexpr static float POP_INCREASE_TAX = 1.1;
@@ -23,6 +23,7 @@ namespace Application
         const static int INIT_RESOURCES_VALUE = 100;
         const static int POPULATION_INDEX = BASE_STATS_NO;
         constexpr static float TAX_REDUCT = 0.5;
+    private:
         bool onAttack;
         float statTax;
         int maxPop;
@@ -90,7 +91,7 @@ namespace Application
         int getPopulation() const;
 
         void setStat(int,float);
-        void changeStat(int, int);
+        void changeStat(int type, int increase);
         void decayStats();
 
         void initializeStats();

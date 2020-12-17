@@ -1,3 +1,5 @@
+#pragma once
+
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
 using namespace DampEngine;
 

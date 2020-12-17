@@ -163,20 +163,21 @@ namespace Application
     //The stats are decreased
     void VillageStats::decayStats()
     {
-        // int it = 0;
+        int it = 0;
         while (true) {
             avenueVS[POPULATION_INDEX]->down();
 
-            // for(int i =0;i<BASE_STATS_NO - 1;i++) decayStat(it,i);
-            // decayPopulation();
+            for(int i =0;i<BASE_STATS_NO - 1;i++) {
+                 decayStat(it,i);
+            }
 
-            population -= 100;
-            DE_TRACE("Decrementando, Population = {0}", population);
-            DE_TRACE("Decrementando, getPopulation() = {0}", getPopulation());
+            // DE_DEBUG("decayStats() Population = {0}", population);
+            decayPopulation();
+
 
             avenueVS[POPULATION_INDEX]->up();
 
-            // it = (it+1)==ATTACK_FREQUENCY ? 0 : it+1;
+            it = (it+1)==ATTACK_FREQUENCY ? 0 : it+1;
 
             //TODO: fixed time (adjusting for lag)
             sleep(1);
