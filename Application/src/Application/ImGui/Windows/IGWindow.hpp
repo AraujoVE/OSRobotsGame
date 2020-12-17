@@ -3,6 +3,9 @@
 #include "imgui.h"
 namespace Application
 {
+    struct IGWindowProps {
+        ImVec2 pos, size;
+    };
     class IGWindow
     {
     public:
@@ -12,13 +15,21 @@ namespace Application
         }
 
         inline ImGuiViewport *GetMainViewport() const { return ImGui::GetMainViewport(); }
-        inline void SetNextPos(float relx, float rely) { ImGui::SetNextWindowPos(ImVec2(GetMainViewport()->GetWorkPos().x + relx, GetMainViewport()->GetWorkPos().y + rely)); }
-        inline void SetNextSize(float w, float h) { ImGui::SetNextWindowSize(ImVec2(w, h)); }
+        inline void SetNextPos() { 
+            ImGui::SetNextWindowPos(
+                 {
+                     GetMainViewport()->GetWorkPos().x + m_WindowProps.pos.x, 
+                     GetMainViewport()->GetWorkPos().y + m_WindowProps.pos.y
+                 }
+            ); 
+        }
+        inline void SetNextSize() { ImGui::SetNextWindowSize(m_WindowProps.size); }
 
         virtual void Render() = 0;
         virtual ~IGWindow() = default;
 
     protected:
+        IGWindowProps m_WindowProps;
         ImGuiWindowFlags m_WindowFlags;
     };
 } // namespace Application
