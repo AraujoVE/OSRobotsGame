@@ -1,7 +1,7 @@
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
 using namespace DampEngine;
 
-#include "Application/ImGui/Windows/FunctionWindow.hpp"
+#include "Application/ImGui/Window/FunctionWindow.hpp"
 
 #include "Application/header/Task.hpp"
 #include "Application/header/GameSave.hpp"
