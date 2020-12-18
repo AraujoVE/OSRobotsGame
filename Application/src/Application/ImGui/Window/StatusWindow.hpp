@@ -8,9 +8,6 @@
 
 namespace Application
 {
-
-    void *spawnChange(void *abab);
-
     class StatusWindow final : IGWindow
     {
     public:
@@ -27,23 +24,12 @@ namespace Application
             // unsigned stat1 = m_VillageStatus.getStat(1);
 
 
-            bool issuedSpawn = false;
             ImGui::Begin("Status");
             {
                 ImGui::Text("Population: %d", population);
                 // ImGui::Text("Status 1: %d", stat1);
-
-
-                issuedSpawn = ImGui::Button("Spawn producer");
             }
             ImGui::End();
-
-            static bool spawned = false;
-            if (issuedSpawn && !spawned) {
-                // spawned = true;
-                pthread_t t;
-                pthread_create(&t, NULL, spawnChange, (void*)&m_VillageStatus);
-            }
         }
 
     private:

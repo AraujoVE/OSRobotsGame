@@ -48,45 +48,37 @@ namespace Application
 
         //Task creation if issued
         if (createNewTaskIssued && canCreateNewTask)
-        {
             CreateTask();
-        }
 
         //Render children
         for (auto taskWindow : m_TaskWindows)
-        {
             taskWindow->Render();
-        }
     }
+
     void FunctionWindow::CreateTask()
     {
-        static int taskID = 0;
+        auto taskCanceledCallback = std::bind(&FunctionWindow::EndTask, this, std::placeholders::_1);
+
         //TODO: make m_RobotsManagement return the task ID, to keep track internally
-        m_RobotsManagement.createTask(m_Function);
+        Task &createdTask = m_RobotsManagement.createTask(m_Function);
 
-        int taskIdx = m_TaskWindows.size();
-        m_TaskWindows.push_back(
-            new TaskWindow(
-                TaskWindowProps(taskIdx, m_WindowProps),
-                m_RobotsManagement,
-                taskID,
-                std::bind(&FunctionWindow::EndTask, this, std::placeholders::_1)));
+        TaskWindowProps associatedWindowProps = {m_TaskWindows.size(), m_WindowProps};
+        TaskWindow *associatedWindow = new TaskWindow(associatedWindowProps, m_RobotsManagement, createdTask, taskCanceledCallback);
 
-        //TODO: change Temporary
-        taskID++;
+        m_TaskWindows.push_back(associatedWindow);
     }
+
     void FunctionWindow::EndTask(TaskWindow *taskWindow)
     {
         //TODO: m_RobotsManagement.endTask(taskWindow->GetTaskID());
 
-        auto it = std::find(m_TaskWindows.begin(), m_TaskWindows.end(), taskWindow);
-        if (it != m_TaskWindows.end())
+        unsigned long deletedWindowIndex = taskWindow->GetIndex();
+
+        m_TaskWindows.erase(m_TaskWindows.begin() + deletedWindowIndex);
+
+        for (unsigned long affectedWindowOldIndex = deletedWindowIndex; affectedWindowOldIndex < m_TaskWindows.size(); affectedWindowOldIndex++)
         {
-            m_TaskWindows.erase(it);
-            for (; it != m_TaskWindows.end(); it++)
-            {
-                (*it)->SetIndex(it - m_TaskWindows.begin());
-            }
+            m_TaskWindows[affectedWindowOldIndex]->SetIndex(affectedWindowOldIndex + 1);
         }
 
         delete taskWindow;

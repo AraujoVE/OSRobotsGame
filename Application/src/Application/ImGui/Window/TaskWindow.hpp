@@ -18,11 +18,11 @@ namespace Application
     struct TaskWindowProps
     {
 
-        unsigned FunctionTaskVecIdx;
+        unsigned long FunctionTaskVecIdx;
         IGWindowProps ParentProps;
         unsigned xOffsetFirst, xSpacing;
 
-        TaskWindowProps(unsigned functionTaskVecIdx, IGWindowProps parentProps, unsigned xOffsetFirst = 10, unsigned xSpacing = 10)
+        TaskWindowProps(unsigned long functionTaskVecIdx, IGWindowProps parentProps, unsigned xOffsetFirst = 10, unsigned xSpacing = 10)
             : FunctionTaskVecIdx(functionTaskVecIdx), ParentProps(parentProps), xOffsetFirst(xOffsetFirst), xSpacing(xSpacing)
         {
         }
@@ -31,23 +31,30 @@ namespace Application
     class TaskWindow final : public Application::IGWindow
     {
     public:
+        //When user choses to close current Task, this callback is called (you must destroy the TaskWindow associated object in the callback)
         using OnTaskCancelledFn = std::function<void(TaskWindow *)>;
 
-        TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, TaskID taskID, OnTaskCancelledFn onTaskCancelledFn);
+        TaskWindow(
+            TaskWindowProps taskWindowProps,
+            RobotsManagement &robotsManagement, 
+            Task& task, 
+            OnTaskCancelledFn onTaskCancelledFn
+        );
+
         virtual ~TaskWindow() override 
         {
             //TODO: n fazer isso a cada frame kk
-            m_RobotsManagement.endTask(m_RobotsManagement.findTask(m_TaskID), true);
+            m_RobotsManagement.endTask(m_Task, true);
         }
-
-
         
-        inline TaskID GetTaskID() const { return m_TaskID; }
-        inline void SetIndex(int newIndex)
+        inline TaskID GetTaskID() const { return m_Task.getId(); }
+        inline void SetIndex(unsigned long newIndex)
         {
             m_TaskWindowProps.FunctionTaskVecIdx = newIndex;
             UpdateProps();
         }
+
+        inline unsigned long GetIndex() const { return m_TaskWindowProps.FunctionTaskVecIdx; }
 
         virtual void Render() override;
 
@@ -57,7 +64,7 @@ namespace Application
     private:
         TaskWindowProps m_TaskWindowProps;
         RobotsManagement &m_RobotsManagement;
-        TaskID m_TaskID;
+        Task& m_Task;
         std::string m_WindowName;
         OnTaskCancelledFn m_OnTaskCancelledFn;
     };

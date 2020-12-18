@@ -45,7 +45,7 @@ namespace Application
 
         bool createRobots(int);
         bool destroyRobots(int);
-        void createTask(RobotFunction);
+        Task& createTask(RobotFunction);
         void updateTasks();
         bool moveRobot(Task &, int);
         bool endTask(Task &, bool force = false);

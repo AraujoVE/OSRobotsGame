@@ -120,7 +120,7 @@ namespace Application
         //TODO: AraujoVE logic
     }
 
-    void RobotsManagement::createTask(RobotFunction funct)
+    Task& RobotsManagement::createTask(RobotFunction funct)
     {   
         DE_TRACE("(RobotsManagement) createTask() ");
 
@@ -129,6 +129,8 @@ namespace Application
         
 
         tasks[(int)funct][newTask->getId()] = newTask;
+
+        return *newTask;
     }
 
     bool RobotsManagement::endTask(Task &curTask, bool force)

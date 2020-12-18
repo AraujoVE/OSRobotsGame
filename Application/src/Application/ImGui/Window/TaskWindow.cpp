@@ -5,12 +5,11 @@
 namespace Application
 {
 
-    TaskWindow::TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, TaskID taskID, OnTaskCancelledFn onTaskCancelledFn)
+    TaskWindow::TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, Task &task, OnTaskCancelledFn onTaskCancelledFn)
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings),
           m_TaskWindowProps(taskWindowProps),
-          m_RobotsManagement(robotsManagement), m_TaskID(taskID),
-          //TODO: include RobotFunction info in title
-          m_WindowName(std::string("Task_") + std::to_string(taskID)),
+          m_RobotsManagement(robotsManagement), m_Task(task),
+          m_WindowName(std::string("Task_") + std::to_string(task.getId())),
           m_OnTaskCancelledFn(onTaskCancelledFn)
     {
         UpdateProps();
@@ -21,35 +20,39 @@ namespace Application
         SetNextPos();
         SetNextSize();
 
-        // Task& task = m_RobotsManagement.findTask(m_TaskID);
-
         bool cancelIssued = false;
         int deltaRobots = 0;
 
         ImGui::Begin(m_WindowName.c_str(), NULL, m_WindowFlags);
-        {
-            // int currRobotsNo = task.getRobotsNo();
+        {  
+            //First line
             ImGui::Text("%s",m_WindowName.c_str());
             ImGui::SameLine(60);
             cancelIssued = ImGui::Button("x");
+
+            //Second line
+            ImGui::Text("Robot count: %d", m_Task.getRobotsNo());
+
+            //Third line
             deltaRobots += -ImGui::Button("-");
             ImGui::SameLine(30);
             deltaRobots += +ImGui::Button("+");
+            ImGui::SameLine(110);
+            ImGui::Text("Goods: %.2f", m_Task.getGainedGoods());
+            
         }
         ImGui::End();
 
-        //TODO: n fazer isso a cada frame kk
-        Task &task = m_RobotsManagement.findTask(m_TaskID);
-
         if (cancelIssued)
         {
+            //This callback destroys the current object
             m_OnTaskCancelledFn(this);
+            return;
         }
-        else if (deltaRobots != 0)
-        {
-            m_RobotsManagement.moveRobot(task, deltaRobots);
-            DE_DEBUG("Nova qtd = {0}", task.getRobotsNo());
-        }
+
+
+        if (deltaRobots != 0)
+            m_RobotsManagement.moveRobot(m_Task, deltaRobots);
     }
 
     void TaskWindow::UpdateProps()
