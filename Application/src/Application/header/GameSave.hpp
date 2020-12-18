@@ -1,12 +1,8 @@
 #pragma once
 
-#include "VillageStats.hpp"
-#include "RobotsManagement.hpp"
-// bool isGameOver(VillageStats * village,  RobotsManagement * robotsManag) {
-//     if (village->getPopulation() == 0 || robotsManag->getTotRobots() == 0) // if population is 0 or all robots were destroyed, game is over
-//         return true;
-//     return false;
-// }
+//Forward declaration to boost compilation time
+class VillageStats;
+class RobotsManagement;
 
 #include <memory>
 
@@ -23,6 +19,7 @@ namespace Application
         {
             villageStats.reset(new VillageStats());
             robotsManagement.reset(new RobotsManagement());
+            robotsManagement->setVillageStats(villageStats.get());
         }
         ~GameSave() {}
 

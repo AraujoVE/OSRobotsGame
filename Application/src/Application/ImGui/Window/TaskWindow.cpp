@@ -1,16 +1,15 @@
 #include "TaskWindow.hpp"
 
-#include "DampEngine/Core/Macros.hpp"
+#include "mypch.hpp"
 
 namespace Application
 {
 
-    TaskWindow::TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, TaskID taskID, OnTaskCancelledFn onTaskCancelledFn)
+    TaskWindow::TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, Task &task, OnTaskCancelledFn onTaskCancelledFn)
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings),
           m_TaskWindowProps(taskWindowProps),
-          m_RobotsManagement(robotsManagement), m_TaskID(taskID),
-          //TODO: include RobotFunction info in title
-          m_WindowName(std::string("Task_") + std::to_string(taskID)),
+          m_RobotsManagement(robotsManagement), m_Task(task),
+          m_WindowName(std::string("Task_") + std::to_string(task.getId())),
           m_OnTaskCancelledFn(onTaskCancelledFn)
     {
         UpdateProps();
@@ -21,30 +20,51 @@ namespace Application
         SetNextPos();
         SetNextSize();
 
-        // Task& task = m_RobotsManagement.findTask(m_TaskID);
-
         bool cancelIssued = false;
         int deltaRobots = 0;
 
         ImGui::Begin(m_WindowName.c_str(), NULL, m_WindowFlags);
-        {
-            // int currRobotsNo = task.getRobotsNo();
-            ImGui::Text("Task 1");
+        {  
+            //First line
+            ImGui::Text("%s",m_WindowName.c_str());
             ImGui::SameLine(60);
             cancelIssued = ImGui::Button("x");
-            deltaRobots += -ImGui::Button("-");
+
+            //Second line
+            ImGui::Text("Robot count: %d", m_Task.getRobotsNo());
+
+            //Third line
+            deltaRobots += -ImGui::ButtonEx("-", {0,0}, ImGuiButtonFlags_Repeat);
             ImGui::SameLine(30);
-            deltaRobots += ImGui::Button("+");
+            deltaRobots += +ImGui::ButtonEx("+", {0,0}, ImGuiButtonFlags_Repeat);
+            ImGui::SameLine(110);
+            ImGui::Text("Goods: %.2f", m_Task.getGainedGoods());
+            time_t remainingTime = m_Task.getRemainingTime();
+
+            const char *endTimeStr = "--";
+            if (remainingTime >= 0) {
+                time_t endTime = time(0) + remainingTime;
+                tm *endLocalTime = localtime(&endTime);
+                std::stringstream ss;
+                // ss << endLocalTime->tm_hour << ":" << endLocalTime->tm_min << ":" << endLocalTime->tm_sec;
+                ss << remainingTime << "s";
+                endTimeStr = ss.str().c_str();
+            }
+
+            ImGui::Text("end time: %s", endTimeStr);
         }
         ImGui::End();
 
         if (cancelIssued)
         {
-            m_OnTaskCancelledFn(this);
+            //This callback destroys the current object
+            DE_DEBUG("(click) Pedindo para parar task {0}", m_Task.getId());
+            m_OnTaskCancelledFn(m_Task);
+            return;
         }
-        else if (deltaRobots != 0)
-            DE_DEBUG("Delta = {0}", deltaRobots);
-        //     task.setRobotsNo(currRobotsNo + deltaRobots);
+
+        if (deltaRobots != 0)
+            m_RobotsManagement.moveRobot(m_Task, deltaRobots);
     }
 
     void TaskWindow::UpdateProps()

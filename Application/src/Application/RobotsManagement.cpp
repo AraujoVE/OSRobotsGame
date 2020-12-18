@@ -1,12 +1,4 @@
-#include "header/RobotsManagement.hpp"
-#include "header/Task.hpp"
-#include "header/VillageStats.hpp"
-#include <vector>
-#include <map>
-#include <ctime>
-#include <iostream>
-#include <iterator>
-#include <stdexcept>
+#include "mypch.hpp"
 
 //Inicialização e destruição da classe
 namespace Application
@@ -30,10 +22,12 @@ namespace Application
 
     void RobotsManagement::initializeStats()
     {
-        totRobots = 1;
-        freeRobots = 1;
+        //TODO: mudar de volta (para 1, tot e free)
+        totRobots = 10;
+        freeRobots = 10;
         prodCost = 1;
         villageStats = NULL;
+        m_FunctionWindowArray = nullptr;
     }
 
     RobotsManagement::~RobotsManagement() {}
@@ -94,6 +88,10 @@ namespace Application
         villageStats = newVillageStats;
     }
 
+    void RobotsManagement::setFunctionWindowsArray(FunctionWindow **functionWindowArray) {
+        m_FunctionWindowArray = functionWindowArray;
+    }
+
     bool RobotsManagement::createRobots(int no)
     {   
         int currentResources;
@@ -149,53 +147,40 @@ namespace Application
         return hasDestroyed;
     }
 
-    void RobotsManagement::onTaskCompleted(TaskID completedTaskID) {
-        //TODO: AraujoVE logic
-    }
+    Task& RobotsManagement::createTask(RobotFunction funct)
+    {   
+        DE_TRACE("(RobotsManagement) createTask() ");
 
-    void RobotsManagement::createTask(RobotFunction funct)
-    {
         //Cria nova task com o id Incrementado
-        Task *newTask = new Task(funct, std::bind(&RobotsManagement::onTaskCompleted, this, std::placeholders::_1));
+        Task *newTask = new Task(funct, std::bind(&RobotsManagement::onTaskEnded, this, std::placeholders::_1));
+        
 
         tasksDown();
         tasks[(int)funct][newTask->getId()] = newTask;
         tasksUp();
+
+        newTask->start();
+
+        return *newTask;
     }
 
-    bool RobotsManagement::endTask(Task &curTask)
-    {
-        bool hasEnded = false;
-        int lostRobots;
-        
-        if (!curTask.updateTask())
-        {   
-            lostRobots = curTask.calcLostRobots();
-            moveRobot(curTask, -1 * curTask.getRobotsNo());
-            destroyRobots(lostRobots);
-            villageStats->changeStat((int)curTask.getType(), (int)curTask.getGainedGoods());
-
-            hasEnded = true;
-        }
-
-        return hasEnded;
+    void RobotsManagement::endTask(Task &task) {
+        DE_DEBUG("(RobotsManagement) Solicitada endtask()");
+        task.stop();
     }
 
-    //This method is probably useless once each task will have a thread
-    void RobotsManagement::updateTasks()
+    void RobotsManagement::onTaskEnded(Task &endedTask)
     {
-        for (int functIdx = 0; functIdx < FUNCTION_QTY; functIdx++)
-        {
-            //E se itera em cada robo de dada função
-            std::unordered_map<TaskID, Task*>::iterator itr = tasks[functIdx].begin();
-            while (itr != tasks[functIdx].end())
-            {
-                if (endTask(*itr->second))
-                    itr = tasks[functIdx].erase(itr);
-                else
-                    ++itr;
-            }
-        }
+        DE_DEBUG("(RobotsManagement) onTaskEnded()");
+
+        int lostRobots = endedTask.calcLostRobots();
+        moveRobot(endedTask, -1 * endedTask.getRobotsNo());
+        destroyRobots(lostRobots);
+        villageStats->changeStat((int)endedTask.getType(), (int)endedTask.getGainedGoods());
+
+        DE_ASSERT(m_FunctionWindowArray != nullptr, "FunctionWindowArray is not set");
+
+        m_FunctionWindowArray[(int)endedTask.getType()]->OnTaskEnded(endedTask);
     }
 
     bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)

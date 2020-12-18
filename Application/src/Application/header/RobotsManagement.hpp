@@ -6,8 +6,9 @@
 #include "VillageStats.hpp"
 #include "Avenue.hpp"
 #include <vector>
+#include "Application/ImGui/Window/FunctionWindow.hpp"
+
 #include <unordered_map>
-#include <ctime>
 
 namespace Application
 {
@@ -31,6 +32,7 @@ namespace Application
 
         void initializeAvenues();
         void changeRobotsNum (int type, int increase);
+        FunctionWindow **m_FunctionWindowArray;
 
     public:
         
@@ -49,18 +51,20 @@ namespace Application
         void setFreeRobots(int newFreeRobots);
         void setProdCost(int newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
+        void setFunctionWindowsArray(FunctionWindow **FunctionWindowArray);
         //TODO: determine if it will be in fact allowed to set tasks
         // void setTasks(std::vector<std::unordered_map<int, Task>> *newTasks);
 
         bool createRobots(int);
         bool destroyRobots(int);
-        void createTask(RobotFunction);
-        void updateTasks();
+        Task& createTask(RobotFunction);
         bool moveRobot(Task &, int);
-        bool endTask(Task &);
 
         void tasksUp();
         void tasksDown();
+        
+        void endTask(Task &);
+        void onTaskEnded(Task &);
     };
 } // namespace Application
 #endif

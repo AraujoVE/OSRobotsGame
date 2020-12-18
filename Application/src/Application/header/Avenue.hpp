@@ -6,22 +6,23 @@
 
 #define FULL_N 1000
 
+template<typename T>
 class Avenue {
     private:
         sem_t empty, full;
         pthread_mutex_t mutex;
-        int &attr;
+        T &attr;
         std::queue<int> items;
 
     public:
-        Avenue(int &attr);
+        Avenue(T &attr);
         ~Avenue();
 
-        void producer (int value);
+        void producer (T value);
         void consumer ();
 
         void up();
         void down();
 
-        int getValue ();
+        T getValue ();
 };

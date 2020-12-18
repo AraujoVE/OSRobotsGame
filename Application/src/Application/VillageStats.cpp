@@ -1,13 +1,4 @@
-#include "header/VillageStats.hpp"
-#include "header/RobotFunctions.hpp"
-#include "header/RobotFunctions.hpp"
-#include <ctime>
-#include <cstdlib>
-#include <iostream>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include "DampEngine/Core/Macros.hpp"
+#include "mypch.hpp"
 
 namespace Application
 {
@@ -56,11 +47,11 @@ namespace Application
 
     void VillageStats::initializeVSAvenues() {
         for (int i = 0; i < BASE_STATS_NO; i++) {
-            avenueVS[i] = new Avenue(baseStats[i]);
+            avenueVS[i] = new Avenue<int>(baseStats[i]);
             pthread_create(&consumers[i], NULL, runConsumer, avenueVS[i]);
         }
 
-        avenueVS[POPULATION_INDEX] = new Avenue(population);
+        avenueVS[POPULATION_INDEX] = new Avenue<int>(population);
         pthread_create(&consumers[POPULATION_INDEX], NULL, runConsumer, avenueVS[POPULATION_INDEX]);
     }
 
@@ -143,7 +134,7 @@ namespace Application
     //LAST
     void VillageStats::decayPopulation(){
         int popReduct = (int)((float)population * (1 - statTax));
-        if((population - popReduct)>(int)(TAX_REDUCT * (float)population)){
+        if((population - popReduct) > (int)(TAX_REDUCT * (float)population)){
             population -= popReduct;
         }
         else{
@@ -174,7 +165,8 @@ namespace Application
         int it = 0;
         while (true) {
             avenueVS[POPULATION_INDEX]->down();
-
+            
+            onAttack = false;
             for(int i =0;i<BASE_STATS_NO - 1;i++) {
                  decayStat(it,i);
             }
@@ -185,10 +177,10 @@ namespace Application
 
             avenueVS[POPULATION_INDEX]->up();
 
-            it = (it+1)==ATTACK_FREQUENCY ? 0 : it+1;
+            it = (it+1+ATTACK_FREQUENCY)%ATTACK_FREQUENCY;
 
             //TODO: fixed time (adjusting for lag)
-            sleep(1);
+            usleep(DECAY_DELAY_MICRO);
         }
     }
 
@@ -208,7 +200,7 @@ namespace Application
     }
 
     void *runConsumer (void *consumerObject) {
-        Avenue *avenue = (Avenue*) consumerObject;
+        Avenue<int> *avenue = (Avenue<int>*) consumerObject;
         avenue->consumer();
         return NULL;
     }

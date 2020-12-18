@@ -3,7 +3,7 @@
 
 #include "RobotFunctions.hpp"
 #include "Avenue.hpp"
-#include <ctime>
+
 #include <pthread.h>
 
 namespace Application
@@ -23,7 +23,7 @@ namespace Application
         const static int INIT_RESOURCES_VALUE = 100;
         const static int POPULATION_INDEX = BASE_STATS_NO;
         constexpr static float TAX_REDUCT = 0.5;
-
+        const unsigned long DECAY_DELAY_MICRO = 500e3;
     private:
         bool onAttack;
         float statTax;
@@ -49,7 +49,7 @@ namespace Application
             resources;
         */
 
-        Avenue *avenueVS[BASE_STATS_NO+1];
+        Avenue<int> *avenueVS[BASE_STATS_NO+1];
         pthread_t decayThread;
         pthread_t consumers[BASE_STATS_NO+1];
 

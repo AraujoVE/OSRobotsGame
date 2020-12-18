@@ -31,10 +31,6 @@
 
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
 
-//----- ENTRY POINT -----//
-#include "DampEngine/Core/EntryPoint.hpp"
-
-
 //Include Linux Window if running system is linux
 #ifdef DE_PLATFORM_LINUX
     #include "Platform/Linux/LinuxGLFWWindow.hpp"

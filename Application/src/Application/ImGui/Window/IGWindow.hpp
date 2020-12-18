@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imgui.h"
+
 namespace Application
 {
     struct IGWindowProps {

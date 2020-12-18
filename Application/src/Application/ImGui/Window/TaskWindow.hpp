@@ -2,27 +2,19 @@
 
 #include "IGWindow.hpp"
 
-#include "imgui.h"
-
-#include <memory>
-#include <vector>
-#include <string>
-#include <functional>
-#include <algorithm>
-#include "Application/header/Task.hpp"
-
-#include "Application/header/RobotsManagement.hpp"
+class Task;
+class RobotsManagement;
 
 namespace Application
 {
     struct TaskWindowProps
     {
 
-        unsigned FunctionTaskVecIdx;
+        unsigned long FunctionTaskVecIdx;
         IGWindowProps ParentProps;
         unsigned xOffsetFirst, xSpacing;
 
-        TaskWindowProps(unsigned functionTaskVecIdx, IGWindowProps parentProps, unsigned xOffsetFirst = 10, unsigned xSpacing = 10)
+        TaskWindowProps(unsigned long functionTaskVecIdx, IGWindowProps parentProps, unsigned xOffsetFirst = 10, unsigned xSpacing = 10)
             : FunctionTaskVecIdx(functionTaskVecIdx), ParentProps(parentProps), xOffsetFirst(xOffsetFirst), xSpacing(xSpacing)
         {
         }
@@ -31,15 +23,25 @@ namespace Application
     class TaskWindow final : public Application::IGWindow
     {
     public:
-        using OnTaskCancelledFn = std::function<void(TaskWindow *)>;
-        TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, TaskID taskID, OnTaskCancelledFn onTaskCancelledFn);
+        //When user choses to close current Task, this callback is called (you must destroy the TaskWindow associated object in the callback)
+        using OnTaskCancelledFn = std::function<void(Task &)>;
 
-        inline TaskID GetTaskID() const { return m_TaskID; }
-        inline void SetIndex(int newIndex)
+        TaskWindow(
+            TaskWindowProps taskWindowProps,
+            RobotsManagement &robotsManagement, 
+            Task& task, 
+            OnTaskCancelledFn onTaskCancelledFn
+        );
+        
+        inline Task& GetTask() const { return m_Task; }
+        inline TaskID GetTaskID() const { return m_Task.getId(); }
+        inline void SetIndex(unsigned long newIndex)
         {
             m_TaskWindowProps.FunctionTaskVecIdx = newIndex;
             UpdateProps();
         }
+
+        inline unsigned long GetIndex() const { return m_TaskWindowProps.FunctionTaskVecIdx; }
 
         virtual void Render() override;
 
@@ -49,7 +51,7 @@ namespace Application
     private:
         TaskWindowProps m_TaskWindowProps;
         RobotsManagement &m_RobotsManagement;
-        TaskID m_TaskID;
+        Task& m_Task;
         std::string m_WindowName;
         OnTaskCancelledFn m_OnTaskCancelledFn;
     };
