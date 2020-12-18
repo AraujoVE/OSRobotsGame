@@ -26,7 +26,7 @@ namespace Application
         int prodCost; //TODO: Implementation to change this value
         VillageStats *villageStats;
         std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
-        Avenue *robotsAvenues[2];
+        Avenue<int> *robotsAvenues[2];
         pthread_t consumers[2];
         pthread_mutex_t tasksMutex;
 

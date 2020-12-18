@@ -13,8 +13,8 @@ namespace Application
     }
 
     void RobotsManagement::initializeAvenues() {
-        robotsAvenues[TOT_ROBOTS] = new Avenue(totRobots);
-        robotsAvenues[FREE_ROBOTS] = new Avenue(freeRobots);
+        robotsAvenues[TOT_ROBOTS] = new Avenue<int>(totRobots);
+        robotsAvenues[FREE_ROBOTS] = new Avenue<int>(freeRobots);
 
         pthread_create(&consumers[TOT_ROBOTS], NULL, runConsumer, robotsAvenues[TOT_ROBOTS]);
         pthread_create(&consumers[FREE_ROBOTS], NULL, runConsumer, robotsAvenues[FREE_ROBOTS]);
@@ -54,13 +54,18 @@ namespace Application
     }
 
     Task &RobotsManagement::findTask(TaskID taskID) const {
+        tasksDown();
+
         for (int i = 0; i < FUNCTION_QTY; i++)
         {
             auto searchRes = tasks[i].find(taskID);
             if (searchRes != tasks[i].end()) {
                 return *(Task*)searchRes->second;
+                tasksUp();
             }
         }
+
+        tasksUp();
 
         throw std::logic_error("Task not found");
     }
@@ -96,9 +101,8 @@ namespace Application
     {   
         int currentResources;
         int price;
-        Avenue *VSResourcesAvenue;
+        Avenue<int> *VSResourcesAvenue;
         bool hasCreated = false;
-
 
         price = prodCost * no;
         VSResourcesAvenue = villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING);
@@ -153,7 +157,6 @@ namespace Application
 
         //Cria nova task com o id Incrementado
         Task *newTask = new Task(funct, std::bind(&RobotsManagement::onTaskEnded, this, std::placeholders::_1));
-        
 
         tasksDown();
         tasks[(int)funct][newTask->getId()] = newTask;
