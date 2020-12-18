@@ -2,16 +2,8 @@
 
 #include "IGWindow.hpp"
 
-#include "imgui.h"
-
-#include <memory>
-#include <vector>
-#include <string>
-#include <functional>
-#include <algorithm>
-#include "Application/header/Task.hpp"
-
-#include "Application/header/RobotsManagement.hpp"
+class Task;
+class RobotsManagement;
 
 namespace Application
 {

@@ -1,7 +1,10 @@
 #include "MainGuiLayer.hpp"
-#include "imgui.h"
 
-#include "DampEngine/Core/Macros/Log.hpp"
+#include "mypch.hpp"
+
+#include "Application/ImGui/Window/FunctionWindow.hpp"
+#include "Application/ImGui/Window/StatusWindow.hpp"
+
 namespace Application
 {
     MainGuiLayer::MainGuiLayer(GameSave &gameSave)

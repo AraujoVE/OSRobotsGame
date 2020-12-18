@@ -40,7 +40,7 @@ namespace DampEngine
         m_Running = true;
         while (m_Running) {
             
-            glad_glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+            glad_glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             glad_glClear(GL_COLOR_BUFFER_BIT);
 
             // DE_TRACE("Calling Application::OnUpdate hook");

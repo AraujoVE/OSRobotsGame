@@ -1,4 +1,5 @@
-#include <DampEngine.hpp>
+#include "mypch.hpp"
+#include <DampEngine/Core/EntryPoint.hpp>
 
 #include "ImGui/MainGuiLayer.hpp"
 
@@ -13,6 +14,7 @@ namespace Application
 
         virtual void OnStart() override
         {
+            DE_INFO("OSRobotsGame starting");
         }
 
         virtual void InitLayers() override
@@ -22,10 +24,12 @@ namespace Application
 
         virtual void OnUpdate() override
         { 
+            
         }
 
         virtual void OnStop() override
         {
+            DE_INFO("OSRobotsGame stopping");
         }
 
     private:
@@ -38,3 +42,9 @@ DampEngine::Application *CreateApplication()
 {
     return new Application::MyApplication();
 }
+
+// bool isGameOver(VillageStats * village,  RobotsManagement * robotsManag) {
+//     if (village->getPopulation() == 0 || robotsManag->getTotRobots() == 0) // if population is 0 or all robots were destroyed, game is over
+//         return true;
+//     return false;
+// } 

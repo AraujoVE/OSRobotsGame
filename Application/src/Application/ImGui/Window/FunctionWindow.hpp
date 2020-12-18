@@ -2,19 +2,11 @@
 
 #include "IGWindow.hpp"
 
-#include "imgui_internal.h"
-#include "imgui.h"
-
-#include "Application/header/RobotFunctions.hpp"
-#include "Application/header/RobotsManagement.hpp"
-
-#include "TaskWindow.hpp"
-
-#include <vector>
-#include <algorithm>
-
 namespace Application
 {
+    class TaskWindow;
+    class RobotsManagement;
+
     class FunctionWindow final : public Application::IGWindow
     {
     public:

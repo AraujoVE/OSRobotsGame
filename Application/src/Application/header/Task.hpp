@@ -2,12 +2,6 @@
 #define TASK
 
 #include "RobotFunctions.hpp"
-// #include "RobotsManagement.hpp"
-// #include "VillageStats.hpp"
-// #include <vector>
-//#include <map>
-#include <ctime>
-//#include <iostream>
 #include <functional>
 
 namespace Application

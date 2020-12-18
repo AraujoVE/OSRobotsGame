@@ -3,9 +3,6 @@
 #include "Application/header/VillageStats.hpp"
 
 #include "IGWindow.hpp"
-
-#include "DampEngine/Core/Macros.hpp"
-
 namespace Application
 {
     class StatusWindow final : IGWindow

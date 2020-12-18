@@ -1,13 +1,4 @@
-#include "header/VillageStats.hpp"
-#include "header/RobotFunctions.hpp"
-#include "header/RobotFunctions.hpp"
-#include <ctime>
-#include <cstdlib>
-#include <iostream>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include "DampEngine/Core/Macros.hpp"
+#include "mypch.hpp"
 
 namespace Application
 {

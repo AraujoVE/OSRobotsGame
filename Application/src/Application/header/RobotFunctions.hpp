@@ -13,11 +13,5 @@ namespace Application
         RESOURCE_GATHERING
     };
 
-    const std::string RobotFunctionString[] = {
-        "PROTECTION",
-        "HUNT",
-        "MEDICINE",
-        "CONSTRUCTION",
-        "RESOURCE_GATHERIN"
-    };      
+    const std::string& getRobotFunctionString(RobotFunction function);
 }

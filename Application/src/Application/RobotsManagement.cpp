@@ -1,14 +1,4 @@
-#include "header/RobotsManagement.hpp"
-#include "header/Task.hpp"
-#include "header/VillageStats.hpp"
-#include <vector>
-#include <map>
-#include <ctime>
-#include <iostream>
-#include <iterator>
-#include <stdexcept>
-
-#include "DampEngine/Core/Macros/Log.hpp"
+#include "mypch.hpp"
 
 //Inicialização e destruição da classe
 namespace Application

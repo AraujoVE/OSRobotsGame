@@ -1,13 +1,4 @@
-#include "header/RobotsManagement.hpp"
-#include "header/Task.hpp"
-#include "header/VillageStats.hpp"
-#include "header/Task.hpp"
-
-#include <random>
-//#include <vector>
-//#include <map>
-#include <ctime>
-//#include <iostream>
+#include "mypch.hpp"
 
 namespace Application
 {

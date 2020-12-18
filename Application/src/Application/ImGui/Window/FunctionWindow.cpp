@@ -1,6 +1,8 @@
 #include "FunctionWindow.hpp"
 
-#include "DampEngine/Core/Macros.hpp"
+#include "mypch.hpp"
+
+#include "Application/ImGui/Window/TaskWindow.hpp"
 
 namespace Application
 {
@@ -27,9 +29,9 @@ namespace Application
         bool canCreateNewTask = (m_TaskWindows.size() < m_RobotsManagement.MAX_TASKS_PER_FUNCTION);
 
         //Window description
-        ImGui::Begin(("Function_" + RobotFunctionString[(int)m_Function]).c_str(), NULL, m_WindowFlags);
+        ImGui::Begin(("Function_" + getRobotFunctionString(m_Function)).c_str(), NULL, m_WindowFlags);
         {
-            ImGui::Text("%s", RobotFunctionString[(int)m_Function].c_str());
+            ImGui::Text("%s", getRobotFunctionString(m_Function).c_str());
             ImGui::SameLine();
 
             if (canCreateNewTask)
