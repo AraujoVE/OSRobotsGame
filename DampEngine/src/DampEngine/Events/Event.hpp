@@ -55,8 +55,8 @@ namespace DampEngine
         inline static EventType GetStaticEventType() { return EventType::Invalid; }
         inline static const std::string GetStaticEventName() { return "Invalid"; }
 
-        virtual inline EventType GetEventType() const = 0;
-        virtual inline std::string GetEventName() const = 0;
+        virtual EventType GetEventType() const = 0;
+        virtual std::string GetEventName() const = 0;
 
         inline bool IsHandled() const { return m_Handled; }
 
