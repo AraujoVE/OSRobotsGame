@@ -2,19 +2,36 @@
 
 #include "mypch.hpp"
 
-Avenue::Avenue (int &attr): attr(attr) {
+template <>
+Avenue<int>::Avenue (int &attr): attr(attr) {
     sem_init(&empty, 1, FULL_N);
     sem_init(&full, 1, 0);
     pthread_mutex_init(&mutex, NULL);
 }
 
-Avenue::~Avenue () {
+template <>
+Avenue<std::nullptr_t>::Avenue (std::nullptr_t &attr): attr(attr) {
+    sem_init(&empty, 1, FULL_N);
+    sem_init(&full, 1, 0);
+    pthread_mutex_init(&mutex, NULL);
+}
+
+template <>
+Avenue<int>::~Avenue () {
     sem_destroy(&empty);
     sem_destroy(&full);
     pthread_mutex_destroy(&mutex);
 }
 
-void Avenue::producer (int value) {
+template <>
+Avenue<std::nullptr_t>::~Avenue () {
+    sem_destroy(&empty);
+    sem_destroy(&full);
+    pthread_mutex_destroy(&mutex);
+}
+
+template <>
+void Avenue<int>::producer (int value) {
     sem_wait(&empty);
     pthread_mutex_lock(&mutex);
 
@@ -24,7 +41,8 @@ void Avenue::producer (int value) {
     sem_post(&full);
 }
 
-void Avenue::consumer () {
+template <>
+void Avenue<int>::consumer () {
     DE_TRACE("(Avenue) Spawnei Consumer");
     while (true) {
         sem_wait(&full);
@@ -39,16 +57,28 @@ void Avenue::consumer () {
         sem_post(&empty);
     }
 }
-
-void Avenue::up () {
+template <>
+void Avenue<int>::up () {
     pthread_mutex_unlock(&mutex);
 }
 
-void Avenue::down () {
+template <>
+void Avenue<int>::down () {
     pthread_mutex_lock(&mutex);
 }
 
-int Avenue::getValue () {
+template <>
+void Avenue<std::nullptr_t>::up () {
+    pthread_mutex_unlock(&mutex);
+}
+
+template <>
+void Avenue<std::nullptr_t>::down () {
+    pthread_mutex_lock(&mutex);
+}
+
+template <>
+int Avenue<int>::getValue () {
     int value;
 
     pthread_mutex_lock(&mutex);

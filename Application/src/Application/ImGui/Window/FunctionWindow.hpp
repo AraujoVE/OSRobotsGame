@@ -14,13 +14,15 @@ namespace Application
 
         virtual void Render() override;
 
+        void OnTaskEnded(Task& endedTask);
     private:
         void CreateTask();
-        void EndTask(TaskWindow *taskWindow);
 
     private:
         RobotFunction m_Function;
         RobotsManagement &m_RobotsManagement;
-        std::vector<TaskWindow *> m_TaskWindows;
+        std::unordered_map<TaskID, TaskWindow *> m_TaskWindowMap;
+        std::queue<TaskID> m_TasksPendingDeletion;
+        Avenue<std::nullptr_t> m_MapAvenue;
     };
 } // namespace Application

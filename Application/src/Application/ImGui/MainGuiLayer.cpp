@@ -17,6 +17,8 @@ namespace Application
         m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::CONSTRUCTION);
         m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::PROTECTION);
         m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
+
+        gameSave.getRobotsManagement().setFunctionWindowsArray(m_FunctionWindows);
     }
 
     void MainGuiLayer::ImGuiDescription()

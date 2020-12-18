@@ -10,6 +10,8 @@ namespace Application
         // use current time as seed for random generator
         std::srand(std::time(nullptr));
         initializeParameters(funct);
+
+        m_Running = false;
     }
 
     Task::~Task() {}
@@ -38,7 +40,6 @@ namespace Application
         gainedGoods = 0;
         rewardMultiplier = MIN_REWARD + (std::rand() % REWARD_RANGE);
         predictedTime = 0;
-        createThread();
     }
 
     //Gets of each parameter
@@ -91,19 +92,49 @@ namespace Application
     bool Task::updateTask()
     {
         time_t curTime = time(0);
-        int oldProgress = curProgress;
-        int progress = curProgress + (lastUpdateTime - curTime) * robotsNo;
+        // int oldProgress = curProgress;
+        int progress = curProgress + (curTime - lastUpdateTime) * robotsNo;
         curProgress = progress > progressLength ? progressLength : progress;
-        remainingTime = !robotsNo ? -1 : (progressLength - curProgress) / robotsNo;
+        remainingTime = robotsNo==0 ? -1 : (progressLength - curProgress) / robotsNo;
         gainedGoods = (pow((float)curProgress, 2) / (float)progressLength) * (float)rewardMultiplier;
         lastUpdateTime = curTime;
         return remainingTime != 0;
     }
 
+
+    
+
     //TODO: Implmentar a criação e destruição da thread e como ela funciona
 
-    void Task::createThread() {}
+    void Task::threadLoop() {
+        DE_DEBUG("THREADLOOP INIT");
+        
+        while (true) {
+            DE_TRACE("Threadloop vive"  );
+            if (!updateTask() || !m_Running) break;
+            sleep(1);
+        }
 
-    void Task::deleteThread() {}
+        DE_DEBUG("(Task) fim da thread");
+        m_OnFinishedCallback(*this);
+    }
+
+    void Task::start() {
+        m_Running = true;
+        pthread_create(&m_TaskThread, NULL, runThreadLoop, this);
+    }
+
+    void Task::stop() {
+        DE_DEBUG("(Task) Solicitada stop()");
+
+        m_Running = false;
+    }
+
+    void *runThreadLoop(void *taskObject) {
+        Task *task = (Task*)taskObject;
+        DE_DEBUG("PTHREAD START");
+        task->threadLoop();
+        return NULL;
+    }
 
 } // namespace Application

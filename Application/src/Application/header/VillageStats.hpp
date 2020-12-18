@@ -49,7 +49,7 @@ namespace Application
             resources;
         */
 
-        Avenue *avenueVS[BASE_STATS_NO+1];
+        Avenue<int> *avenueVS[BASE_STATS_NO+1];
         pthread_t decayThread;
         pthread_t consumers[BASE_STATS_NO+1];
 

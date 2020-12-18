@@ -39,11 +39,11 @@ namespace Application
 
     void VillageStats::initializeVSAvenues() {
         for (int i = 0; i < BASE_STATS_NO; i++) {
-            avenueVS[i] = new Avenue(baseStats[i]);
+            avenueVS[i] = new Avenue<int>(baseStats[i]);
             pthread_create(&consumers[i], NULL, runConsumer, avenueVS[i]);
         }
 
-        avenueVS[POPULATION_INDEX] = new Avenue(population);
+        avenueVS[POPULATION_INDEX] = new Avenue<int>(population);
         pthread_create(&consumers[POPULATION_INDEX], NULL, runConsumer, avenueVS[POPULATION_INDEX]);
     }
 
@@ -188,7 +188,7 @@ namespace Application
     }
 
     void *runConsumer (void *consumerObject) {
-        Avenue *avenue = (Avenue*) consumerObject;
+        Avenue<int> *avenue = (Avenue<int>*) consumerObject;
         avenue->consumer();
         return NULL;
     }

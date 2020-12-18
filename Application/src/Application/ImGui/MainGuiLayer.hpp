@@ -14,6 +14,7 @@ namespace Application
     public:
         MainGuiLayer(GameSave &gameSave);
 
+        inline FunctionWindow &GetFunctionWindow(RobotFunction function) const { return *m_FunctionWindows[(int)function]; }
     private:
         virtual void ImGuiDescription() override;
 

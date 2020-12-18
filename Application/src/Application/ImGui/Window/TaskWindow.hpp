@@ -24,7 +24,7 @@ namespace Application
     {
     public:
         //When user choses to close current Task, this callback is called (you must destroy the TaskWindow associated object in the callback)
-        using OnTaskCancelledFn = std::function<void(TaskWindow *)>;
+        using OnTaskCancelledFn = std::function<void(Task &)>;
 
         TaskWindow(
             TaskWindowProps taskWindowProps,
@@ -32,13 +32,8 @@ namespace Application
             Task& task, 
             OnTaskCancelledFn onTaskCancelledFn
         );
-
-        virtual ~TaskWindow() override 
-        {
-            //TODO: n fazer isso a cada frame kk
-            m_RobotsManagement.endTask(m_Task, true);
-        }
         
+        inline Task& GetTask() const { return m_Task; }
         inline TaskID GetTaskID() const { return m_Task.getId(); }
         inline void SetIndex(unsigned long newIndex)
         {

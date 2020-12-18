@@ -11,7 +11,7 @@ namespace Application
     class Task
     {
     public:
-        using OnFinishedCallback = std::function<void(TaskID)>;
+        using OnFinishedCallback = std::function<void(Task&)>;
 
     private:
         const static int TIME_STEP = 10;
@@ -22,6 +22,9 @@ namespace Application
         constexpr static float FAILURE_TAX = 0.8;
 
         static TaskID s_NextID;
+
+        pthread_t m_TaskThread;
+        bool m_Running;
             
         int id;
         RobotFunction type;
@@ -57,8 +60,11 @@ namespace Application
 
         int calcLostRobots();
 
-        void createThread();
-        void deleteThread();
+        void threadLoop();
+        void start();
+        void stop();
     };
+
+    void *runThreadLoop(void *taskObject);
 } // namespace Application
 #endif

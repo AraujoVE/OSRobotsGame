@@ -4,6 +4,7 @@
 #include "RobotFunctions.hpp"
 #include "Task.hpp"
 #include "VillageStats.hpp"
+#include "Application/ImGui/Window/FunctionWindow.hpp"
 
 #include <unordered_map>
 
@@ -21,6 +22,7 @@ namespace Application
         int prodCost; //TODO: Implementation to change this value
         VillageStats *villageStats;
         std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
+        FunctionWindow **m_FunctionWindowArray;
 
     public:
         
@@ -39,15 +41,16 @@ namespace Application
         void setFreeRobots(int newFreeRobots);
         void setProdCost(int newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
+        void setFunctionWindowsArray(FunctionWindow **FunctionWindowArray);
         //TODO: determine if it will be in fact allowed to set tasks
         // void setTasks(std::vector<std::unordered_map<int, Task>> *newTasks);
 
         bool createRobots(int);
         bool destroyRobots(int);
         Task& createTask(RobotFunction);
-        void updateTasks();
         bool moveRobot(Task &, int);
-        bool endTask(Task &, bool force = false);
+        void endTask(Task &);
+        void onTaskEnded(Task &);
     };
 } // namespace Application
 #endif

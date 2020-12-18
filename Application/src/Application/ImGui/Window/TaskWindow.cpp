@@ -34,22 +34,34 @@ namespace Application
             ImGui::Text("Robot count: %d", m_Task.getRobotsNo());
 
             //Third line
-            deltaRobots += -ImGui::Button("-");
+            deltaRobots += -ImGui::ButtonEx("-", {0,0}, ImGuiButtonFlags_Repeat);
             ImGui::SameLine(30);
-            deltaRobots += +ImGui::Button("+");
+            deltaRobots += +ImGui::ButtonEx("+", {0,0}, ImGuiButtonFlags_Repeat);
             ImGui::SameLine(110);
             ImGui::Text("Goods: %.2f", m_Task.getGainedGoods());
-            
+            time_t remainingTime = m_Task.getRemainingTime();
+
+            const char *endTimeStr = "--";
+            if (remainingTime >= 0) {
+                time_t endTime = time(0) + remainingTime;
+                tm *endLocalTime = localtime(&endTime);
+                std::stringstream ss;
+                // ss << endLocalTime->tm_hour << ":" << endLocalTime->tm_min << ":" << endLocalTime->tm_sec;
+                ss << remainingTime << "s";
+                endTimeStr = ss.str().c_str();
+            }
+
+            ImGui::Text("end time: %s", endTimeStr);
         }
         ImGui::End();
 
         if (cancelIssued)
         {
             //This callback destroys the current object
-            m_OnTaskCancelledFn(this);
+            DE_DEBUG("(click) Pedindo para parar task {0}", m_Task.getId());
+            m_OnTaskCancelledFn(m_Task);
             return;
         }
-
 
         if (deltaRobots != 0)
             m_RobotsManagement.moveRobot(m_Task, deltaRobots);

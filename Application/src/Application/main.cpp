@@ -7,9 +7,12 @@ namespace Application
 {
     class MyApplication : public DampEngine::Application
     {
+    private:
+        MyApplication *s_Instance = nullptr;
     public:
         MyApplication() : DampEngine::Application({"OSRobotGame"})
         {
+
         }
 
         virtual void OnStart() override
@@ -19,7 +22,8 @@ namespace Application
 
         virtual void InitLayers() override
         {
-            m_LayerStack.PushOverlay(new MainGuiLayer(m_GameSave));
+            m_MainGuiLayer = new MainGuiLayer(m_GameSave);
+            m_LayerStack.PushOverlay(m_MainGuiLayer);
         }
 
         virtual void OnUpdate() override
@@ -31,9 +35,10 @@ namespace Application
         {
             DE_INFO("OSRobotsGame stopping");
         }
-
+        
     private:
         GameSave m_GameSave;
+        MainGuiLayer *m_MainGuiLayer;
     };
 
 } // namespace Application
