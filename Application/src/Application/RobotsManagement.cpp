@@ -216,12 +216,12 @@ namespace Application
         robotsAvenues[type]->producer(increase);
     }
 
-    void RobotsManagement::tasksUp() {
-        pthread_mutex_unlock(&tasksMutex);
+    void RobotsManagement::tasksUp() const {
+        pthread_mutex_unlock((pthread_mutex_t*)&tasksMutex);
     } 
 
-    void RobotsManagement::tasksDown() {
-        pthread_mutex_lock(&tasksMutex);
+    void RobotsManagement::tasksDown() const {
+        pthread_mutex_lock((pthread_mutex_t*)&tasksMutex);
     }
 
 } // namespace Application

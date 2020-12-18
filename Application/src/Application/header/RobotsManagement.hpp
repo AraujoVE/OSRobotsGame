@@ -17,7 +17,6 @@ namespace Application
     public:
         enum Robots_Values_Index {TOT_ROBOTS, FREE_ROBOTS};
 
-        static const int FUNCTION_QTY = 5;
         static const int MAX_TASKS_PER_FUNCTION = 5;
 
     private:
@@ -60,8 +59,8 @@ namespace Application
         Task& createTask(RobotFunction);
         bool moveRobot(Task &, int);
 
-        void tasksUp();
-        void tasksDown();
+        void tasksUp() const;
+        void tasksDown() const;
         
         void endTask(Task &);
         void onTaskEnded(Task &);

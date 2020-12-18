@@ -21,6 +21,6 @@ namespace Application
     private:
         GameSave &m_GameSave;
         StatusWindow* m_StatusWindow;
-        FunctionWindow* m_FunctionWindows[RobotsManagement::FUNCTION_QTY];
+        FunctionWindow* m_FunctionWindows[FUNCTION_QTY];
     };
 } // namespace Application

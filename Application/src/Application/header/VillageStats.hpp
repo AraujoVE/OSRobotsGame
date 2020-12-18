@@ -11,7 +11,7 @@ namespace Application
     class VillageStats
     {
     public:
-        static const int BASE_STATS_NO = 5;
+        static const int BASE_STATS_NO = FUNCTION_QTY;
         const static int ON_ATTACK_MULTIPLIER = 2.0;
         constexpr static float POP_INCREASE_TAX = 1.1;
         const static int POP_PER_CONSTRUCTION = 5;
@@ -86,7 +86,7 @@ namespace Application
 
         void decayPopulation();
 
-        Avenue *getAvenue(int type);
+        Avenue<int> *getAvenue(int type);
 
         int getStat(int) const;
         int getPopulation() const;

@@ -10,21 +10,7 @@ Avenue<int>::Avenue (int &attr): attr(attr) {
 }
 
 template <>
-Avenue<std::nullptr_t>::Avenue (std::nullptr_t &attr): attr(attr) {
-    sem_init(&empty, 1, FULL_N);
-    sem_init(&full, 1, 0);
-    pthread_mutex_init(&mutex, NULL);
-}
-
-template <>
 Avenue<int>::~Avenue () {
-    sem_destroy(&empty);
-    sem_destroy(&full);
-    pthread_mutex_destroy(&mutex);
-}
-
-template <>
-Avenue<std::nullptr_t>::~Avenue () {
     sem_destroy(&empty);
     sem_destroy(&full);
     pthread_mutex_destroy(&mutex);
@@ -75,17 +61,4 @@ void Avenue<std::nullptr_t>::up () {
 template <>
 void Avenue<std::nullptr_t>::down () {
     pthread_mutex_lock(&mutex);
-}
-
-template <>
-int Avenue<int>::getValue () {
-    int value;
-
-    pthread_mutex_lock(&mutex);
-    
-    value = attr;
-    
-    pthread_mutex_unlock(&mutex);
-
-    return value;
 }

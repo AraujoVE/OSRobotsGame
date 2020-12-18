@@ -6,7 +6,7 @@ namespace Application
     // ======================== GETS/SETS ========================
     //Each set must enter in the semaphore
     int VillageStats::getStat(int statType) const{
-        return statType;
+        return baseStats[statType];
     }
 
     int VillageStats::getPopulation() const
@@ -189,7 +189,7 @@ namespace Application
         DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
     }
 
-    Avenue* VillageStats::getAvenue(int type) {
+    Avenue<int>* VillageStats::getAvenue(int type) {
         return avenueVS[type];
     }
 

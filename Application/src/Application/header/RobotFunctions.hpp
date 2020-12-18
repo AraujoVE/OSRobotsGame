@@ -4,6 +4,8 @@
 
 namespace Application
 {
+    const int FUNCTION_QTY = 5;
+
     enum class RobotFunction : short
     {
         PROTECTION = 0,

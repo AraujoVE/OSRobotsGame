@@ -12,7 +12,7 @@ class Avenue {
         sem_t empty, full;
         pthread_mutex_t mutex;
         T &attr;
-        std::queue<int> items;
+        std::queue<T> items;
 
     public:
         Avenue(T &attr);
@@ -23,6 +23,4 @@ class Avenue {
 
         void up();
         void down();
-
-        T getValue ();
 };

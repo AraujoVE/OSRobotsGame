@@ -41,7 +41,7 @@ namespace Application
         }
         ImGui::End();
 
-        for (int i = 0; i < RobotsManagement::FUNCTION_QTY; i++)
+        for (int i = 0; i < FUNCTION_QTY; i++)
         {
             m_FunctionWindows[i]->Render();
         }
