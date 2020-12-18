@@ -23,6 +23,7 @@ namespace Application
         {
             villageStats.reset(new VillageStats());
             robotsManagement.reset(new RobotsManagement());
+            robotsManagement->setVillageStats(villageStats.get());
         }
         ~GameSave() {}
 

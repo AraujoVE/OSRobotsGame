@@ -32,8 +32,16 @@ namespace Application
     {
     public:
         using OnTaskCancelledFn = std::function<void(TaskWindow *)>;
-        TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, TaskID taskID, OnTaskCancelledFn onTaskCancelledFn);
 
+        TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, TaskID taskID, OnTaskCancelledFn onTaskCancelledFn);
+        virtual ~TaskWindow() override 
+        {
+            //TODO: n fazer isso a cada frame kk
+            m_RobotsManagement.endTask(m_RobotsManagement.findTask(m_TaskID), true);
+        }
+
+
+        
         inline TaskID GetTaskID() const { return m_TaskID; }
         inline void SetIndex(int newIndex)
         {

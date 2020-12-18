@@ -48,7 +48,7 @@ namespace Application
         void createTask(RobotFunction);
         void updateTasks();
         bool moveRobot(Task &, int);
-        bool endTask(Task &);
+        bool endTask(Task &, bool force = false);
     };
 } // namespace Application
 #endif

@@ -17,7 +17,6 @@ namespace Application
         StatusWindow(const VillageStats& villageStats)
             : m_VillageStatus(villageStats)
         {
-            DE_INFO("{0}", (unsigned long)&villageStats);
         }
 
         void Render() override {

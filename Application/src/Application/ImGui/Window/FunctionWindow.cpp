@@ -62,7 +62,7 @@ namespace Application
     {
         static int taskID = 0;
         //TODO: make m_RobotsManagement return the task ID, to keep track internally
-        // m_RobotsManagement.createTask(m_Function);
+        m_RobotsManagement.createTask(m_Function);
 
         int taskIdx = m_TaskWindows.size();
         m_TaskWindows.push_back(

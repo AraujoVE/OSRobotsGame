@@ -29,22 +29,27 @@ namespace Application
         ImGui::Begin(m_WindowName.c_str(), NULL, m_WindowFlags);
         {
             // int currRobotsNo = task.getRobotsNo();
-            ImGui::Text("Task 1");
+            ImGui::Text(m_WindowName.c_str());
             ImGui::SameLine(60);
             cancelIssued = ImGui::Button("x");
             deltaRobots += -ImGui::Button("-");
             ImGui::SameLine(30);
-            deltaRobots += ImGui::Button("+");
+            deltaRobots += +ImGui::Button("+");
         }
         ImGui::End();
+
+        //TODO: n fazer isso a cada frame kk
+        Task &task = m_RobotsManagement.findTask(m_TaskID);
 
         if (cancelIssued)
         {
             m_OnTaskCancelledFn(this);
         }
         else if (deltaRobots != 0)
-            DE_DEBUG("Delta = {0}", deltaRobots);
-        //     task.setRobotsNo(currRobotsNo + deltaRobots);
+        {
+            m_RobotsManagement.moveRobot(task, deltaRobots);
+            DE_DEBUG("Nova qtd = {0}", task.getRobotsNo());
+        }
     }
 
     void TaskWindow::UpdateProps()

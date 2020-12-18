@@ -23,6 +23,7 @@ namespace Application
         const static int INIT_RESOURCES_VALUE = 100;
         const static int POPULATION_INDEX = BASE_STATS_NO;
         constexpr static float TAX_REDUCT = 0.5;
+        const unsigned long DECAY_DELAY_MICRO = 500e3;
     private:
         bool onAttack;
         float statTax;

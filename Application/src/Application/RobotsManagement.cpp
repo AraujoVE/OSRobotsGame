@@ -8,6 +8,8 @@
 #include <iterator>
 #include <stdexcept>
 
+#include "DampEngine/Core/Macros/Log.hpp"
+
 //Inicialização e destruição da classe
 namespace Application
 {
@@ -119,7 +121,9 @@ namespace Application
     }
 
     void RobotsManagement::createTask(RobotFunction funct)
-    {
+    {   
+        DE_TRACE("(RobotsManagement) createTask() ");
+
         //Cria nova task com o id Incrementado
         Task *newTask = new Task(funct, std::bind(&RobotsManagement::onTaskCompleted, this, std::placeholders::_1));
         
@@ -127,9 +131,9 @@ namespace Application
         tasks[(int)funct][newTask->getId()] = newTask;
     }
 
-    bool RobotsManagement::endTask(Task &curTask)
+    bool RobotsManagement::endTask(Task &curTask, bool force)
     {
-        if (!curTask.updateTask())
+        if (force || !curTask.updateTask())
         {
             int lostRobots = curTask.calcLostRobots();
             moveRobot(curTask, -1 * curTask.getRobotsNo());

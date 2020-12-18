@@ -135,7 +135,7 @@ namespace Application
     //LAST
     void VillageStats::decayPopulation(){
         int popReduct = (int)((float)population * (1 - statTax));
-        if((population - popReduct)>(int)(TAX_REDUCT * (float)population)){
+        if((population - popReduct) > (int)(TAX_REDUCT * (float)population)){
             population -= popReduct;
         }
         else{
@@ -166,7 +166,8 @@ namespace Application
         int it = 0;
         while (true) {
             avenueVS[POPULATION_INDEX]->down();
-
+            
+            onAttack = false;
             for(int i =0;i<BASE_STATS_NO - 1;i++) {
                  decayStat(it,i);
             }
@@ -177,10 +178,10 @@ namespace Application
 
             avenueVS[POPULATION_INDEX]->up();
 
-            it = (it+1)==ATTACK_FREQUENCY ? 0 : it+1;
+            it = (it+1+ATTACK_FREQUENCY)%ATTACK_FREQUENCY;
 
             //TODO: fixed time (adjusting for lag)
-            sleep(1);
+            usleep(DECAY_DELAY_MICRO);
         }
     }
 
