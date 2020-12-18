@@ -107,15 +107,15 @@ namespace Application
     //TODO: Implmentar a criação e destruição da thread e como ela funciona
 
     void Task::threadLoop() {
-        DE_DEBUG("THREADLOOP INIT");
+        DE_DEBUG("THREADLOOP INIT {0}", id);
         
         while (true) {
-            DE_TRACE("Threadloop vive"  );
+            DE_TRACE("Threadloop vive {0}", id);
             if (!updateTask() || !m_Running) break;
             sleep(1);
         }
 
-        DE_DEBUG("(Task) fim da thread");
+        DE_DEBUG("(Task) fim da thread {0}", id);
         m_OnFinishedCallback(*this);
     }
 

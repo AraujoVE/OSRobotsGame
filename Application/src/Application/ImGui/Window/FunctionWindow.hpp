@@ -23,6 +23,6 @@ namespace Application
         RobotsManagement &m_RobotsManagement;
         std::unordered_map<TaskID, TaskWindow *> m_TaskWindowMap;
         std::queue<TaskID> m_TasksPendingDeletion;
-        Avenue<std::nullptr_t> m_MapAvenue;
+        pthread_mutex_t m_MutexMapRemoval;
     };
 } // namespace Application

@@ -43,10 +43,7 @@ namespace Application
 
             const char *endTimeStr = "--";
             if (remainingTime >= 0) {
-                time_t endTime = time(0) + remainingTime;
-                tm *endLocalTime = localtime(&endTime);
                 std::stringstream ss;
-                // ss << endLocalTime->tm_hour << ":" << endLocalTime->tm_min << ":" << endLocalTime->tm_sec;
                 ss << remainingTime << "s";
                 endTimeStr = ss.str().c_str();
             }

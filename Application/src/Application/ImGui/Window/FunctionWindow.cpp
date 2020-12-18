@@ -6,10 +6,9 @@
 
 namespace Application
 {
-    static std::nullptr_t s_NullptrT = nullptr;
     FunctionWindow::FunctionWindow(RobotsManagement &robotsManagement, RobotFunction function)
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize),
-          m_Function(function), m_RobotsManagement(robotsManagement), m_MapAvenue(s_NullptrT)
+          m_Function(function), m_RobotsManagement(robotsManagement)
     {
         //Next window position and size
         const static float ySpacing = 10;
@@ -17,6 +16,7 @@ namespace Application
         m_WindowProps = {
             {40, 80 + (ySize + ySpacing) * (int)function},
             {200, ySize}};
+        pthread_mutex_init(&m_MutexMapRemoval, NULL);
     }
 
     void FunctionWindow::Render()
@@ -55,7 +55,7 @@ namespace Application
 
         //TODO: create Update() method
         
-        m_MapAvenue.down();
+        pthread_mutex_lock(&m_MutexMapRemoval);
         while (!m_TasksPendingDeletion.empty()) {
             TaskID toDeleteID = m_TasksPendingDeletion.front();
             auto pendingIt = m_TaskWindowMap.find(toDeleteID);
@@ -65,7 +65,7 @@ namespace Application
             m_TaskWindowMap.erase(pendingIt);
             m_TasksPendingDeletion.pop();
         }
-        m_MapAvenue.up();
+        pthread_mutex_unlock(&m_MutexMapRemoval);
 
 
         //Render children
@@ -95,13 +95,13 @@ namespace Application
 
         DE_ASSERT(windowIt != m_TaskWindowMap.end(), "Trying to end an unknown Task");
         
-        m_MapAvenue.down();
+        pthread_mutex_lock(&m_MutexMapRemoval);
         for (auto affectedPair : m_TaskWindowMap)
         {
             if (affectedPair.second->GetIndex() > windowIndex)
                 affectedPair.second->SetIndex(affectedPair.second->GetIndex()-1);
         }
-        m_MapAvenue.up();
+        pthread_mutex_unlock(&m_MutexMapRemoval);
         
         
         DE_DEBUG("INSERINDO O {0}", endedTask.getId());
