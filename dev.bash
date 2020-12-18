@@ -4,6 +4,7 @@ err=0
 
 sys_command=premake5
 shipped_bin=vendor/premake5/binaries/premake5
+shipped_bin_fallback=vendor/premake5/binaries/premake5_fallback
 
 premake_success_postcommands='make -j all && ./bin/Debug*/Application/Application'
 premake_succes=0
@@ -13,7 +14,7 @@ premake_succes=0
         echo "" &&
         echo "WARNING: Premake5 is not installed on the system, searching for shipped precompiled binary" &&
         echo "" &&
-        $shipped_bin $target 
+        $shipped_bin $target || $shipped_bin_fallback $target
     )
 ) && (premake_succes=1 && echo "> Premake executed with 0 errors" && eval $premake_success_postcommands) || 
     (   
