@@ -4,6 +4,7 @@
 #include "RobotFunctions.hpp"
 #include "Task.hpp"
 #include "VillageStats.hpp"
+#include "Avenue.hpp"
 #include <vector>
 #include <unordered_map>
 #include <ctime>
@@ -13,6 +14,8 @@ namespace Application
     class RobotsManagement
     {
     public:
+        enum Robots_Values_Index {TOT_ROBOTS, FREE_ROBOTS};
+
         static const int FUNCTION_QTY = 5;
         static const int MAX_TASKS_PER_FUNCTION = 5;
 
@@ -22,6 +25,12 @@ namespace Application
         int prodCost; //TODO: Implementation to change this value
         VillageStats *villageStats;
         std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
+        Avenue *robotsAvenues[2];
+        pthread_t consumers[2];
+        pthread_mutex_t tasksMutex;
+
+        void initializeAvenues();
+        void changeRobotsNum (int type, int increase);
 
     public:
         
@@ -49,6 +58,9 @@ namespace Application
         void updateTasks();
         bool moveRobot(Task &, int);
         bool endTask(Task &);
+
+        void tasksUp();
+        void tasksDown();
     };
 } // namespace Application
 #endif

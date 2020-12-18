@@ -23,6 +23,14 @@ namespace Application
         return population;
     }
 
+    int VillageStats::getResources() const {
+        return baseStats[4];
+    }
+
+    void VillageStats::setResources(int quantity) {
+        baseStats[4] = quantity;
+    }
+
     // ======================== CONSTRUCTOR / INITIALIZE VILLAGES STATS ========================
     VillageStats::VillageStats()
     {
@@ -187,6 +195,10 @@ namespace Application
     void VillageStats::decayResources(int,int,float&) 
     {
         DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
+    }
+
+    Avenue* VillageStats::getAvenue(int type) {
+        return avenueVS[type];
     }
 
     void *runDecay (void *decayFuncObject) {

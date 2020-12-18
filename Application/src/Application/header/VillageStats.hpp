@@ -23,6 +23,7 @@ namespace Application
         const static int INIT_RESOURCES_VALUE = 100;
         const static int POPULATION_INDEX = BASE_STATS_NO;
         constexpr static float TAX_REDUCT = 0.5;
+
     private:
         bool onAttack;
         float statTax;
@@ -85,10 +86,13 @@ namespace Application
 
         void decayPopulation();
 
-
+        Avenue *getAvenue(int type);
 
         int getStat(int) const;
         int getPopulation() const;
+        int getResources() const;
+        
+        void setResources(int);
 
         void setStat(int,float);
         void changeStat(int type, int increase);
