@@ -39,6 +39,7 @@ namespace DampEngine
         DE_TRACE("Entering application main loop");
         m_Running = true;
         while (m_Running) {
+            
             glad_glClearColor(0.1f, 0.1f, 0.1f, 1.f);
             glad_glClear(GL_COLOR_BUFFER_BIT);
 

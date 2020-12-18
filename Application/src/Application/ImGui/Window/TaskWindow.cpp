@@ -29,7 +29,7 @@ namespace Application
         ImGui::Begin(m_WindowName.c_str(), NULL, m_WindowFlags);
         {
             // int currRobotsNo = task.getRobotsNo();
-            ImGui::Text(m_WindowName.c_str());
+            ImGui::Text("%s",m_WindowName.c_str());
             ImGui::SameLine(60);
             cancelIssued = ImGui::Button("x");
             deltaRobots += -ImGui::Button("-");
