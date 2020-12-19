@@ -43,6 +43,11 @@ namespace Application
         int getTotRobots() const;
         int getFreeRobots() const;
         int getProdCost() const;
+        
+        bool canRemoveRobots() const;
+        bool canAddRobots() const;
+
+
         const std::unordered_map<TaskID, Task*> &getTasks(RobotFunction function) const;
         Task &findTask(TaskID taskID) const;
 

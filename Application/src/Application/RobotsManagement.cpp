@@ -46,6 +46,25 @@ namespace Application
         return freeRobots;
     }
 
+
+    bool RobotsManagement::canRemoveRobots() const{
+        robotsAvenues[FREE_ROBOTS]->down();
+        bool canRemove = freeRobots > 0;
+        robotsAvenues[FREE_ROBOTS]->up();
+        return canRemove;
+    }
+
+    bool RobotsManagement::canAddRobots() const{
+        robotsAvenues[PROD_COST]->down();
+        villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING)->down();
+        bool canAdd = villageStats->getResources() >= prodCost;
+        villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING)->up();
+        robotsAvenues[PROD_COST]->up();
+
+        return canAdd;
+    }
+
+
     int RobotsManagement::getProdCost() const
     {
         return prodCost;
