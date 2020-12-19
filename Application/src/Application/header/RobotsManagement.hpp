@@ -15,9 +15,10 @@ namespace Application
     class RobotsManagement
     {
     public:
-        enum Robots_Values_Index {TOT_ROBOTS, FREE_ROBOTS};
+        enum Robots_Values_Index {TOT_ROBOTS, FREE_ROBOTS, PROD_COST};
 
         static const int MAX_TASKS_PER_FUNCTION = 5;
+        static constexpr float PROD_COST_INCREASE_TAX = 0.5;
 
     private:
         int totRobots;
@@ -25,8 +26,8 @@ namespace Application
         int prodCost; //TODO: Implementation to change this value
         VillageStats *villageStats;
         std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
-        Avenue<int> *robotsAvenues[2];
-        pthread_t consumers[2];
+        Avenue<int> *robotsAvenues[3];
+        pthread_t consumers[3];
         pthread_mutex_t tasksMutex;
 
         void initializeAvenues();

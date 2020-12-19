@@ -15,9 +15,11 @@ namespace Application
     void RobotsManagement::initializeAvenues() {
         robotsAvenues[TOT_ROBOTS] = new Avenue<int>(totRobots);
         robotsAvenues[FREE_ROBOTS] = new Avenue<int>(freeRobots);
+        robotsAvenues[PROD_COST] = new Avenue<int>(prodCost);
 
         pthread_create(&consumers[TOT_ROBOTS], NULL, runConsumer, robotsAvenues[TOT_ROBOTS]);
         pthread_create(&consumers[FREE_ROBOTS], NULL, runConsumer, robotsAvenues[FREE_ROBOTS]);
+        pthread_create(&consumers[PROD_COST], NULL, runConsumer, robotsAvenues[PROD_COST]);
     }
 
     void RobotsManagement::initializeStats()
@@ -179,6 +181,20 @@ namespace Application
         int lostRobots = endedTask.calcLostRobots();
         moveRobot(endedTask, -1 * endedTask.getRobotsNo());
         destroyRobots(lostRobots);
+
+        if(endedTask.getType() == RobotFunction::RESOURCE_GATHERING){
+            Avenue<int> *VSResourcesAvenue = villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING);
+            
+            VSResourcesAvenue->down();
+            float prodCostIncrement = 1.0 + (endedTask.getGainedGoods()*PROD_COST_INCREASE_TAX)/((float)villageStats->getResources());
+            VSResourcesAvenue->up();
+
+            robotsAvenues[PROD_COST]->down();
+            prodCost = (int)((float)prodCost * prodCostIncrement);
+            robotsAvenues[PROD_COST]->up();
+        }
+
+
         villageStats->changeStat((int)endedTask.getType(), (int)endedTask.getGainedGoods());
 
         DE_ASSERT(m_FunctionWindowArray != nullptr, "FunctionWindowArray is not set");
