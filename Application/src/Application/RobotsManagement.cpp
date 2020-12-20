@@ -262,7 +262,8 @@ namespace Application
         robotsAvenues[FREE_ROBOTS]->up();
 
         //Add or remove a robot from a given task
-        choosenTask.setRobotsNo(choosenTask.getRobotsNo() + robotsNo);
+        if (returnValue == true)
+            choosenTask.setRobotsNo(choosenTask.getRobotsNo() + robotsNo);
 
         return returnValue;
     }

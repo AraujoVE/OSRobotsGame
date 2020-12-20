@@ -4,6 +4,7 @@
 
 #include "Application/ImGui/Window/FunctionWindow.hpp"
 #include "Application/ImGui/Window/StatusWindow.hpp"
+#include "Application/ImGui/Window/RobotCreationWindow.hpp"
 
 namespace Application
 {
@@ -19,6 +20,8 @@ namespace Application
         m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
 
         gameSave.getRobotsManagement()->setFunctionWindowsArray(m_FunctionWindows);
+
+        m_RobotCreationWindow = new RobotCreationWindow(gameSave.getRobotsManagement());
 
         m_GameLost = false;
     }
@@ -53,6 +56,7 @@ namespace Application
         }
 
         m_StatusWindow->Render();
+        m_RobotCreationWindow->Render();
 
         //Check if game is lost
         if (m_GameSave.getVillageStats()->getPopulation() <= 0)

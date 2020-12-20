@@ -9,6 +9,7 @@ namespace Application
     class GameSave;
     class StatusWindow;
     class FunctionWindow;
+    class RobotCreationWindow;
     class MainGuiLayer final : public ImGuiLayer
     {
     public:
@@ -25,5 +26,6 @@ namespace Application
         GameSave &m_GameSave;
         StatusWindow* m_StatusWindow;
         FunctionWindow* m_FunctionWindows[FUNCTION_QTY];
+        RobotCreationWindow* m_RobotCreationWindow;
     };
 } // namespace Application
