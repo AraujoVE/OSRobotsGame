@@ -8,7 +8,7 @@ namespace Application
     class StatusWindow final : IGWindow
     {
     public:
-        StatusWindow(const VillageStats& villageStats)
+        StatusWindow(const std::unique_ptr<VillageStats>& villageStats)
             : m_VillageStatus(villageStats)
         {
         }
@@ -17,13 +17,13 @@ namespace Application
             SetNextPos();
             SetNextSize();
 
-            unsigned population = m_VillageStatus.getPopulation();
-            unsigned protection = m_VillageStatus.getStat((int) RobotFunction::PROTECTION);
-            unsigned hunt = m_VillageStatus.getStat((int) RobotFunction::HUNT);
-            unsigned medicine = m_VillageStatus.getStat((int) RobotFunction::MEDICINE);
-            unsigned construction = m_VillageStatus.getStat((int) RobotFunction::CONSTRUCTION);
-            unsigned resource_gathering = m_VillageStatus.getStat((int) RobotFunction::RESOURCE_GATHERING);
-            // unsigned stat1 = m_VillageStatus.getStat(1);
+            unsigned population = m_VillageStatus->getPopulation();
+            unsigned protection = m_VillageStatus->getStat((int) RobotFunction::PROTECTION);
+            unsigned hunt = m_VillageStatus->getStat((int) RobotFunction::HUNT);
+            unsigned medicine = m_VillageStatus->getStat((int) RobotFunction::MEDICINE);
+            unsigned construction = m_VillageStatus->getStat((int) RobotFunction::CONSTRUCTION);
+            unsigned resource_gathering = m_VillageStatus->getStat((int) RobotFunction::RESOURCE_GATHERING);
+            // unsigned stat1 = m_VillageStatus->getStat(1);
 
             ImGui::Begin("Status");
             {
@@ -38,7 +38,7 @@ namespace Application
         }
 
     private:
-        const VillageStats &m_VillageStatus;
+        const std::unique_ptr<VillageStats> &m_VillageStatus;
     };
 
     

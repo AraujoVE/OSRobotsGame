@@ -19,6 +19,9 @@ namespace Application
         virtual void ImGuiDescription() override;
 
     private:
+        void LostScreenDescription();
+        bool m_GameLost;
+
         GameSave &m_GameSave;
         StatusWindow* m_StatusWindow;
         FunctionWindow* m_FunctionWindows[FUNCTION_QTY];

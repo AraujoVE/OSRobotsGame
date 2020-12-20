@@ -2,22 +2,25 @@
 
 #include "mypch.hpp"
 
-template <>
-Avenue<int>::Avenue (int &attr): attr(attr) {
+void *runConsumer (void *consumerObject) {
+    Avenue *avenue = (Avenue*) consumerObject;
+    avenue->consumer();
+    return NULL;
+}
+
+Avenue::Avenue (int &attr): attr(attr) {
     sem_init(&empty, 1, FULL_N);
     sem_init(&full, 1, 0);
     pthread_mutex_init(&mutex, NULL);
 }
 
-template <>
-Avenue<int>::~Avenue () {
+Avenue::~Avenue () {
     sem_destroy(&empty);
     sem_destroy(&full);
     pthread_mutex_destroy(&mutex);
 }
 
-template <>
-void Avenue<int>::producer (int value) {
+void Avenue::producer(int value) {
     sem_wait(&empty);
     pthread_mutex_lock(&mutex);
 
@@ -27,10 +30,9 @@ void Avenue<int>::producer (int value) {
     sem_post(&full);
 }
 
-template <>
-void Avenue<int>::consumer () {
+void Avenue::consumer() {
     DE_TRACE("(Avenue) Spawnei Consumer");
-    while (true) {
+    while (m_ConsumerRunning) {
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
         attr += items.front();
@@ -43,22 +45,27 @@ void Avenue<int>::consumer () {
         sem_post(&empty);
     }
 }
-template <>
-void Avenue<int>::up () {
+
+void Avenue::startConsumer() {
+    m_ConsumerRunning = true;
+    pthread_create(&consumer_thread, NULL, runConsumer, this);
+}
+
+void Avenue::stopConsumer() {
+    m_ConsumerRunning = false;
+    producer(666);
+    DE_DEBUG("IN: join @Avenue::stopConsumer");
+    pthread_join(consumer_thread, NULL);
+    DE_DEBUG("OUT: join @Avenue::stopConsumer");
+}
+
+
+void Avenue::up () {
     pthread_mutex_unlock(&mutex);
 }
 
-template <>
-void Avenue<int>::down () {
+void Avenue::down () {
     pthread_mutex_lock(&mutex);
 }
 
-template <>
-void Avenue<std::nullptr_t>::up () {
-    pthread_mutex_unlock(&mutex);
-}
 
-template <>
-void Avenue<std::nullptr_t>::down () {
-    pthread_mutex_lock(&mutex);
-}

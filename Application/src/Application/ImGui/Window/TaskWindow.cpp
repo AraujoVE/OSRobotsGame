@@ -5,7 +5,7 @@
 namespace Application
 {
 
-    TaskWindow::TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement &robotsManagement, Task &task, OnTaskCancelledFn onTaskCancelledFn)
+    TaskWindow::TaskWindow(TaskWindowProps taskWindowProps, std::unique_ptr<RobotsManagement> &robotsManagement, Task &task, OnTaskCancelledFn onTaskCancelledFn)
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings),
           m_TaskWindowProps(taskWindowProps),
           m_RobotsManagement(robotsManagement), m_Task(task),
@@ -61,7 +61,7 @@ namespace Application
         }
 
         if (deltaRobots != 0)
-            m_RobotsManagement.moveRobot(m_Task, deltaRobots);
+            m_RobotsManagement->moveRobot(m_Task, deltaRobots);
     }
 
     void TaskWindow::UpdateProps()

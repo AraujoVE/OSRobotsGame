@@ -8,6 +8,7 @@ project "Application"
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "mypch.hpp"
+	pchsource "src/mypch.cpp"
 
 	files {
 		"src/**.cpp",

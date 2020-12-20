@@ -18,18 +18,24 @@ namespace Application
         m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::PROTECTION);
         m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
 
-        gameSave.getRobotsManagement().setFunctionWindowsArray(m_FunctionWindows);
+        gameSave.getRobotsManagement()->setFunctionWindowsArray(m_FunctionWindows);
+
+        m_GameLost = false;
     }
+    
 
     void MainGuiLayer::ImGuiDescription()
     {
+        if (m_GameLost) {
+            LostScreenDescription();
+            return;
+        }
+
         ImGuiWindowFlags windowFlags = ImGuiBackendFlags_None;
 
         windowFlags |= ImGuiWindowFlags_NoMove;
         windowFlags |= ImGuiWindowFlags_NoTitleBar;
         windowFlags |= ImGuiWindowFlags_NoResize;
-
-        this->ImGuiLayer::ImGuiDescription();
 
         ImGuiViewport *main_viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(ImVec2(main_viewport->GetWorkPos().x, main_viewport->GetWorkPos().y));
@@ -47,5 +53,30 @@ namespace Application
         }
 
         m_StatusWindow->Render();
+
+        //Check if game is lost
+        if (m_GameSave.getVillageStats()->getPopulation() <= 0)
+            m_GameLost = true;
+    }
+
+    void MainGuiLayer::LostScreenDescription() {
+        bool restart, quit;
+        ImGui::Begin("Game Over", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        {
+            ImGui::Text("Your population reached 0!!");
+            ImGui::Text("Do you want to play again?");
+            restart = ImGui::Button("Yes"); ImGui::SameLine(); quit = ImGui::Button("No");
+        }
+        ImGui::End();
+
+        if (quit) DampEngine::Application::GetCurrent().Stop();
+        else if (restart) {
+            m_GameLost = false;
+            for (int i = 0; i < FUNCTION_QTY; i++)
+                m_FunctionWindows[i]->ClearTaskWindows();
+            m_GameSave.clear();
+            m_GameSave.getRobotsManagement()->setFunctionWindowsArray(m_FunctionWindows);
+        }
+
     }
 } // namespace Application

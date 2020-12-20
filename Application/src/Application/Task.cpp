@@ -14,7 +14,12 @@ namespace Application
         m_Running = false;
     }
 
-    Task::~Task() {}
+    Task::~Task() {
+        static auto inertCallback = [](Task& _){};
+        m_OnFinishedCallback = inertCallback;
+        m_Running = false;
+        DE_DEBUG("~Task()");
+    }
 
     int Task::calcLostRobots()
     {
@@ -110,13 +115,17 @@ namespace Application
         DE_DEBUG("THREADLOOP INIT {0}", id);
         
         while (true) {
-            DE_TRACE("Threadloop vive {0}", id);
+            // DE_TRACE("Threadloop vive {0}", id);
             if (!updateTask() || !m_Running) break;
             sleep(1);
         }
 
         DE_DEBUG("(Task) fim da thread {0}", id);
-        m_OnFinishedCallback(*this);
+        try{
+            m_OnFinishedCallback(*this);
+        } catch (const std::exception &e) {
+            DE_ERROR("Task::m_OnFinishedCallback exception emmitted an exception\n: {0}", e.what());
+        }
     }
 
     void Task::start() {
@@ -129,6 +138,13 @@ namespace Application
 
         m_Running = false;
     }
+
+    void Task::detach() {
+        DE_DEBUG("(Task) Solicitada stop()");
+
+        m_OnFinishedCallback = nullptr;
+    }
+
 
     void *runThreadLoop(void *taskObject) {
         Task *task = (Task*)taskObject;

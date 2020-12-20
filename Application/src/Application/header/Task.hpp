@@ -63,6 +63,8 @@ namespace Application
         void threadLoop();
         void start();
         void stop();
+
+        void detach();
     };
 
     void *runThreadLoop(void *taskObject);

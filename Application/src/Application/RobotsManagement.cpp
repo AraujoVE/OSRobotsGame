@@ -13,13 +13,14 @@ namespace Application
     }
 
     void RobotsManagement::initializeAvenues() {
-        robotsAvenues[TOT_ROBOTS] = new Avenue<int>(totRobots);
-        robotsAvenues[FREE_ROBOTS] = new Avenue<int>(freeRobots);
-        robotsAvenues[PROD_COST] = new Avenue<int>(prodCost);
+        robotsAvenues[TOT_ROBOTS] = new Avenue(totRobots);
+        robotsAvenues[FREE_ROBOTS] = new Avenue(freeRobots);
+        robotsAvenues[PROD_COST] = new Avenue(prodCost);
 
-        pthread_create(&consumers[TOT_ROBOTS], NULL, runConsumer, robotsAvenues[TOT_ROBOTS]);
-        pthread_create(&consumers[FREE_ROBOTS], NULL, runConsumer, robotsAvenues[FREE_ROBOTS]);
-        pthread_create(&consumers[PROD_COST], NULL, runConsumer, robotsAvenues[PROD_COST]);
+
+        robotsAvenues[TOT_ROBOTS]->startConsumer();
+        robotsAvenues[FREE_ROBOTS]->startConsumer();
+        robotsAvenues[PROD_COST]->startConsumer();
     }
 
     void RobotsManagement::initializeStats()
@@ -32,7 +33,24 @@ namespace Application
         m_FunctionWindowArray = nullptr;
     }
 
-    RobotsManagement::~RobotsManagement() {}
+    RobotsManagement::~RobotsManagement() {
+        robotsAvenues[TOT_ROBOTS]->stopConsumer();
+        robotsAvenues[FREE_ROBOTS]->stopConsumer();
+        robotsAvenues[PROD_COST]->stopConsumer();
+
+        delete robotsAvenues[TOT_ROBOTS];
+        delete robotsAvenues[FREE_ROBOTS];
+        delete robotsAvenues[PROD_COST];
+
+
+        for (int i = 0; i < FUNCTION_QTY; i++) {
+            auto &taskMap = tasks[i];
+            for (auto taskP : taskMap) {
+                delete taskP.second;
+            }
+            taskMap.clear();
+        }
+    }
 
     //Gets de cada um dos parâmetros
 
@@ -122,7 +140,7 @@ namespace Application
     {   
         int currentResources;
         int price;
-        Avenue<int> *VSResourcesAvenue;
+        Avenue *VSResourcesAvenue;
         bool hasCreated = false;
 
         price = prodCost * no;
@@ -202,7 +220,7 @@ namespace Application
         destroyRobots(lostRobots);
 
         if(endedTask.getType() == RobotFunction::RESOURCE_GATHERING){
-            Avenue<int> *VSResourcesAvenue = villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING);
+            Avenue *VSResourcesAvenue = villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING);
             
             VSResourcesAvenue->down();
             float prodCostIncrement = 1.0 + (endedTask.getGainedGoods()*PROD_COST_INCREASE_TAX)/((float)villageStats->getResources());
@@ -216,9 +234,11 @@ namespace Application
 
         villageStats->changeStat((int)endedTask.getType(), (int)endedTask.getGainedGoods());
 
-        DE_ASSERT(m_FunctionWindowArray != nullptr, "FunctionWindowArray is not set");
-
-        m_FunctionWindowArray[(int)endedTask.getType()]->OnTaskEnded(endedTask);
+        DE_ASSERT(m_FunctionWindowArray != nullptr && m_FunctionWindowArray[(int)endedTask.getType()] != nullptr,
+         "FunctionWindowArray is not set");
+        
+        if (m_FunctionWindowArray != nullptr && m_FunctionWindowArray[(int)endedTask.getType()] != nullptr)
+            m_FunctionWindowArray[(int)endedTask.getType()]->OnTaskEnded(endedTask);
     }
 
     bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)

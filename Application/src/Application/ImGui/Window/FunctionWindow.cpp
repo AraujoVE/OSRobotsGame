@@ -6,7 +6,7 @@
 
 namespace Application
 {
-    FunctionWindow::FunctionWindow(RobotsManagement &robotsManagement, RobotFunction function)
+    FunctionWindow::FunctionWindow(std::unique_ptr<RobotsManagement> &robotsManagement, RobotFunction function)
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize),
           m_Function(function), m_RobotsManagement(robotsManagement)
     {
@@ -26,7 +26,7 @@ namespace Application
 
         //New thread button control variables
         bool createNewTaskIssued = false;
-        bool canCreateNewTask = (m_TaskWindowMap.size() < m_RobotsManagement.MAX_TASKS_PER_FUNCTION);
+        bool canCreateNewTask = (m_TaskWindowMap.size() < m_RobotsManagement->MAX_TASKS_PER_FUNCTION);
 
         //Window description
         ImGui::Begin(("Function_" + getRobotFunctionString(m_Function)).c_str(), NULL, m_WindowFlags);
@@ -52,22 +52,6 @@ namespace Application
         if (createNewTaskIssued && canCreateNewTask)
             CreateTask();
 
-
-        //TODO: create Update() method
-        
-        pthread_mutex_lock(&m_MutexMapRemoval);
-        while (!m_TasksPendingDeletion.empty()) {
-            TaskID toDeleteID = m_TasksPendingDeletion.front();
-            auto pendingIt = m_TaskWindowMap.find(toDeleteID);
-            DE_ASSERT(pendingIt != m_TaskWindowMap.end(), "Invalid task (not in map)");
-            auto window =  pendingIt->second;
-            delete window;
-            m_TaskWindowMap.erase(pendingIt);
-            m_TasksPendingDeletion.pop();
-        }
-        pthread_mutex_unlock(&m_MutexMapRemoval);
-
-
         //Render children
         for (auto taskWindowPair : m_TaskWindowMap)
             taskWindowPair.second->Render();
@@ -75,10 +59,10 @@ namespace Application
 
     void FunctionWindow::CreateTask()
     {
-        auto taskCanceledCallback = std::bind(&RobotsManagement::endTask, m_RobotsManagement, std::placeholders::_1);
+        auto taskCanceledCallback = std::bind(&RobotsManagement::endTask, m_RobotsManagement.get(), std::placeholders::_1);
 
         //TODO: make m_RobotsManagement return the task ID, to keep track internally
-        Task &createdTask = m_RobotsManagement.createTask(m_Function);
+        Task &createdTask = m_RobotsManagement->createTask(m_Function);
 
         TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};
         TaskWindow *associatedWindow = new TaskWindow(associatedWindowProps, m_RobotsManagement, createdTask, taskCanceledCallback);
@@ -86,21 +70,39 @@ namespace Application
         m_TaskWindowMap.insert({createdTask.getId(), associatedWindow});
     }
 
+
+    void FunctionWindow::ClearTaskWindows() {
+        pthread_mutex_lock(&m_MutexMapRemoval);
+        
+        for (auto deletePair : m_TaskWindowMap)
+        {
+            DE_DEBUG("Deleting TaskWindow ID={0}, Index={1}, Function={2}", deletePair.first, deletePair.second->GetIndex(), getRobotFunctionString(deletePair.second->GetTask().getType()));
+            delete deletePair.second;
+        }
+        m_TaskWindowMap.clear();
+        pthread_mutex_unlock(&m_MutexMapRemoval);
+    }
+
     void FunctionWindow::OnTaskEnded(Task &endedTask)
     {
         DE_DEBUG("(FunctionWindow) onTaskEnded()");
 
         auto windowIt = m_TaskWindowMap.find(endedTask.getId());
-        unsigned long windowIndex = windowIt->second->GetIndex();
 
         DE_ASSERT(windowIt != m_TaskWindowMap.end(), "Trying to end an unknown Task");
-        
+
         pthread_mutex_lock(&m_MutexMapRemoval);
-        for (auto affectedPair : m_TaskWindowMap)
+
+        int i = windowIt->second->GetIndex();
+
+        windowIt = m_TaskWindowMap.erase(windowIt);
+        //windowIt is now the next (after erase)
+
+        for ( ; windowIt != m_TaskWindowMap.end() ; windowIt++)
         {
-            if (affectedPair.second->GetIndex() > windowIndex)
-                affectedPair.second->SetIndex(affectedPair.second->GetIndex()-1);
+            (windowIt->second)->SetIndex(i++); 
         }
+
         pthread_mutex_unlock(&m_MutexMapRemoval);
         
         

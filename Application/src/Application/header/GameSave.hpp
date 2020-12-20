@@ -17,17 +17,20 @@ namespace Application
     public:
         GameSave()
         {
-            villageStats.reset(new VillageStats());
-            robotsManagement.reset(new RobotsManagement());
-            robotsManagement->setVillageStats(villageStats.get());
+            clear();
         }
         ~GameSave() {}
 
         void loadGame();
         void saveGame() const;
+        void clear() { 
+            villageStats.reset(new VillageStats());
+            robotsManagement.reset(new RobotsManagement());
+            robotsManagement->setVillageStats(villageStats.get());
+        }
 
-        inline VillageStats &getVillageStats() const { return *villageStats; }
-        inline RobotsManagement &getRobotsManagement() const { return *robotsManagement; }
+        inline std::unique_ptr<VillageStats> &getVillageStats() { return villageStats; }
+        inline std::unique_ptr<RobotsManagement> &getRobotsManagement() { return robotsManagement; }
     };
 
 } // namespace Application

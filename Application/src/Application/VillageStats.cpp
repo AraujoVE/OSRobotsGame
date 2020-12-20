@@ -30,6 +30,7 @@ namespace Application
         initializeStats();
         initializeVSAvenues();
     
+        //TODO: onGameStarted()
         pthread_create(&decayThread, NULL, runDecay, this);
 
         return;
@@ -47,12 +48,12 @@ namespace Application
 
     void VillageStats::initializeVSAvenues() {
         for (int i = 0; i < BASE_STATS_NO; i++) {
-            avenueVS[i] = new Avenue<int>(baseStats[i]);
-            pthread_create(&consumers[i], NULL, runConsumer, avenueVS[i]);
+            avenueVS[i] = new Avenue(baseStats[i]);
+            avenueVS[i]->startConsumer();
         }
 
-        avenueVS[POPULATION_INDEX] = new Avenue<int>(population);
-        pthread_create(&consumers[POPULATION_INDEX], NULL, runConsumer, avenueVS[POPULATION_INDEX]);
+        avenueVS[POPULATION_INDEX] = new Avenue(population);
+        avenueVS[POPULATION_INDEX]->startConsumer();
     }
 
     // ======================== ADD/REMOVE FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
@@ -163,7 +164,7 @@ namespace Application
     void VillageStats::decayStats()
     {
         int it = 0;
-        while (true) {
+        while (!m_MarkedForDeletion) {
             avenueVS[POPULATION_INDEX]->down();
             
             onAttack = false;
@@ -189,7 +190,7 @@ namespace Application
         DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
     }
 
-    Avenue<int>* VillageStats::getAvenue(int type) {
+    Avenue* VillageStats::getAvenue(int type) {
         return avenueVS[type];
     }
 
@@ -199,11 +200,23 @@ namespace Application
         return NULL;
     }
 
-    void *runConsumer (void *consumerObject) {
-        Avenue<int> *avenue = (Avenue<int>*) consumerObject;
-        avenue->consumer();
-        return NULL;
+    
+
+    VillageStats::~VillageStats() {
+        m_MarkedForDeletion = true;
+
+        DE_DEBUG("IN: join @VillageStats::~VillageStats");
+        pthread_join(decayThread, NULL);
+        DE_DEBUG("OUT: join @VillageStats::~VillageStats");
+
+        
+        for (int i = 0; i < BASE_STATS_NO+1; i++)
+        {
+            avenueVS[i]->stopConsumer();
+            delete avenueVS[i];
+        }
     }
+
 } // namespace Application
 /*
 

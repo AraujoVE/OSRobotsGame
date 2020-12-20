@@ -28,10 +28,18 @@ namespace Application
 
         TaskWindow(
             TaskWindowProps taskWindowProps,
-            RobotsManagement &robotsManagement, 
+            std::unique_ptr<RobotsManagement> &robotsManagement, 
             Task& task, 
             OnTaskCancelledFn onTaskCancelledFn
         );
+
+        ~TaskWindow() {
+            //Make orphan
+            m_Task.detach();
+
+            //Issue stop with no callback
+            m_Task.stop();
+        }
         
         inline Task& GetTask() const { return m_Task; }
         inline TaskID GetTaskID() const { return m_Task.getId(); }
@@ -50,7 +58,7 @@ namespace Application
 
     private:
         TaskWindowProps m_TaskWindowProps;
-        RobotsManagement &m_RobotsManagement;
+        std::unique_ptr<RobotsManagement> &m_RobotsManagement;
         Task& m_Task;
         std::string m_WindowName;
         OnTaskCancelledFn m_OnTaskCancelledFn;

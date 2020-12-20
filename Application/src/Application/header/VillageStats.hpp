@@ -10,6 +10,10 @@ namespace Application
 {
     class VillageStats
     {
+    private:
+
+        bool m_MarkedForDeletion = false;
+
     public:
         static const int BASE_STATS_NO = FUNCTION_QTY;
         const static int ON_ATTACK_MULTIPLIER = 2.0;
@@ -49,9 +53,8 @@ namespace Application
             resources;
         */
 
-        Avenue<int> *avenueVS[BASE_STATS_NO+1];
+        Avenue *avenueVS[BASE_STATS_NO+1];
         pthread_t decayThread;
-        pthread_t consumers[BASE_STATS_NO+1];
 
         void (VillageStats::*decayStatsFuncts[BASE_STATS_NO])(int,int,float&) = {
             &VillageStats::decayFood,
@@ -62,7 +65,6 @@ namespace Application
         };
 
 
-
         int population; // if population reaches zero, the game is over -> pop calculated based on other village stats
         //TODO: Aumentar e Diminuir tamanho da população
 
@@ -70,6 +72,7 @@ namespace Application
 
     public:
         VillageStats();
+        ~VillageStats();
 
         float calcReduction(float,float);
         float calcRatio(int);
@@ -86,7 +89,7 @@ namespace Application
 
         void decayPopulation();
 
-        Avenue<int> *getAvenue(int type);
+        Avenue *getAvenue(int type);
 
         int getStat(int) const;
         int getPopulation() const;
@@ -103,6 +106,5 @@ namespace Application
     };
 
     void *runDecay (void *decayFuncObject);
-    void *runConsumer (void *consumerObject);
 } // namespace Application
 #endif
