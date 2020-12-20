@@ -93,14 +93,12 @@ namespace Application
 
         pthread_mutex_lock(&m_MutexMapRemoval);
 
-        int i = windowIt->second->GetIndex();
-
-        windowIt = m_TaskWindowMap.erase(windowIt);
-        //windowIt is now the next (after erase)
-
-        for ( ; windowIt != m_TaskWindowMap.end() ; windowIt++)
+        m_TaskWindowMap.erase(windowIt);
+        
+        int i = m_TaskWindowMap.size()-1;
+        for (windowIt = m_TaskWindowMap.begin() ; windowIt != m_TaskWindowMap.end() ; windowIt++)
         {
-            (windowIt->second)->SetIndex(i++); 
+            (windowIt->second)->SetIndex(i--); 
         }
 
         pthread_mutex_unlock(&m_MutexMapRemoval);

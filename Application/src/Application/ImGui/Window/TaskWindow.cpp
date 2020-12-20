@@ -27,7 +27,7 @@ namespace Application
         {  
             //First line
             ImGui::Text("%s",m_WindowName.c_str());
-            ImGui::SameLine(60);
+            ImGui::SameLine(m_WindowProps.size.x-20);
             cancelIssued = ImGui::Button("x");
 
             //Second line
@@ -68,9 +68,11 @@ namespace Application
     {
         constexpr static float padding = 0;
 
+        m_WindowName = std::string("Task (") + getRobotFunctionString(m_Task.getType()) + ") #" + std::to_string(m_Task.getId());  
+
         DE_ASSERT(m_TaskWindowProps.ParentProps.size.y >= padding, "Padding is greater than root window size");
 
-        constexpr static float xSize = 200;
+        constexpr static float xSize = 250;
         float ySize = m_TaskWindowProps.ParentProps.size.y - padding;
 
         float xPos = (m_TaskWindowProps.FunctionTaskVecIdx * (xSize + m_TaskWindowProps.xSpacing) +
