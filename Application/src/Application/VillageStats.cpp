@@ -209,6 +209,7 @@ namespace Application
 
     void VillageStats::decayResources(int,int,float&) 
     {
+        //TODO: AraujoVE ver oq é isso
         DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
     }
 

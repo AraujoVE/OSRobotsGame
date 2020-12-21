@@ -71,10 +71,10 @@ namespace Application
 
         void decayStat(int,int);
 
+        void decayDefenses(int,int,float&);
         void decayFood(int,int,float&);
         void decayHealth(int,int,float&);
         void decayStructures(int,int,float&);
-        void decayDefenses(int,int,float&);
         void decayResources(int,int,float&);
 
         void decayPopulation();

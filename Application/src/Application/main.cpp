@@ -19,11 +19,12 @@ namespace Application
         {
             DE_INFO("OSRobotsGame starting");
             ConstsMap::initMapFromFile("constValues.cfg");
+            m_GameSave.reset(new GameSave());
         }
 
         virtual void InitLayers() override
         {
-            m_MainGuiLayer = new MainGuiLayer(m_GameSave);
+            m_MainGuiLayer = new MainGuiLayer(*m_GameSave.get());
             m_LayerStack.PushOverlay(m_MainGuiLayer);
         }
 
@@ -38,7 +39,7 @@ namespace Application
         }
         
     private:
-        GameSave m_GameSave;
+        std::unique_ptr<GameSave> m_GameSave;
         MainGuiLayer *m_MainGuiLayer;
     };
 
