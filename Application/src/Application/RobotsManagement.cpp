@@ -28,7 +28,7 @@ namespace Application
         //TODO: mudar de volta (para 1, tot e free)
         totRobots = 10;
         freeRobots = 10;
-        prodCost = 1;
+        prodCost = 50;
         villageStats = NULL;
         m_FunctionWindowArray = nullptr;
     }
