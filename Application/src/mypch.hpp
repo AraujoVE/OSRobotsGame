@@ -7,6 +7,7 @@
 #include "Application/header/VillageStats.hpp"
 #include "Application/header/RobotFunctions.hpp"
 #include "Application/header/GameSave.hpp"
+#include "Application/header/ConstsMap.hpp"
 
 #include <vector>
 #include <algorithm>

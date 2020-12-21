@@ -15,36 +15,26 @@ namespace Application
         bool m_MarkedForDeletion = false;
 
     public:
-        static const int BASE_STATS_NO = FUNCTION_QTY;
-        const static int ON_ATTACK_MULTIPLIER = 2.0;
-        constexpr static float POP_INCREASE_TAX = 1.1;
-        const static int POP_PER_CONSTRUCTION = 5;
-        const static int INIT_POP_VALUE = 1000;
-        const static int INIT_STAT_VALUE = 500;
-        constexpr static float ON_ATTACK_DECAY_TAX = 0.6;
-        constexpr static float NORMAL_DECAY_TAX = 0.9;
-        const static int ATTACK_FREQUENCY = 5;
-        const static int INIT_RESOURCES_VALUE = 100;
+        const static int BASE_STATS_NO = FUNCTION_QTY;
         const static int POPULATION_INDEX = BASE_STATS_NO;
-        constexpr static float TAX_REDUCT = 0.5;
-        const unsigned long DECAY_DELAY_MICRO = 500e3;
+        const int ON_ATTACK_MULTIPLIER;
+        const float POP_INCREASE_TAX;
+        const int POP_PER_CONSTRUCTION;
+        const int INIT_POP_VALUE;
+        const int INIT_STAT_VALUE;
+        const float ON_ATTACK_DECAY_TAX;
+        const float NORMAL_DECAY_TAX;
+        const int ATTACK_FREQUENCY;
+        const int INIT_RESOURCES_VALUE;
+        const float TAX_REDUCT;
+        const unsigned long DECAY_DELAY_MICRO;
     private:
         bool onAttack;
         float statTax;
         int maxPop;
 
-        const float MIN_LOSS[BASE_STATS_NO - 1] = {
-            0.05f,
-            0.05f,
-            0.05f,
-            0.025f,
-        };
-        const float MAX_LOSS[BASE_STATS_NO - 1] = {
-            0.5f,
-            0.25f,
-            0.25f,
-            0.125f,
-        };
+        const float MIN_LOSS[BASE_STATS_NO - 1];
+        const float MAX_LOSS[BASE_STATS_NO - 1];
         int baseStats[BASE_STATS_NO];/*
             defenses;
             food;

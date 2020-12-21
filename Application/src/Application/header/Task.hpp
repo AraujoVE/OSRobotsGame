@@ -14,13 +14,13 @@ namespace Application
         using OnFinishedCallback = std::function<void(Task&)>;
 
     private:
-        const static int TIME_STEP = 10;
-        const static int INIT_TIME_STEP = 2;
-        const static int MAX_TIME_STEPS = 10;
-        const static int MIN_REWARD = 2;
-        const static int REWARD_RANGE = 3;
-        constexpr static float FAILURE_TAX = 0.8;
-        const static int AVG_REWARD = (int)(((float)TIME_STEP)*((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0)/2.0)*((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0)/2.0));
+        const int TIME_STEP;
+        const int INIT_TIME_STEP;
+        const int MAX_TIME_STEPS;
+        const int MIN_REWARD;
+        const int REWARD_RANGE;
+        const float FAILURE_TAX;
+        const int AVG_REWARD = (int)(((float)TIME_STEP)*((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0)/2.0)*((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0)/2.0));
 
         static TaskID s_NextID;
 

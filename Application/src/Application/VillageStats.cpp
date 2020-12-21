@@ -23,10 +23,32 @@ namespace Application
     }
 
     // ======================== CONSTRUCTOR / INITIALIZE VILLAGES STATS ========================
-    VillageStats::VillageStats()
+    VillageStats::VillageStats():
+        ON_ATTACK_MULTIPLIER(ConstsMap::getValue("ON_ATTACK_MULTIPLIER")),
+        POP_INCREASE_TAX(ConstsMap::getValue("POP_INCREASE_TAX")),
+        POP_PER_CONSTRUCTION(ConstsMap::getValue("POP_PER_CONSTRUCTION")),
+        INIT_POP_VALUE(ConstsMap::getValue("INIT_POP_VALUE")),
+        INIT_STAT_VALUE(ConstsMap::getValue("INIT_STAT_VALUE")),
+        ON_ATTACK_DECAY_TAX(ConstsMap::getValue("ON_ATTACK_DECAY_TAX")),
+        NORMAL_DECAY_TAX(ConstsMap::getValue("NORMAL_DECAY_TAX")),
+        ATTACK_FREQUENCY(ConstsMap::getValue("ATTACK_FREQUENCY")),
+        INIT_RESOURCES_VALUE(ConstsMap::getValue("INIT_RESOURCES_VALUE")),
+        TAX_REDUCT(ConstsMap::getValue("TAX_REDUCT")),
+        DECAY_DELAY_MICRO(ConstsMap::getValue("DECAY_DELAY_MICRO")),
+        MIN_LOSS({
+            ConstsMap::getValue("MIN_LOSS_0"),
+            ConstsMap::getValue("MIN_LOSS_1"),
+            ConstsMap::getValue("MIN_LOSS_2"),
+            ConstsMap::getValue("MIN_LOSS_3")
+        }),
+        MAX_LOSS({
+            ConstsMap::getValue("MAX_LOSS_0"),
+            ConstsMap::getValue("MAX_LOSS_1"),
+            ConstsMap::getValue("MAX_LOSS_2"),
+            ConstsMap::getValue("MAX_LOSS_3")
+        })
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
-        
         initializeStats();
         initializeVSAvenues();
     

@@ -18,13 +18,17 @@ namespace Application
         enum Robots_Values_Index {TOT_ROBOTS, FREE_ROBOTS, PROD_COST};
 
         static const int MAX_TASKS_PER_FUNCTION = 5;
-        static constexpr float PROD_COST_INCREASE_TAX = 0.1;
-        static const int PROD_AVG = 3;
 
     private:
         int totRobots;
         int freeRobots;
         int prodCost; //TODO: Implementation to change this value
+        const float PROD_COST_INCREASE_TAX;
+        const int TOT_ROBOTS_INI;
+        const int FREE_ROBOTS_INI;
+        const int PROD_COST_INI;
+
+
         VillageStats *villageStats;
         std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
         Avenue *robotsAvenues[3];

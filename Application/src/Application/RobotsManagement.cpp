@@ -4,7 +4,11 @@
 namespace Application
 {
 
-    RobotsManagement::RobotsManagement()
+    RobotsManagement::RobotsManagement():
+        PROD_COST_INCREASE_TAX(ConstsMap::getValue("PROD_COST_INCREASE_TAX")),
+        TOT_ROBOTS_INI(ConstsMap::getValue("TOT_ROBOTS_INI")),
+        FREE_ROBOTS_INI(ConstsMap::getValue("FREE_ROBOTS_INI")),
+        PROD_COST_INI(ConstsMap::getValue("PROD_COST_INI"))
     {
         initializeStats();
         initializeAvenues();
@@ -12,7 +16,8 @@ namespace Application
         pthread_mutex_init(&tasksMutex, NULL);
     }
 
-    void RobotsManagement::initializeAvenues() {
+    void RobotsManagement::initializeAvenues()
+    {
         robotsAvenues[TOT_ROBOTS] = new Avenue(totRobots);
         robotsAvenues[FREE_ROBOTS] = new Avenue(freeRobots);
         robotsAvenues[PROD_COST] = new Avenue(prodCost);
@@ -26,9 +31,9 @@ namespace Application
     void RobotsManagement::initializeStats()
     {
         //TODO: mudar de volta (para 1, tot e free)
-        totRobots = 10;
-        freeRobots = 10;
-        prodCost = 50;
+        totRobots = TOT_ROBOTS_INI;
+        freeRobots = FREE_ROBOTS_INI;
+        prodCost = PROD_COST_INI;
         villageStats = NULL;
         m_FunctionWindowArray = nullptr;
     }

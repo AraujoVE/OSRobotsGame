@@ -18,6 +18,7 @@ namespace Application
         virtual void OnStart() override
         {
             DE_INFO("OSRobotsGame starting");
+            ConstsMap::initMapFromFile("constValues.cfg");
         }
 
         virtual void InitLayers() override

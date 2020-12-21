@@ -5,7 +5,14 @@ namespace Application
     TaskID Task::s_NextID = 0;
 
     //Inicialização e destruição de classe
-    Task::Task(RobotFunction funct, OnFinishedCallback onFinishedCallback) : m_OnFinishedCallback(onFinishedCallback)
+    Task::Task(RobotFunction funct, OnFinishedCallback onFinishedCallback) : 
+        m_OnFinishedCallback(onFinishedCallback),
+        TIME_STEP(ConstsMap::getValue("TIME_STEP")),
+        INIT_TIME_STEP(ConstsMap::getValue("INIT_TIME_STEP")),
+        MAX_TIME_STEPS(ConstsMap::getValue("MAX_TIME_STEPS")),
+        MIN_REWARD(ConstsMap::getValue("MIN_REWARD")),
+        REWARD_RANGE(ConstsMap::getValue("REWARD_RANGE")),
+        FAILURE_TAX(ConstsMap::getValue("FAILURE_TAX"))
     {
         // use current time as seed for random generator
         std::srand(std::time(nullptr));
