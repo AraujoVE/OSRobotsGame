@@ -12,11 +12,11 @@ namespace Application
     {
     public:
         RobotCreationWindow(std::unique_ptr<RobotsManagement> &robotsManagement)
-            : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse),
+            : IGWindow(ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse),
               m_RobotsManagement(robotsManagement)
         {
             m_WindowProps = { 
-                {700, 100},
+                {100, 650},
                 {300, 200}
             };
         }
