@@ -85,9 +85,8 @@ namespace Application
 
             ImGui::Text("Do you want to play again?");
 
-            ImGui::SameLine(60); 
             restart =  ImGui::Button("Yes"); 
-            ImGui::SameLine(60);  
+            ImGui::SameLine();
             quit = ImGui::Button("No");
 
         }
