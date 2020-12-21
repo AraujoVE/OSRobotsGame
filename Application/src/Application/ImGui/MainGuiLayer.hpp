@@ -22,6 +22,7 @@ namespace Application
     private:
         void LostScreenDescription();
         bool m_GameLost;
+        const char *m_GameLostReason; 
 
         GameSave &m_GameSave;
         StatusWindow* m_StatusWindow;

@@ -99,8 +99,8 @@ namespace Application
         {
             auto searchRes = tasks[i].find(taskID);
             if (searchRes != tasks[i].end()) {
-                return *(Task*)searchRes->second;
                 tasksUp();
+                return *(Task*)searchRes->second;
             }
         }
 
