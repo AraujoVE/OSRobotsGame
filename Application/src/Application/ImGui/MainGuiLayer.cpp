@@ -24,6 +24,7 @@ namespace Application
         m_RobotCreationWindow = new RobotCreationWindow(gameSave.getRobotsManagement());
 
         m_GameLost = false;
+        m_GameLostReason = "You've lost, game over";
     }
     
 
@@ -59,17 +60,36 @@ namespace Application
         m_RobotCreationWindow->Render();
 
         //Check if game is lost
-        if (m_GameSave.getVillageStats()->getPopulation() <= 0)
+        if (m_GameSave.getVillageStats()->getPopulation() <= 0) {
+            m_GameLostReason = "Your population reached 0!!";
             m_GameLost = true;
+        }
+        else if (m_GameSave.getRobotsManagement()->getTotRobots() <= 0) {
+            m_GameLostReason = "All your robots were destroyed!!";
+            m_GameLost = true;
+        }
     }
 
     void MainGuiLayer::LostScreenDescription() {
         bool restart, quit;
+        const static auto xSize = 300u, ySize = 125u;
+        ImGui::SetNextWindowPos(
+            {
+                ImGui::GetMainViewport()->Pos.x + (ImGui::GetMainViewport()->Size.x - xSize) /2, 
+                ImGui::GetMainViewport()->Pos.y + (ImGui::GetMainViewport()->Size.y - ySize ) /2
+            });
+        ImGui::SetNextWindowSize({xSize, ySize});
         ImGui::Begin("Game Over", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
-            ImGui::Text("Your population reached 0!!");
+            ImGui::Text("%s", m_GameLostReason);
+
             ImGui::Text("Do you want to play again?");
-            restart = ImGui::Button("Yes"); ImGui::SameLine(); quit = ImGui::Button("No");
+
+            ImGui::SameLine(60); 
+            restart =  ImGui::Button("Yes"); 
+            ImGui::SameLine(60);  
+            quit = ImGui::Button("No");
+
         }
         ImGui::End();
 
