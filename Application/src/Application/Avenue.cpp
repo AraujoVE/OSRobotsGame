@@ -20,22 +20,27 @@ Avenue::~Avenue () {
     pthread_mutex_destroy(&mutex);
 }
 
+//Method called every time an absolute increment/decrement is desired
 void Avenue::producer(int value) {
     sem_wait(&empty);
     pthread_mutex_lock(&mutex);
 
+    //Queues an absolute increment/decrement
     items.push(value);
 
     pthread_mutex_unlock(&mutex);
     sem_post(&full);
 }
 
+//Method called once, (in a separate thread)
 void Avenue::consumer() {
-    DE_TRACE("(Avenue) Spawnei Consumer");
     while (m_ConsumerRunning) {
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
+
+        //Eval one absolute increment/decrement (delta)
         attr += items.front();
+        
         items.pop();
 
         if (attr < 0)
@@ -53,7 +58,7 @@ void Avenue::startConsumer() {
 
 void Avenue::stopConsumer() {
     m_ConsumerRunning = false;
-    producer(666);
+    producer(1);
     DE_DEBUG("IN: join @Avenue::stopConsumer");
     pthread_join(consumer_thread, NULL);
     DE_DEBUG("OUT: join @Avenue::stopConsumer");
