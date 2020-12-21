@@ -61,7 +61,7 @@ namespace Application
     {
         auto taskCanceledCallback = std::bind(&RobotsManagement::endTask, m_RobotsManagement.get(), std::placeholders::_1);
 
-        //TODO: make m_RobotsManagement return the task ID, to keep track internally
+        
         Task &createdTask = m_RobotsManagement->createTask(m_Function);
 
         TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};

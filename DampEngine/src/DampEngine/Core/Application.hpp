@@ -7,7 +7,7 @@
 
 #include <functional>
 
-//TODO: remove Temporary
+
 #include "DampEngine/Renderer/Buffers/VertexArray.hpp"
 #include "DampEngine/Renderer/Buffers/VertexBuffer.hpp"
 #include "DampEngine/Renderer/Buffers/IndicesBuffer.hpp"

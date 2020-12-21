@@ -6,7 +6,7 @@ sys_command=premake5
 shipped_bin=vendor/premake5/binaries/premake5
 shipped_bin_fallback=vendor/premake5/binaries/premake5_fallback
 
-premake_success_postcommands='make -j all && ./bin/Debug*/Application/Application'
+premake_success_postcommands='make -j 6 all && ./bin/Debug*/Application/Application'
 premake_succes=0
 
 ($sys_command $target || 

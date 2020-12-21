@@ -35,24 +35,24 @@ namespace Application
         INIT_RESOURCES_VALUE(ConstsMap::getValue("INIT_RESOURCES_VALUE")),
         TAX_REDUCT(ConstsMap::getValue("TAX_REDUCT")),
         DECAY_DELAY_MICRO(ConstsMap::getValue("DECAY_DELAY_MICRO")),
-        MIN_LOSS({
+        MIN_LOSS{
             ConstsMap::getValue("MIN_LOSS_0"),
             ConstsMap::getValue("MIN_LOSS_1"),
             ConstsMap::getValue("MIN_LOSS_2"),
             ConstsMap::getValue("MIN_LOSS_3")
-        }),
-        MAX_LOSS({
+        },
+        MAX_LOSS{
             ConstsMap::getValue("MAX_LOSS_0"),
             ConstsMap::getValue("MAX_LOSS_1"),
             ConstsMap::getValue("MAX_LOSS_2"),
             ConstsMap::getValue("MAX_LOSS_3")
-        })
+        }
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
         initializeStats();
         initializeVSAvenues();
     
-        //TODO: onGameStarted()
+        
         pthread_create(&decayThread, NULL, runDecay, this);
 
         return;
@@ -194,22 +194,21 @@ namespace Application
                  decayStat(it,i);
             }
 
-            // DE_DEBUG("decayStats() Population = {0}", population);
             decayPopulation();
 
 
             avenueVS[POPULATION_INDEX]->up();
+            
+            if (ATTACK_FREQUENCY == 0) it = -1;
+            else it = (it+1+ATTACK_FREQUENCY)%ATTACK_FREQUENCY;
 
-            it = (it+1+ATTACK_FREQUENCY)%ATTACK_FREQUENCY;
-
-            //TODO: fixed time (adjusting for lag)
             usleep(DECAY_DELAY_MICRO);
         }
     }
 
     void VillageStats::decayResources(int,int,float&) 
     {
-        //TODO: AraujoVE ver oq é isso
+        
         DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
     }
 

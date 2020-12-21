@@ -4,11 +4,17 @@
 #include <unordered_map>
 #include "header/ConstsMap.hpp"
 
+#include "mypch.hpp"
+
 namespace Application
 {
 
+    std::unordered_map<std::string,float> ConstsMap::constsMap = {};
+
     void ConstsMap::initMapFromFile(const std::string &srcFile)
     {
+        constsMap.clear();
+
         std::fstream myFile;
         int tokenPos;
         float val;

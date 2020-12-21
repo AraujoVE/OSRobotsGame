@@ -23,7 +23,7 @@ namespace Application
 
             //Third line
 
-            //TODO: remove robs and diable if cant
+            
             ImGui::Text("Production cost: %d", m_RobotsManagement->getProdCost());
 
             if (!canCreateRobot) {

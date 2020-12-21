@@ -22,7 +22,7 @@ namespace Application
     private:
         int totRobots;
         int freeRobots;
-        int prodCost; //TODO: Implementation to change this value
+        int prodCost; 
         const float PROD_COST_INCREASE_TAX;
         const int TOT_ROBOTS_INI;
         const int FREE_ROBOTS_INI;
@@ -62,7 +62,7 @@ namespace Application
         void setProdCost(int newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
         void setFunctionWindowsArray(FunctionWindow **FunctionWindowArray);
-        //TODO: determine if it will be in fact allowed to set tasks
+        
         // void setTasks(std::vector<std::unordered_map<int, Task>> *newTasks);
 
         bool createRobots(int);

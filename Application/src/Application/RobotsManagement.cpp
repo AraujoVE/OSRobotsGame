@@ -8,7 +8,7 @@ namespace Application
         PROD_COST_INCREASE_TAX(ConstsMap::getValue("PROD_COST_INCREASE_TAX")),
         TOT_ROBOTS_INI(ConstsMap::getValue("TOT_ROBOTS_INI")),
         FREE_ROBOTS_INI(ConstsMap::getValue("FREE_ROBOTS_INI")),
-        PROD_COST_INI(ConstsMap::getValue("PROD_COST_INI"))
+        PROD_COST_INI(ConstsMap::getValue("PROD_COST_INI")) 
     {
         initializeStats();
         initializeAvenues();
@@ -30,7 +30,7 @@ namespace Application
 
     void RobotsManagement::initializeStats()
     {
-        //TODO: mudar de volta (para 1, tot e free)
+        
         totRobots = TOT_ROBOTS_INI;
         freeRobots = FREE_ROBOTS_INI;
         prodCost = PROD_COST_INI;
