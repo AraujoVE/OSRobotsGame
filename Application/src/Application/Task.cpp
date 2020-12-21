@@ -63,6 +63,11 @@ namespace Application
         return robotsNo;
     }
 
+    int Task::getAvgReward() const
+    {
+        return AVG_REWARD;
+    }
+
     int Task::getProgressLength() const
     {
         return progressLength;

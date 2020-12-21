@@ -220,14 +220,9 @@ namespace Application
         destroyRobots(lostRobots);
 
         if(endedTask.getType() == RobotFunction::RESOURCE_GATHERING){
-            Avenue *VSResourcesAvenue = villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING);
-            
-            VSResourcesAvenue->down();
-            float prodCostIncrement = 1.0 + (endedTask.getGainedGoods()*PROD_COST_INCREASE_TAX)/((float)villageStats->getResources());
-            VSResourcesAvenue->up();
-
             robotsAvenues[PROD_COST]->down();
-            prodCost = (int)((float)prodCost * prodCostIncrement);
+            float increase = 1.0 + PROD_COST_INCREASE_TAX*(endedTask.getGainedGoods()/(float)endedTask.getAvgReward()) ;
+            prodCost = (int)((float)prodCost * increase);
             robotsAvenues[PROD_COST]->up();
         }
 

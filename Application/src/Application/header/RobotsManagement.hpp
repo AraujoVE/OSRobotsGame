@@ -18,7 +18,8 @@ namespace Application
         enum Robots_Values_Index {TOT_ROBOTS, FREE_ROBOTS, PROD_COST};
 
         static const int MAX_TASKS_PER_FUNCTION = 5;
-        static constexpr float PROD_COST_INCREASE_TAX = 0.5;
+        static constexpr float PROD_COST_INCREASE_TAX = 0.1;
+        static const int PROD_AVG = 3;
 
     private:
         int totRobots;
