@@ -80,15 +80,19 @@ void evaluatePop() {
     }
 }
 
+void crossover(int i,double *parent1,double *parent2){
+    for(int j = 0; j < NB_PARAMETERS; j++){
+        population[i][j] = (parent1[j] + parent2[j])/2.0;        
+    }
+}
+
 void elitism() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
         if (i == maxFitIndex) // keeping the best individual (no changes are made to it)
             continue;
         
         // crossover
-        for (int j = 0; j < NB_PARAMETERS; j++) {
-            population[i][j] = (population[i][j] + population[maxFitIndex][j])/2.0;
-        }
+        crossover(i,population[i],population[maxFitIndex]);
     }
 
     return;
@@ -118,9 +122,7 @@ void tournament() {
         }
 
         // crossover
-        for (int j = 0; j < NB_PARAMETERS; j++) {
-            population[i][j] = (oldPopulation[parentIndex[0]][j] + oldPopulation[parentIndex[1]][j])/2.0;
-        }
+        crossover(i,oldPopulation[parentIndex[0]],oldPopulation[parentIndex[1]]);
     }
 
     return;
@@ -164,11 +166,10 @@ void roulette() {
         }
 
         // crossover
-        for (int j = 0; j < NB_PARAMETERS; j++) {
-            population[i][j] = (oldPopulation[parentIndex[0]][j] + oldPopulation[parentIndex[1]][j])/2.0;
-        }
+        crossover(i,oldPopulation[parentIndex[0]],oldPopulation[parentIndex[1]]);
     }
 }
+
 
 // 3rd step: selection + mutation and crossover
 void selection() { // tournament, elitism, roulette...
@@ -193,6 +194,11 @@ void selection() { // tournament, elitism, roulette...
                 break;
         }
 
+        // Isso aqui pode mudar, ou não, a mutação pode ocorrer em todos os parametros, ou não.
+        // Isso depende de caso a caso, normalmente é feito a mutação em cada indivíduo, mas em 
+        // apenas um parâmetro aleatório desse indivíduo. 
+        // Todavia, em alguns casos é interessante fazer a mutação em todos os parâmtros como 
+        // está sendo feito aqui. É importante testar.
         // Mutation
         for (int i = 0; i < POPULATION_SIZE; i++) { 
             if (i == maxFitIndex)
@@ -200,12 +206,14 @@ void selection() { // tournament, elitism, roulette...
 
             for (int j = 0; j < NB_PARAMETERS; j++) {
                 population[i][j] += (((double) (rand() % MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * (mutationRate));
+
+                // esse if e else if estavam para fora
+                if (population[i][j] < 0)
+                    population[i][j] += MAX_PARAM_VALUE;
+                else if (population[i][j] > MAX_PARAM_VALUE)
+                    population[i][j] -= MAX_PARAM_VALUE;
             }
 
-            if (population[i][j] < 0)
-                population[i][j] += MAX_PARAM_VALUE;
-            else if (population[i][j] > MAX_PARAM_VALUE)
-                population[i][j] -= MAX_PARAM_VALUE;
         }
     }
     
