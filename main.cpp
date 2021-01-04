@@ -7,15 +7,16 @@
 5. Mutação
 6. Rearranjo da população
 
-// g++ -o main main.cpp -std=c++11 -lpthread -ldl 
-[-lglut -lGLU -lGL (-lm)] -> not used
+// g++ -o main main.cpp -std=c++11  -O2 -larmadillo
+[-lpthread -ldl -lglut -lGLU -lGL (-lm)] -> not used for now
 // Warning flags: -Wall -Wextra -Werror
  
 */
 #include<stdlib.h>  /* srand, rand */
 #include<iostream>
 #include <vector>
-// #include<cstring>
+#include<cstring>
+#include <armadillo>
 // #include<unistd.h>
 // #include <thread>   /* std::this_thread::sleep_for */
 // #include <chrono>   /* std::chrono::seconds */
@@ -31,8 +32,9 @@
 enum selectionMethods { TOURNAMENT, ELITISM, ROULETTE };
 selectionMethods selectionMethod = ELITISM;
 
-double population[POPULATION_SIZE][NB_PARAMETERS];
-double fitness[NB_PARAMETERS];
+arma::mat::fixed<POPULATION_SIZE, NB_PARAMETERS> population; // arma::mat : armadillo matrix (Mat<double>)
+// Each LINE (ROW) is the individual's parameters
+double fitness[POPULATION_SIZE];
 double maxFitness = 0, minFitness = 2000000000;
 int maxFitIndex = -1;
 double mutationRate = MAX_MUTATION_RATE;
@@ -41,14 +43,19 @@ double mutationRate = MAX_MUTATION_RATE;
 // 1st step: initialize population
 void initializePop() {
     std::cout << "INITIALIZING POPULATION\n";
-    for (int i = 0; i < POPULATION_SIZE; i++) {
-        for (int j = 0; j < NB_PARAMETERS; j++) {
-            population[i][j] = (double) (rand() % MAX_PARAM_VALUE); // number range = [0, MAX_PARAM_VALUE[
-        }
-    }
+    // for (int i = 0; i < POPULATION_SIZE; i++) {
+    //     for (int j = 0; j < NB_PARAMETERS; j++) {
+    //         population[i][j] = (double) (rand() % MAX_PARAM_VALUE); // number range = [0, MAX_PARAM_VALUE[
+    //     }
+    // }
+    population.randu(); // initialize with values between 0 and 1
+    population = population * MAX_PARAM_VALUE;
+
+    population.print("Population matrix initialized:");
 
     return;
 }
+
 
 double * normalizeFitness() {
     double normalizedFitness[POPULATION_SIZE];
@@ -67,9 +74,8 @@ void evaluatePop() {
     // I don't know how the population will be evaluated yet...
 
     for (int i = 0; i < POPULATION_SIZE; i++) { 
-        for (int j = 0; j < NB_PARAMETERS; j++) { // example of fitness calculation -> CHANGE!!!!
-            fitness[i] += population[i][j];
-        }
+        // example of fitness calculation -> CHANGE!!!!
+        fitness[i] = arma::sum(population.row(i));
 
         if (maxFitness < fitness[i]) { // searching for the  max fitnnes from new generation
             maxFitness = fitness[i];
@@ -77,37 +83,51 @@ void evaluatePop() {
         }
         else if (fitness[i] < minFitness)
             minFitness = fitness[i];
+
+        // printf("fitness[%d] %lf\n", i, fitness[i]);
     }
+
+    printf("MAX FITNESS: %lf - INDEX: %d\n", maxFitness, maxFitIndex);
+
+    return;
 }
 
-void crossover(int i,double *parent1,double *parent2){
-    for(int j = 0; j < NB_PARAMETERS; j++){
-        population[i][j] = (parent1[j] + parent2[j])/2.0;        
-    }
+void crossover(int i, arma::rowvec parent1, arma::rowvec parent2) {
+    // for(int j = 0; j < NB_PARAMETERS; j++){
+    //     population[i][j] = (parent1[j] + parent2[j])/2.0;        
+    // }
+    population.row(0) = (parent1 + parent2)/2.0;
+
+    return;
 }
 
 void elitism() {
+    std::cout << "ELITISM\n";
+    arma::rowvec bestIndv = population.row(maxFitIndex);
+    
     for (int i = 0; i < POPULATION_SIZE; i++) {
         if (i == maxFitIndex) // keeping the best individual (no changes are made to it)
             continue;
         
         // crossover
-        crossover(i,population[i],population[maxFitIndex]);
+        crossover(i, population.row(i), bestIndv);
     }
 
     return;
 }
 
 void tournament() {
-    double oldPopulation[POPULATION_SIZE][NB_PARAMETERS];
+    std::cout << "TOURNAMENT\n";
+    arma::mat::fixed<POPULATION_SIZE, NB_PARAMETERS> oldPopulation;
     int parentIndex[2]; 
     
     // copying last population (new one will be different)
-    for (int i = 0; i < POPULATION_SIZE; i++) {
-        for (int j = 0; j < NB_PARAMETERS; j++) {
-            oldPopulation[i][j] = population[i][j];
-        }
-    }
+    // for (int i = 0; i < POPULATION_SIZE; i++) {
+    //     for (int j = 0; j < NB_PARAMETERS; j++) {
+    //         oldPopulation[i][j] = population[i][j];
+    //     }
+    // }
+    oldPopulation = population;
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
         if (i == maxFitIndex)
@@ -122,24 +142,26 @@ void tournament() {
         }
 
         // crossover
-        crossover(i,oldPopulation[parentIndex[0]],oldPopulation[parentIndex[1]]);
+        crossover(i, oldPopulation.row(parentIndex[0]), oldPopulation.row(parentIndex[1]));
     }
 
     return;
 }
 
 void roulette() {
-    double oldPopulation[POPULATION_SIZE][NB_PARAMETERS];
+    std::cout << "ROULETTE\n";
+    arma::mat::fixed<POPULATION_SIZE, NB_PARAMETERS> oldPopulation;
     double standardizedFitness[POPULATION_SIZE];
     int parentIndex[2], rNb; 
     double probSum = 0.0, partialSum = 0.0;
     
     // copying last population (new one will be different)
-    for (int i = 0; i < POPULATION_SIZE; i++) {
-        for (int j = 0; j < NB_PARAMETERS; j++) {
-            oldPopulation[i][j] = population[i][j];
-        }
-    }
+    // for (int i = 0; i < POPULATION_SIZE; i++) {
+    //     for (int j = 0; j < NB_PARAMETERS; j++) {
+    //         oldPopulation[i][j] = population[i][j];
+    //     }
+    // }
+    oldPopulation = population;
 
     // Standardize fitness (set probabilites that add up to 100%)
     for (int i = 0; i < POPULATION_SIZE; i++)
@@ -166,13 +188,14 @@ void roulette() {
         }
 
         // crossover
-        crossover(i,oldPopulation[parentIndex[0]],oldPopulation[parentIndex[1]]);
+        crossover(i, oldPopulation.row(parentIndex[0]), oldPopulation.row(parentIndex[1]));
     }
 }
 
 
 // 3rd step: selection + mutation and crossover
 void selection() { // tournament, elitism, roulette...
+    std::cout << "SELECTION\n";
     /* 
     https://en.wikipedia.org/wiki/Selection_(genetic_algorithm)
     https://medium.com/datadriveninvestor/genetic-algorithms-selection-5634cfc45d78
@@ -181,45 +204,49 @@ void selection() { // tournament, elitism, roulette...
     Stochastic Uniform (Fitness Proportionate) -> PROB THE BEST?
     */
 
-        // Selection method (+ crossover)
-        switch (selectionMethod) {
-            case TOURNAMENT:
-                tournament();
-                break;
-            case ELITISM:
-                elitism();
-                break;
-            case ROULETTE:
-                roulette();
-                break;
-        }
-
-        // Isso aqui pode mudar, ou não, a mutação pode ocorrer em todos os parametros, ou não.
-        // Isso depende de caso a caso, normalmente é feito a mutação em cada indivíduo, mas em 
-        // apenas um parâmetro aleatório desse indivíduo. 
-        // Todavia, em alguns casos é interessante fazer a mutação em todos os parâmtros como 
-        // está sendo feito aqui. É importante testar.
-        // Mutation
-        for (int i = 0; i < POPULATION_SIZE; i++) { 
-            if (i == maxFitIndex)
-                continue; // don't mutate the best from last generation
-
-            for (int j = 0; j < NB_PARAMETERS; j++) {
-                population[i][j] += (((double) (rand() % MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * (mutationRate));
-
-                // esse if e else if estavam para fora
-                if (population[i][j] < 0)
-                    population[i][j] += MAX_PARAM_VALUE;
-                else if (population[i][j] > MAX_PARAM_VALUE)
-                    population[i][j] -= MAX_PARAM_VALUE;
-            }
-
-        }
+    // Selection method (+ crossover)
+    switch (selectionMethod) {
+        case TOURNAMENT:
+            tournament();
+            break;
+        case ELITISM:
+            elitism();
+            break;
+        case ROULETTE:
+            roulette();
+            break;
     }
+
+    // Isso aqui pode mudar, ou não, a mutação pode ocorrer em todos os parametros, ou não.
+    // Isso depende de caso a caso, normalmente é feito a mutação em cada indivíduo, mas em 
+    // apenas um parâmetro aleatório desse indivíduo. 
+    // Todavia, em alguns casos é interessante fazer a mutação em todos os parâmtros como 
+    // está sendo feito aqui. É importante testar.
+    // Mutation
+    arma::rowvec bestIndv = population.row(maxFitIndex);
+
+    arma::mat mutateMatrix(POPULATION_SIZE, NB_PARAMETERS, arma::fill::randu);
+    mutateMatrix = ((mutateMatrix * MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * mutationRate;
+
+    population = population + mutateMatrix;
+
+    population.row(maxFitIndex) = bestIndv;
+    population.transform( [](double x) { return ((x < 0 || x > MAX_PARAM_VALUE) ? abs(MAX_PARAM_VALUE-abs(x)) : x); } );
+    // for (int i = 0; i < POPULATION_SIZE; i++) { 
+    //     if (i == maxFitIndex)
+    //         continue; // don't mutate the best from last generation
+
+    //     for (int j = 0; j < NB_PARAMETERS; j++) {
+    //         population[i][j] += (((double) (rand() % MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * (mutationRate));
+
+    //         // esse if e else if estavam para fora
+    //         if (population[i][j] < 0)
+    //             population[i][j] += MAX_PARAM_VALUE;
+    //         else if (population[i][j] > MAX_PARAM_VALUE)
+    //             population[i][j] -= MAX_PARAM_VALUE;
+    //     }
+    // }
     
-
-
-
 }
 
 int main(int argc, char * argv[]) {
@@ -227,11 +254,11 @@ int main(int argc, char * argv[]) {
 
     system("clear");
     initializePop();
-    
     int generationIndex = 0;
 
     while (true) {
-        std::cout << "\n==== Generation " << generationIndex << "====\n";
+        std::cout << "\n==== Generation " << generationIndex << " ====\n";
+        // population.print("Current population:");
         evaluatePop();
         selection();
         generationIndex++;
