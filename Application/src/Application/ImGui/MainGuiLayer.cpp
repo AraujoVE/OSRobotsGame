@@ -11,6 +11,7 @@ namespace Application
     MainGuiLayer::MainGuiLayer(GameSave &gameSave)
         : m_GameSave(gameSave)
     {
+
         m_StatusWindow = new StatusWindow(gameSave.getVillageStats());
 
         m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::HUNT);
@@ -25,6 +26,8 @@ namespace Application
 
         m_GameLost = false;
         m_GameLostReason = "You've lost, game over";
+
+        m_scriptLoop = new EAScript(m_FunctionWindows,m_RobotCreationWindow,"gameScript.cfg");
     }
     
 
@@ -50,6 +53,16 @@ namespace Application
             ImGui::Text("Status");
         }
         ImGui::End();
+
+
+        //void (Application::VillageStats::*mudarPop)(int,int) = &VillageStats::changeStat; 
+        /*
+        if(m_GameSave.getVillageStats()->getPopulation() < 100000){
+            std::cout << "Pop Increased by 500" << std::endl;
+            ((m_GameSave.getVillageStats().get())->*mudarPop)(5,500);
+            //m_GameSave.getVillageStats()->changeStat(5,100);
+        }
+        */
 
         for (int i = 0; i < FUNCTION_QTY; i++)
         {

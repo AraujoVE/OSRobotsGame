@@ -191,7 +191,7 @@ namespace Application
             
             onAttack = false;
             for(int i =0;i<BASE_STATS_NO - 1;i++) {
-                 decayStat(it,i);
+                decayStat(it,i);
             }
 
             decayPopulation();

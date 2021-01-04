@@ -15,11 +15,14 @@ namespace Application
         virtual void Render() override;
 
         void OnTaskEnded(Task& endedTask);
+        void OnTaskEnded(int id);
 
         void ClearTaskWindows();
+        TaskWindow * getTaskWindow(TaskID id);
 
-    private:
+
         void CreateTask();
+    private:
 
     private:
         RobotFunction m_Function;

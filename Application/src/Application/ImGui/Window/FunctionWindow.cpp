@@ -108,4 +108,39 @@ namespace Application
         m_TasksPendingDeletion.push(endedTask.getId());
 
     }
+
+    void FunctionWindow::OnTaskEnded(int id)
+    {
+        DE_DEBUG("(FunctionWindow) onTaskEnded()");
+
+        auto windowIt = m_TaskWindowMap.find(id);
+
+        DE_ASSERT(windowIt != m_TaskWindowMap.end(), "Trying to end an unknown Task");
+
+        pthread_mutex_lock(&m_MutexMapRemoval);
+
+        m_TaskWindowMap.erase(windowIt);
+        
+        int i = m_TaskWindowMap.size()-1;
+        for (windowIt = m_TaskWindowMap.begin() ; windowIt != m_TaskWindowMap.end() ; windowIt++)
+        {
+            (windowIt->second)->SetIndex(i--); 
+        }
+
+        pthread_mutex_unlock(&m_MutexMapRemoval);
+        
+        
+        DE_DEBUG("INSERINDO O {0}", id);
+        m_TasksPendingDeletion.push(id);
+
+    }
+
+
+    TaskWindow * FunctionWindow::getTaskWindow(TaskID id){
+        return m_TaskWindowMap[id];
+    }
+
+
+
+
 } // namespace Application

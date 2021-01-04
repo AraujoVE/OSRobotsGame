@@ -23,7 +23,9 @@ namespace Application
         void LostScreenDescription();
         bool m_GameLost;
         const char *m_GameLostReason; 
+        const static int SCRIPT_FUNCT_SIZE = 7;
 
+        EAScript* m_scriptLoop;
         GameSave &m_GameSave;
         StatusWindow* m_StatusWindow;
         FunctionWindow* m_FunctionWindows[FUNCTION_QTY];
