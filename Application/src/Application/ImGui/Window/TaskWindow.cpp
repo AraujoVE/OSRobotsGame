@@ -86,4 +86,8 @@ namespace Application
             {xSize, ySize}};
     }
 
+    Task& TaskWindow::getTask(){
+        return m_Task;
+    }
+
 } // namespace Application

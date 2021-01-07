@@ -27,7 +27,7 @@ namespace Application
         m_GameLost = false;
         m_GameLostReason = "You've lost, game over";
 
-        m_scriptLoop = new EAScript(m_FunctionWindows,m_RobotCreationWindow,"gameScript.cfg");
+        m_scriptLoop = new EAScript(m_GameSave,m_FunctionWindows,m_RobotCreationWindow,"gameScript.cfg");
     }
     
 

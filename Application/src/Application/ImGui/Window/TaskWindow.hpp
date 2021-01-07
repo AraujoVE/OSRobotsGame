@@ -48,6 +48,7 @@ namespace Application
             m_TaskWindowProps.FunctionTaskVecIdx = newIndex;
             UpdateProps();
         }
+        Task& getTask();
 
         inline unsigned long GetIndex() const { return m_TaskWindowProps.FunctionTaskVecIdx; }
 

@@ -1,6 +1,7 @@
 #include "mypch.hpp"
 namespace Application{
-    EAScript::EAScript(FunctionWindow *functionWindows[FUNCTION_QTY],RobotCreationWindow *robotCreationWindow,std::string filePath): 
+    EAScript::EAScript(GameSave& gameSave,FunctionWindow *functionWindows[FUNCTION_QTY],RobotCreationWindow *robotCreationWindow,std::string filePath): 
+        m_gameSave(gameSave),
         m_functionWindows{
             functionWindows[0],
             functionWindows[1],
@@ -21,79 +22,89 @@ namespace Application{
 
     void EAScript::initScriptDirections(){
         std::fstream myFile;
-        int tokenPos,curOp = -1,curDirect;
+        int tokenPos,curGameplay = -1,curOp;
         myFile.open(srcFile, std::ios::in);
         std::string line;
         while (std::getline(myFile, line))
         {
             if(line[0] == '#'){
-                scriptDirections.push_back(std::vector<std::vector<std::string>>());
-                curOp++;
-                curDirect = -1;
+                gameScript.push_back(std::vector<std::vector<std::string>>());
+                curGameplay++;
+                curOp = 0;
+                gameScript.at(curGameplay).push_back(std::vector<std::string>());
+                gameScript.at(curGameplay).at(curOp).push_back(line.substr(1,line.length() - 1));
             }
             else{
-                scriptDirections.at(curOp).push_back(std::vector<std::string>());
-                curDirect++;
+                gameScript.at(curGameplay).push_back(std::vector<std::string>());
+                curOp++;
                 tokenPos = line.find(",");
                 while(tokenPos != -1){
-                    scriptDirections.at(curOp).at(curDirect).push_back(line.substr(0,tokenPos));
-                    line = line.substr(tokenPos + 1,line.length() - 1);
+                    gameScript.at(curGameplay).at(curOp).push_back(line.substr(0,tokenPos));
+                    line = line.substr(tokenPos + 1,line.length() - (1 + tokenPos));
                     tokenPos = line.find(",");
                 }
-                scriptDirections.at(curOp).at(curDirect).push_back(line);
+                gameScript.at(curGameplay).at(curOp).push_back(line);
             }
         }
     }
 
 
-    void EAScript::direction0(std::vector<std::string> params){
-        RobotFunction function = static_cast<RobotFunction>(stoi(params.at(1)));
+    void EAScript::scriptFunct0(std::vector<std::string> params){
         m_functionWindows[stoi(params.at(1))]->CreateTask();
     }
 
-    void EAScript::direction1(std::vector<std::string> params){
-        m_functionWindows[stoi(params.at(1))]->OnTaskEnded(stoi(params.at(2)));
+    void EAScript::scriptFunct1(std::vector<std::string> params){
+        m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask().stop();
     }
 
-    void EAScript::direction2(std::vector<std::string> params){
-        //TODO:Just posses taskWindow, must make moveRobots work on buttons
-        m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)));
+    void EAScript::scriptFunct2(std::vector<std::string> params){
+        Task& curTask = m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask();
+        m_gameSave.getRobotsManagement()->moveRobot(curTask,1);
     }
 
-    void EAScript::direction3(std::vector<std::string> params){
-        //TODO:Just posses taskWindow, must make moveRobots work on buttons
-        m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)));
+    void EAScript::scriptFunct3(std::vector<std::string> params){
+        Task& curTask = m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask();
+        m_gameSave.getRobotsManagement()->moveRobot(curTask,-1);
     }
 
-    void EAScript::direction4(std::vector<std::string> params){
-        //TODO:Just posses robotCreationWindow, must make createRobot work on buttons
-        m_robotCreationWindow;
+    void EAScript::scriptFunct4(std::vector<std::string> params){
+        m_gameSave.getRobotsManagement()->createRobots(1);
     }
 
-    void EAScript::direction5(std::vector<std::string> params){
-        //TODO:Just posses robotCreationWindow, must make destroyRobot work on buttons
-        m_robotCreationWindow;
+    void EAScript::scriptFunct5(std::vector<std::string> params){
+        m_gameSave.getRobotsManagement()->destroyRobots(1);        
     }
 
-    void EAScript::direction6(std::vector<std::string> params){
-        int waitTime = (std::stoi(params.at(0)) > 1 ? std::stoi(params.at(0)) - 1 : 0);
-
+    void EAScript::scriptFunct6(std::vector<std::string> params){
+        int waitTime = (std::stoi(params.at(1)) > 1 ? std::stoi(params.at(1)) - 1 : 0);
         usleep(waitTime*WAIT_UNIT);
     }
+    //TODO: Definir callback de jogo acabou
+    //TODO: Callbacks da UI para atualizar a parte gráfica
+    //TODO: Jogo versão normal ou calibração
+    //TODO: Velocidade dos segundos do jogo -> slider 
+    //TODO: Limitar Tasks
 
     void EAScript::scriptLoop(){
-        int start = -1;
-        time_t initTime;
-        
+        time_t initTime,endTime;
+        int fitness,it = 0;
         while(true){
-            for(auto gameplay : scriptDirections){
+            fitness = 0;
+            for(auto gameplay : gameScript){
                 initTime = time(0);
-                for(auto instruction : gameplay){
-                    (this->*(scriptLoopFuncts[stoi(instruction.at(0))]))(instruction);
+                std::cout << "Gameplay " << ++it << std::endl;
+                for(int i=1;i < (int)gameplay.size();i++){
+                    std::cout << "\tAction " << i << std::endl;
+                    (this->*(scriptLoopFuncts[stoi(gameplay.at(i).at(0))]))(gameplay.at(i));
                     usleep(WAIT_UNIT);
                 }
-                //EAFunction(initTime - time(0));
+                std::cout << "Acabou a primeira Gameplay";
+                //Callback para saber quando acaba o jogo
+                //quando isso acontece : endTime = time(0)
+                endTime = time(0);
+                fitness += std::abs((int)(initTime - endTime));
             }
+            //EAFunction(fitness);
         }
     }
 
@@ -102,8 +113,6 @@ namespace Application{
         script->scriptLoop();
         return NULL;
     }
-
-
 }
 
 /*
@@ -137,6 +146,13 @@ robots-- //Destroi um robô
 wait(par1) // Espera um certo tempo até a próxima ação
     //par1 : tempo de espera em WAIT_UNITS
 */
+
+
+
+
+
+
+
 /*
 //task++(med)
 0,2
@@ -158,4 +174,30 @@ wait(par1) // Espera um certo tempo até a próxima ação
 
 //wait(3)
 6,3
+*/
+
+
+
+
+/*
+task++(med)
+task--(pro,5)
+move++(con,6)
+move--(med,9)
+robots++
+robots--
+wait(3)
+end(182)
+*/
+
+
+/*
+task++(med)
+task--(pro,5)
+move++(con,6)
+move--(med,9)
+robots++
+robots++
+wait(10)
+end(122)
 */

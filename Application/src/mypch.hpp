@@ -9,6 +9,8 @@
 #include "Application/header/GameSave.hpp"
 #include "Application/header/ConstsMap.hpp"
 #include "Application/header/EAScript.hpp"
+#include "Application/ImGui/Window/RobotCreationWindow.hpp"
+#include "Application/ImGui/Window/TaskWindow.hpp"
 
 
 #include <vector>
