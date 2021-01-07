@@ -11,13 +11,29 @@
 [-lpthread -ldl -lglut -lGLU -lGL (-lm)] -> not used for now
 // Warning flags: -Wall -Wextra -Werror
  
+
+-> O que fazer agora?
+1. Fazer a mutação só alterar um parâmetro de cada indivído ao invés de alterar todos os parâmetros
+[OK]
+2. Fazer "log" com os parâmetros, fitness etc. de cada geração (salvando, ao finalizar , a melhor versão dos parâmetros do jogo). No futuro, usar isso para plotar gráficos e tabelas
+[]
+3. Fazer a função de cálculo do fitness (em evaluatePop)
+[]
+4. Testar diferentes métodos de seleção, variação da taxa de mutação, uso de genocídio e predação etc.
+[]
+5. Fazer geração com os melhores dos outros AGs
+[]
+6. Fazer o AGs gerar o arquivo de configuração com os parâmetros do jogo (em initializePop)
+[]
+
 */
-#include<stdlib.h>  /* srand, rand */
-#include<iostream>
+#include <stdlib.h>  /* srand, rand */
+#include <iostream>
+#include <fstream> // creating (.csv) files
 #include <vector>
-#include<cstring>
-#include <armadillo>
-// #include<unistd.h>
+#include <cstring>
+#include <armadillo> // http://arma.sourceforge.net/docs.html
+// #include <unistd.h>
 // #include <thread>   /* std::this_thread::sleep_for */
 // #include <chrono>   /* std::chrono::seconds */
 // #include <GL/glut.h> /* simple GUI + keyboard usage */
@@ -96,7 +112,7 @@ void crossover(int i, arma::rowvec parent1, arma::rowvec parent2) {
     // for(int j = 0; j < NB_PARAMETERS; j++){
     //     population[i][j] = (parent1[j] + parent2[j])/2.0;        
     // }
-    population.row(0) = (parent1 + parent2)/2.0;
+    population.row(i) = (parent1 + parent2)/2.0;
 
     return;
 }
@@ -222,31 +238,82 @@ void selection() { // tournament, elitism, roulette...
     // apenas um parâmetro aleatório desse indivíduo. 
     // Todavia, em alguns casos é interessante fazer a mutação em todos os parâmtros como 
     // está sendo feito aqui. É importante testar.
+
     // Mutation
-    arma::rowvec bestIndv = population.row(maxFitIndex);
 
-    arma::mat mutateMatrix(POPULATION_SIZE, NB_PARAMETERS, arma::fill::randu);
-    mutateMatrix = ((mutateMatrix * MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * mutationRate;
+    // Mutating all params from individuals
+    // arma::rowvec bestIndv = population.row(maxFitIndex);
 
-    population = population + mutateMatrix;
+    // arma::mat mutateMatrix(POPULATION_SIZE, NB_PARAMETERS, arma::fill::randu);
+    // mutateMatrix = ((mutateMatrix * MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * mutationRate;
 
-    population.row(maxFitIndex) = bestIndv;
-    population.transform( [](double x) { return ((x < 0 || x > MAX_PARAM_VALUE) ? abs(MAX_PARAM_VALUE-abs(x)) : x); } );
-    // for (int i = 0; i < POPULATION_SIZE; i++) { 
-    //     if (i == maxFitIndex)
-    //         continue; // don't mutate the best from last generation
+    // population = population + mutateMatrix;
 
-    //     for (int j = 0; j < NB_PARAMETERS; j++) {
-    //         population[i][j] += (((double) (rand() % MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * (mutationRate));
-
-    //         // esse if e else if estavam para fora
-    //         if (population[i][j] < 0)
-    //             population[i][j] += MAX_PARAM_VALUE;
-    //         else if (population[i][j] > MAX_PARAM_VALUE)
-    //             population[i][j] -= MAX_PARAM_VALUE;
-    //     }
-    // }
+    // population.row(maxFitIndex) = bestIndv;
+    // population.transform( [](double x) { return ((x < 0 || x > MAX_PARAM_VALUE) ? abs(MAX_PARAM_VALUE-abs(x)) : x); } );
     
+    // Mutating only one parameter from each individual
+    for (int i = 0; i < POPULATION_SIZE; i++) { 
+        if (i == maxFitIndex)
+            continue; // don't mutate the best from last generation
+
+        int mutateParamIndex = rand() % NB_PARAMETERS; // index of parameter that will be mutated
+        population(i, mutateParamIndex) += (((double) (rand() % MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * (mutationRate));
+
+        if (population(i, mutateParamIndex) < 0)
+            population(i, mutateParamIndex) += MAX_PARAM_VALUE;
+        else if (population(i, mutateParamIndex) > MAX_PARAM_VALUE)
+            population(i, mutateParamIndex) -= MAX_PARAM_VALUE;
+    }
+    
+    return;
+}
+
+// Initialize .csv file to sabe data from the EA
+// Creates the column's headers
+// generation, paramsIndv1, fitnessIndv1 ..., paramsIndvN, fitnessIndvN, bestParams, bestFitness
+void createCSV() {
+    std::ofstream csvFileWriter;
+
+    csvFileWriter.open("historyEA.csv");
+    if (!csvFileWriter.good()) {
+        std::cout << "[!] Error occurred while trying to create historyEA.csv!\n";
+        return;
+    }
+    
+    csvFileWriter << "generation,";
+    for (int i = 0; i < POPULATION_SIZE; i++)
+        csvFileWriter << "paramsIndv" << i << ",fitnessIndv" << i << ",";
+    csvFileWriter << "paramsBestIndv,fitnessBestIndv\n";
+}
+
+std::string formatParamsString(int indvIndex) {
+    std::string paramsFormated = "[ ";
+    for (int i = 0; i < NB_PARAMETERS; i++) {
+        paramsFormated += std::to_string(population(indvIndex, i));
+        paramsFormated += " ";
+    }
+    paramsFormated += "]";
+
+    return paramsFormated;
+}
+
+// Saves information about a generation in a .csv file
+// Information: generation, paramsIndv1, fitnessIndv1 ..., paramsIndvN, fitnessIndvN, bestParams, bestFitness
+void saveGenerationData(int generation) {
+    std::ofstream csvFileWriter;
+
+    csvFileWriter.open("historyEA.csv", std::ios_base::app); // append instead of overwrite
+    if (!csvFileWriter.good()) {
+        std::cout << "[!] Error occurred while trying to open historyEA.csv!\n";
+        return;
+    }
+    
+    csvFileWriter << generation << ",";
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        csvFileWriter << formatParamsString(i) << "," << fitness[i] << ",";
+    }
+    csvFileWriter << formatParamsString(maxFitIndex) << "," << maxFitness << "\n";
 }
 
 int main(int argc, char * argv[]) {
@@ -254,6 +321,7 @@ int main(int argc, char * argv[]) {
 
     system("clear");
     initializePop();
+    createCSV();
     int generationIndex = 0;
 
     while (true) {
@@ -261,6 +329,10 @@ int main(int argc, char * argv[]) {
         // population.print("Current population:");
         evaluatePop();
         selection();
+        
+        saveGenerationData(generationIndex);
+
         generationIndex++;
+        scanf("%*c");
     }
 }
