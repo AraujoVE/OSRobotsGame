@@ -12,6 +12,15 @@
 
 namespace Application
 {
+
+    struct RobotManagementCallbacks {
+        std::function<void(Task& createdTask)> onTaskCreatedFn;
+        std::function<void(Task& endedTask)> onTaskEnded;
+        std::function<void(int createdRobotsCount)> onRobotsCreatedFn;
+        std::function<void(int destroyedRobotsCount)> onRobotsDestroyedFn;
+        std::function<void(Task& affectedTask, int movedCount)> onRobotsMovedFn;
+    };
+
     class RobotsManagement
     {
     public:
@@ -28,6 +37,7 @@ namespace Application
         const int FREE_ROBOTS_INI;
         const int PROD_COST_INI;
 
+        RobotManagementCallbacks m_Callbacks;
 
         VillageStats *villageStats;
         std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
@@ -37,7 +47,6 @@ namespace Application
 
         void initializeAvenues();
         void changeRobotsNum (int type, int increase);
-        FunctionWindow **m_FunctionWindowArray;
 
     public:
         
@@ -52,6 +61,7 @@ namespace Application
         bool canRemoveRobots() const;
         bool canAddRobots() const;
 
+        void setCallbacks(RobotManagementCallbacks callbacks);
 
         const std::unordered_map<TaskID, Task*> &getTasks(RobotFunction function) const;
         Task &findTask(TaskID taskID) const;
@@ -61,13 +71,10 @@ namespace Application
         void setFreeRobots(int newFreeRobots);
         void setProdCost(int newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
-        void setFunctionWindowsArray(FunctionWindow **FunctionWindowArray);
         
-        // void setTasks(std::vector<std::unordered_map<int, Task>> *newTasks);
-
         bool createRobots(int);
         bool destroyRobots(int);
-        Task& createTask(RobotFunction);
+        bool createTask(RobotFunction);
         bool moveRobot(Task &, int);
 
         void tasksUp() const;

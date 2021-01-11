@@ -21,9 +21,7 @@ namespace Application
             ImGui::Text("Total Robot count: %d", m_RobotsManagement->getTotRobots());
             ImGui::Text("Free Robots: %d/%d", m_RobotsManagement->getFreeRobots() , m_RobotsManagement->getTotRobots());
 
-            //Third line
-
-            
+            //Third line            
             ImGui::Text("Production cost: %d", m_RobotsManagement->getProdCost());
 
             if (!canCreateRobot) {
@@ -47,4 +45,5 @@ namespace Application
         }
         ImGui::End();
     }
+
 } // namespace Application

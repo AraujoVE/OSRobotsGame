@@ -23,12 +23,11 @@ namespace Application
             unsigned medicine = m_VillageStatus->getStat((int) RobotFunction::MEDICINE);
             unsigned construction = m_VillageStatus->getStat((int) RobotFunction::CONSTRUCTION);
             unsigned resource_gathering = m_VillageStatus->getStat((int) RobotFunction::RESOURCE_GATHERING);
-            // unsigned stat1 = m_VillageStatus->getStat(1);
 
             ImGui::Begin("Status");
             {
                 ImGui::Text("Population: %d", population); ImGui::SameLine();
-                ImGui::Text("Protection: %d", protection);ImGui::SameLine();
+                ImGui::Text("Protection: %d", protection); ImGui::SameLine();
                 ImGui::Text("Hunt: %d", hunt); ImGui::SameLine();
                 ImGui::Text("Medicine: %d", medicine);ImGui::SameLine();
                 ImGui::Text("Construction: %d", construction); ImGui::SameLine();

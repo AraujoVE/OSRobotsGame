@@ -9,10 +9,11 @@ namespace Application
     {
     private:
         MyApplication *s_Instance = nullptr;
+        std::unique_ptr<EAScript> m_EAScript;
     public:
         MyApplication() : DampEngine::Application({"OSRobotGame"})
         {
-
+            
         }
 
         virtual void OnStart() override

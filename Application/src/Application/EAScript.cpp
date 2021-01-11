@@ -50,11 +50,13 @@ namespace Application{
 
 
     void EAScript::scriptFunct0(std::vector<std::string> params){
-        m_functionWindows[stoi(params.at(1))]->CreateTask();
+        m_gameSave.getRobotsManagement()->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
     }
 
     void EAScript::scriptFunct1(std::vector<std::string> params){
-        m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask().stop();
+        // m_gameSave.getRobotsManagement()->
+            // getTasks(static_cast<RobotFunction>(stoi(params.at(1)))).
+            // find(stoi(params.at(2)))->second->stop();
     }
 
     void EAScript::scriptFunct2(std::vector<std::string> params){

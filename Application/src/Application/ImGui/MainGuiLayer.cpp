@@ -20,16 +20,21 @@ namespace Application
         m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::PROTECTION);
         m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
 
-        gameSave.getRobotsManagement()->setFunctionWindowsArray(m_FunctionWindows);
-
         m_RobotCreationWindow = new RobotCreationWindow(gameSave.getRobotsManagement());
+
+        m_FunctionWindows[(int)RobotFunction::HUNT]->FeedCallbacks(m_RobotManagementCallbacks);
+        m_FunctionWindows[(int)RobotFunction::MEDICINE]->FeedCallbacks(m_RobotManagementCallbacks);
+        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->FeedCallbacks(m_RobotManagementCallbacks);
+        m_FunctionWindows[(int)RobotFunction::PROTECTION]->FeedCallbacks(m_RobotManagementCallbacks);
+        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->FeedCallbacks(m_RobotManagementCallbacks);
+
+        gameSave.getRobotsManagement()->setCallbacks(m_RobotManagementCallbacks);
 
         m_GameLost = false;
         m_GameLostReason = "You've lost, game over";
 
-        m_scriptLoop = new EAScript(m_GameSave,m_FunctionWindows,m_RobotCreationWindow,"gameScript.cfg");
+        m_scriptLoop = new EAScript(m_GameSave, m_FunctionWindows, m_RobotCreationWindow, "gameScript.cfg");
     }
-    
 
     void MainGuiLayer::ImGuiDescription()
     {
@@ -111,7 +116,8 @@ namespace Application
             for (int i = 0; i < FUNCTION_QTY; i++)
                 m_FunctionWindows[i]->ClearTaskWindows();
             m_GameSave.clear();
-            m_GameSave.getRobotsManagement()->setFunctionWindowsArray(m_FunctionWindows);
+
+            m_GameSave.getRobotsManagement()->setCallbacks(m_RobotManagementCallbacks);
         }
 
     }

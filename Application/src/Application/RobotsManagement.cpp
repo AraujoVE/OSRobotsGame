@@ -1,3 +1,4 @@
+#include "Application/header/RobotsManagement.hpp"
 #include "mypch.hpp"
 
 //Inicialização e destruição da classe
@@ -35,7 +36,6 @@ namespace Application
         freeRobots = FREE_ROBOTS_INI;
         prodCost = PROD_COST_INI;
         villageStats = NULL;
-        m_FunctionWindowArray = nullptr;
     }
 
     RobotsManagement::~RobotsManagement() {
@@ -88,6 +88,10 @@ namespace Application
     }
 
 
+    void RobotsManagement::setCallbacks(RobotManagementCallbacks callbacks) {
+        m_Callbacks = callbacks;
+    }
+
     int RobotsManagement::getProdCost() const
     {
         return prodCost;
@@ -137,10 +141,6 @@ namespace Application
         villageStats = newVillageStats;
     }
 
-    void RobotsManagement::setFunctionWindowsArray(FunctionWindow **functionWindowArray) {
-        m_FunctionWindowArray = functionWindowArray;
-    }
-
     bool RobotsManagement::createRobots(int no)
     {   
         int currentResources;
@@ -169,6 +169,8 @@ namespace Application
             VSResourcesAvenue->up();
         }
 
+        if (m_Callbacks.onRobotsCreatedFn != nullptr && hasCreated)
+            m_Callbacks.onRobotsCreatedFn(no);
 
         return hasCreated;
     }
@@ -192,12 +194,22 @@ namespace Application
         robotsAvenues[TOT_ROBOTS]->up();
         robotsAvenues[FREE_ROBOTS]->up();
 
+        if (m_Callbacks.onRobotsDestroyedFn != nullptr && hasDestroyed)
+            m_Callbacks.onRobotsDestroyedFn(no);
+
         return hasDestroyed;
     }
 
-    Task& RobotsManagement::createTask(RobotFunction funct)
+    bool RobotsManagement::createTask(RobotFunction funct)
     {   
         DE_TRACE("(RobotsManagement) createTask() ");
+
+
+        // //Ignora pedidos que lotariam a tela
+        // if (tasks[(int)funct].size() >= MAX_TASKS_PER_FUNCTION) {
+        //     DE_WARN("(RobotsManagement) Ignoring task creation request (limit of {0} exceeded)", MAX_TASKS_PER_FUNCTION);
+        //     return false;
+        // }
 
         //Cria nova task com o id Incrementado
         Task *newTask = new Task(funct, std::bind(&RobotsManagement::onTaskEnded, this, std::placeholders::_1));
@@ -208,7 +220,10 @@ namespace Application
 
         newTask->start();
 
-        return *newTask;
+        if (m_Callbacks.onTaskEnded != nullptr)
+            m_Callbacks.onTaskCreatedFn(*newTask);
+
+        return true;
     }
 
     void RobotsManagement::endTask(Task &task) {
@@ -231,14 +246,11 @@ namespace Application
             robotsAvenues[PROD_COST]->up();
         }
 
-
         villageStats->changeStat((int)endedTask.getType(), (int)endedTask.getGainedGoods());
 
-        DE_ASSERT(m_FunctionWindowArray != nullptr && m_FunctionWindowArray[(int)endedTask.getType()] != nullptr,
-         "FunctionWindowArray is not set");
+        if (m_Callbacks.onTaskEnded != nullptr)
+            m_Callbacks.onTaskEnded(endedTask);
         
-        if (m_FunctionWindowArray != nullptr && m_FunctionWindowArray[(int)endedTask.getType()] != nullptr)
-            m_FunctionWindowArray[(int)endedTask.getType()]->OnTaskEnded(endedTask);
     }
 
     bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)
@@ -264,6 +276,9 @@ namespace Application
             choosenTask.setRobotsNo(choosenTask.getRobotsNo() + robotsNo);
             
         robotsAvenues[FREE_ROBOTS]->up();
+
+        if (returnValue == true && m_Callbacks.onRobotsMovedFn != nullptr)
+            m_Callbacks.onRobotsMovedFn(choosenTask, robotsNo);
 
 
         return returnValue;
