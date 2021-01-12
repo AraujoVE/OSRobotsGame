@@ -31,7 +31,11 @@ namespace Application
 
         virtual void OnUpdate() override
         { 
-            
+            static int a = 0;
+            if (a++ > 100) {
+                a = 0;
+                m_GameSave->getRobotsManagement()->createTask(RobotFunction::HUNT);
+            }
         }
 
         virtual void OnStop() override

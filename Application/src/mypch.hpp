@@ -1,4 +1,5 @@
 #include <DampEngine.hpp>
+
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -9,7 +10,6 @@
 #include "Application/header/GameSave.hpp"
 #include "Application/header/ConstsMap.hpp"
 #include "Application/header/EAScript.hpp"
-#include "Application/header/RobotManagementCallbackProvider.hpp"
 #include "Application/ImGui/Window/RobotCreationWindow.hpp"
 #include "Application/ImGui/Window/TaskWindow.hpp"
 

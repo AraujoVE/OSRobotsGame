@@ -28,7 +28,5 @@ namespace Application
         StatusWindow* m_StatusWindow;
         FunctionWindow* m_FunctionWindows[FUNCTION_QTY];
         RobotCreationWindow* m_RobotCreationWindow;
-
-        RobotManagementCallbacks m_RobotManagementCallbacks;
     };
 } // namespace Application

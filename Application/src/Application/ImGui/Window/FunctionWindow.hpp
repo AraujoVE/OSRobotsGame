@@ -1,14 +1,13 @@
 #pragma once
 
 #include "IGWindow.hpp"
-#include "Application/header/RobotManagementCallbackProvider.hpp"
 
 namespace Application
 {
     class TaskWindow;
     class RobotsManagement;
 
-    class FunctionWindow final : public Application::IGWindow, public RobotManagementCallbackProvider
+    class FunctionWindow final : public Application::IGWindow
     {
     public:
         FunctionWindow(std::unique_ptr<RobotsManagement> &robotsManagement, RobotFunction function);
@@ -22,7 +21,7 @@ namespace Application
         TaskWindow * getTaskWindow(TaskID id);
 
 
-        virtual void FeedCallbacks(RobotManagementCallbacks callbacksObj) override;
+        virtual void SetEventHandlers(std::unique_ptr<RobotsManagement>& robotManagement);
     private:
 
     private:

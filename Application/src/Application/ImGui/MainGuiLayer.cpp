@@ -22,18 +22,17 @@ namespace Application
 
         m_RobotCreationWindow = new RobotCreationWindow(gameSave.getRobotsManagement());
 
-        m_FunctionWindows[(int)RobotFunction::HUNT]->FeedCallbacks(m_RobotManagementCallbacks);
-        m_FunctionWindows[(int)RobotFunction::MEDICINE]->FeedCallbacks(m_RobotManagementCallbacks);
-        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->FeedCallbacks(m_RobotManagementCallbacks);
-        m_FunctionWindows[(int)RobotFunction::PROTECTION]->FeedCallbacks(m_RobotManagementCallbacks);
-        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->FeedCallbacks(m_RobotManagementCallbacks);
-
-        gameSave.getRobotsManagement()->setCallbacks(m_RobotManagementCallbacks);
+        
+        m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameSave.getRobotsManagement());
+        m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameSave.getRobotsManagement());
+        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameSave.getRobotsManagement());
+        m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(gameSave.getRobotsManagement());
+        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameSave.getRobotsManagement());
 
         m_GameLost = false;
         m_GameLostReason = "You've lost, game over";
 
-        m_scriptLoop = new EAScript(m_GameSave, m_FunctionWindows, m_RobotCreationWindow, "gameScript.cfg");
+        // m_scriptLoop = new EAScript(m_GameSave, m_FunctionWindows, m_RobotCreationWindow, "gameScript.cfg");
     }
 
     void MainGuiLayer::ImGuiDescription()
@@ -117,7 +116,11 @@ namespace Application
                 m_FunctionWindows[i]->ClearTaskWindows();
             m_GameSave.clear();
 
-            m_GameSave.getRobotsManagement()->setCallbacks(m_RobotManagementCallbacks);
+            m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(m_GameSave.getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(m_GameSave.getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(m_GameSave.getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(m_GameSave.getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(m_GameSave.getRobotsManagement());
         }
 
     }

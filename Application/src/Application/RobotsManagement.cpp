@@ -87,10 +87,12 @@ namespace Application
         return canAdd;
     }
 
+    void RobotsManagement::setOnTaskCreated(EventHandler<bool(Task&)> *eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnTaskEnded(EventHandler<bool(Task&)> *eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnRobotsCreated(EventHandler<bool(int count)> *eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnRobotsDestroyed(EventHandler<bool(int count)> *eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnRobotsMoved(EventHandler<bool(Task& targetTask, int count)> *eHandler) { m_EventListener.Register(eHandler); }
 
-    void RobotsManagement::setCallbacks(RobotManagementCallbacks callbacks) {
-        m_Callbacks = callbacks;
-    }
 
     int RobotsManagement::getProdCost() const
     {
@@ -169,8 +171,8 @@ namespace Application
             VSResourcesAvenue->up();
         }
 
-        if (m_Callbacks.onRobotsCreatedFn != nullptr && hasCreated)
-            m_Callbacks.onRobotsCreatedFn(no);
+
+        m_EventListener.On<EH_RobotsCreated>(no);
 
         return hasCreated;
     }
@@ -194,22 +196,18 @@ namespace Application
         robotsAvenues[TOT_ROBOTS]->up();
         robotsAvenues[FREE_ROBOTS]->up();
 
-        if (m_Callbacks.onRobotsDestroyedFn != nullptr && hasDestroyed)
-            m_Callbacks.onRobotsDestroyedFn(no);
+        m_EventListener.On<EH_RobotsDestroyed>(no);
 
         return hasDestroyed;
     }
 
     bool RobotsManagement::createTask(RobotFunction funct)
     {   
-        DE_TRACE("(RobotsManagement) createTask() ");
-
-
-        // //Ignora pedidos que lotariam a tela
-        // if (tasks[(int)funct].size() >= MAX_TASKS_PER_FUNCTION) {
-        //     DE_WARN("(RobotsManagement) Ignoring task creation request (limit of {0} exceeded)", MAX_TASKS_PER_FUNCTION);
-        //     return false;
-        // }
+        //Ignora pedidos que lotariam a tela
+        if (tasks[(int)funct].size() >= RobotsManagement::MAX_TASKS_PER_FUNCTION) {
+            DE_WARN("(RobotsManagement) Ignoring task creation request (limit of {0} exceeded)", RobotsManagement::MAX_TASKS_PER_FUNCTION);
+            return false;
+        }
 
         //Cria nova task com o id Incrementado
         Task *newTask = new Task(funct, std::bind(&RobotsManagement::onTaskEnded, this, std::placeholders::_1));
@@ -220,21 +218,17 @@ namespace Application
 
         newTask->start();
 
-        if (m_Callbacks.onTaskEnded != nullptr)
-            m_Callbacks.onTaskCreatedFn(*newTask);
+        m_EventListener.On<EH_TaskCreated, Task&>(*newTask);
 
         return true;
     }
 
     void RobotsManagement::endTask(Task &task) {
-        DE_DEBUG("(RobotsManagement) Solicitada endtask()");
         task.stop();
     }
 
     void RobotsManagement::onTaskEnded(Task &endedTask)
     {
-        DE_DEBUG("(RobotsManagement) onTaskEnded()");
-
         int lostRobots = endedTask.calcLostRobots();
         moveRobot(endedTask, -1 * endedTask.getRobotsNo());
         destroyRobots(lostRobots);
@@ -248,9 +242,7 @@ namespace Application
 
         villageStats->changeStat((int)endedTask.getType(), (int)endedTask.getGainedGoods());
 
-        if (m_Callbacks.onTaskEnded != nullptr)
-            m_Callbacks.onTaskEnded(endedTask);
-        
+        m_EventListener.On<EH_TaskEnded, Task&>(endedTask);
     }
 
     bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)
@@ -275,10 +267,10 @@ namespace Application
         if (returnValue == true)
             choosenTask.setRobotsNo(choosenTask.getRobotsNo() + robotsNo);
             
-        robotsAvenues[FREE_ROBOTS]->up();
+        robotsAvenues[FREE_ROBOTS]->up(); 
 
-        if (returnValue == true && m_Callbacks.onRobotsMovedFn != nullptr)
-            m_Callbacks.onRobotsMovedFn(choosenTask, robotsNo);
+        if (returnValue == true)
+            m_EventListener.On<EH_RobotsMoved, Task&, int>(choosenTask, robotsNo);
 
 
         return returnValue;

@@ -57,17 +57,24 @@ namespace Application
             taskWindowPair.second->Render();
     }
 
-    void FunctionWindow::FeedCallbacks(RobotManagementCallbacks callbacksObj) {
-        callbacksObj.onTaskCreatedFn = [=](Task& createdTask) {
+    void FunctionWindow::SetEventHandlers(std::unique_ptr<RobotsManagement>& robotsManagement) {
+        RobotFunction thisFunction = m_Function;
+        robotsManagement->setOnTaskCreated(new EH_TaskCreated([=](Task& createdTask) {
+            if (createdTask.getType() != thisFunction) return false;
+
             auto taskCanceledCallback = std::bind(&RobotsManagement::endTask, m_RobotsManagement.get(), std::placeholders::_1);
             TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};
             TaskWindow *associatedWindow = new TaskWindow(associatedWindowProps, m_RobotsManagement, createdTask, taskCanceledCallback);
             m_TaskWindowMap.insert({createdTask.getId(), associatedWindow});
-        };
+            return true;
+        }));
 
-        callbacksObj.onTaskEnded = [=](Task& endedTask) {
+        robotsManagement->setOnTaskEnded(new EH_TaskEnded([=](Task& endedTask) {
+            if (endedTask.getType() != thisFunction) return false;
+
             this->OnTaskEnded(endedTask);
-        };
+            return true;
+        }));
     }
 
 

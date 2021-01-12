@@ -7,26 +7,19 @@
 #include "Avenue.hpp"
 #include <vector>
 #include "Application/ImGui/Window/FunctionWindow.hpp"
+#include "Application/Events/EventListener.hpp"
 
 #include <unordered_map>
 
 namespace Application
 {
 
-    struct RobotManagementCallbacks {
-        std::function<void(Task& createdTask)> onTaskCreatedFn;
-        std::function<void(Task& endedTask)> onTaskEnded;
-        std::function<void(int createdRobotsCount)> onRobotsCreatedFn;
-        std::function<void(int destroyedRobotsCount)> onRobotsDestroyedFn;
-        std::function<void(Task& affectedTask, int movedCount)> onRobotsMovedFn;
-    };
-
     class RobotsManagement
     {
     public:
         enum Robots_Values_Index {TOT_ROBOTS, FREE_ROBOTS, PROD_COST};
 
-        static const int MAX_TASKS_PER_FUNCTION = 5;
+        static constexpr int MAX_TASKS_PER_FUNCTION = 5;
 
     private:
         int totRobots;
@@ -37,8 +30,6 @@ namespace Application
         const int FREE_ROBOTS_INI;
         const int PROD_COST_INI;
 
-        RobotManagementCallbacks m_Callbacks;
-
         VillageStats *villageStats;
         std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
         Avenue *robotsAvenues[3];
@@ -47,6 +38,7 @@ namespace Application
 
         void initializeAvenues();
         void changeRobotsNum (int type, int increase);
+        EventListener m_EventListener;
 
     public:
         
@@ -61,7 +53,11 @@ namespace Application
         bool canRemoveRobots() const;
         bool canAddRobots() const;
 
-        void setCallbacks(RobotManagementCallbacks callbacks);
+        void setOnTaskCreated(EventHandler<bool(Task&)>*);
+        void setOnTaskEnded(EventHandler<bool(Task&)>*);
+        void setOnRobotsCreated(EventHandler<bool(int count)>*);
+        void setOnRobotsDestroyed(EventHandler<bool(int count)>*);
+        void setOnRobotsMoved(EventHandler<bool(Task& targetTask, int count)>*);
 
         const std::unordered_map<TaskID, Task*> &getTasks(RobotFunction function) const;
         Task &findTask(TaskID taskID) const;
