@@ -60,7 +60,7 @@ namespace DampEngine
 
     void LayerStack::PopOverlay(Layer *overlay)
     {
-        
+        //TODO: find remove
         overlay->Disable();
     }
 
@@ -73,7 +73,7 @@ namespace DampEngine
 
     void LayerStack::PopLayer(Layer *layer)
     {
-        
+        //TODO: find remove
         //m_OverlayStartIndex--;
         layer->Disable();
     }

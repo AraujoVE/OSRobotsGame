@@ -14,6 +14,8 @@ namespace Application
         using OnFinishedCallback = std::function<void(Task&)>;
 
     private:
+        OnFinishedCallback m_OnFinishedCallback;
+
         const int TIME_STEP;
         const int INIT_TIME_STEP;
         const int MAX_TIME_STEPS;
@@ -39,7 +41,6 @@ namespace Application
         int rewardMultiplier;
         float gainedGoods;
 
-        OnFinishedCallback m_OnFinishedCallback;
 
     public:
 

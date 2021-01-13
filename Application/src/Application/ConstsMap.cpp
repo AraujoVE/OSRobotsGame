@@ -4,11 +4,11 @@
 
 #include "mypch.hpp"
 
+
 namespace Application
 {
 
     std::unordered_map<std::string,float> ConstsMap::constsMap = {};
-
     void ConstsMap::initMapFromFile(const std::string &srcFile)
     {
         constsMap.clear();

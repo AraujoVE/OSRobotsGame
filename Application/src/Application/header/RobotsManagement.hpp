@@ -25,7 +25,7 @@ namespace Application
     private:
         int totRobots;
         int freeRobots;
-        int prodCost; 
+        int prodCost; //TODO: Implementation to change this value
         const float PROD_COST_INCREASE_TAX;
         const int TOT_ROBOTS_INI;
         const int FREE_ROBOTS_INI;

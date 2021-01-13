@@ -55,7 +55,7 @@ namespace Application
         initializeStats();
         initializeVSAvenues();
     
-        
+        //TODO: onGameStarted()
         pthread_create(&decayThread, NULL, runDecay, this);
 
         return;
@@ -198,6 +198,7 @@ namespace Application
                 decayStat(it,i);
             }
 
+            // DE_DEBUG("decayStats() Population = {0}", population);
             decayPopulation();
 
             avenueVS[POPULATION_INDEX]->up();
@@ -207,12 +208,14 @@ namespace Application
             if (ATTACK_FREQUENCY == 0) it = -1;
             else it = (it+1+ATTACK_FREQUENCY)%ATTACK_FREQUENCY;
 
+            //TODO: fixed time (adjusting for lag)
             usleep(DECAY_DELAY_MICRO);
         }
     }
 
     void VillageStats::decayResources(int,int,float&) 
-    {   
+    {
+        //TODO: AraujoVE ver oq é isso
         DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
     }
 

@@ -58,7 +58,7 @@ namespace Application
 
 
         int population; // if population reaches zero, the game is over -> pop calculated based on other village stats
-        
+        //TODO: Aumentar e Diminuir tamanho da população
 
         void initializeVSAvenues();
 
