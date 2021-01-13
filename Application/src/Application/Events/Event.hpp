@@ -26,6 +26,7 @@ namespace Application
         const std::string& GetType() { return m_Type; }
         static const std::string GetTypeStatic() { return "EventHandler"; }
         EventHandler(std::function<T> handler, std::string type) : m_Handler(handler), m_Type(type) {}
+        EventHandler(EventHandler&&) = default;
         friend class Dispatcher;
     };
 

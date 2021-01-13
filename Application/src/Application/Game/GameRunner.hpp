@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Application/Events/Events.fwd.hpp"
+// #include "Application/Events/Events.fwd.hpp"
 #include "Application/Game/GameSave.hpp"
 
 namespace Application
@@ -15,14 +15,14 @@ namespace Application
         GameRunner(std::shared_ptr<GameSave> gameSave);
         ~GameRunner();
 
-        void setOnGameStarted(EH_GameStarted *eventHandler);
-        void setOnGameEnded(EH_GameEnded *eventHandler);
+        void setOnGameStarted(void *eventHandler);
+        void setOnGameEnded(void *eventHandler);
 
         void Start();
         void Stop();
 
         void OnGameLost(const std::string& reason);
-        bool IsGameLost() const;
+        inline bool IsGameLost() const { return m_GameLost; };
 
         inline GameSave &GetSave() { return *m_GameSave.get(); } 
 

@@ -21,7 +21,7 @@ namespace Application
         void Save() const;
         void Reset();
 
-        std::unique_ptr<VillageStats> &getVillageStats(); 
-        std::unique_ptr<RobotsManagement> &getRobotsManagement();
+        std::unique_ptr<VillageStats> &GetVillageStats(); 
+        std::unique_ptr<RobotsManagement> &GetRobotsManagement();
     };
 } // namespace Application

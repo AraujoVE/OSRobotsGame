@@ -4,7 +4,7 @@
 #include "Application/Events/Events.hpp"
 #include "Application/Events/EventListener.hpp"
 
-// #include "mypch.hpp"
+#include "mypch.hpp"
 namespace Application
 {
     //PUBLIC:
@@ -24,15 +24,15 @@ namespace Application
         delete m_EventListener;
     }
 
-    void GameRunner::setOnGameStarted(EH_GameStarted *eventHandler) {} //m_EventListener.Register(eventHandler); }
-    void GameRunner::setOnGameEnded(EH_GameEnded *eventHandler) {}     //m_EventListener.Register(eventHandler); }
+    void GameRunner::setOnGameStarted(void *eventHandler) {} //m_EventListener.Register(eventHandler); }
+    void GameRunner::setOnGameEnded(void *eventHandler) {}   //m_EventListener.Register(eventHandler); }
 
     void GameRunner::Start()
     {
         if (m_GameRunning)
         {
-            // DE_CRITICAL("Trying to start the game 2 times in the same runner");
-            // std::raise(SIGINT);
+            DE_CRITICAL("Trying to start the game 2 times in the same runner");
+            std::raise(SIGINT);
             return;
         }
         m_GameRunning = true;
@@ -53,33 +53,38 @@ namespace Application
         Stop();
     }
 
-    inline bool GameRunner::IsGameLost() const { return m_GameLost; }
-
     //PRIVATE:
     void GameRunner::SetupGameOverConditions()
     {
-        auto &robotsManagement = *m_GameSave->getRobotsManagement().get();
-        auto &villageStats = *m_GameSave->getVillageStats().get();
+        auto &robotsManagement = *m_GameSave->GetRobotsManagement().get();
+        auto &villageStats = *m_GameSave->GetVillageStats().get();
 
-        robotsManagement.setOnRobotsDestroyed(new EH_RobotsDestroyed([=](int _) {
-            if (robotsManagement.getTotRobots() <= 0)
-            {
-                this->OnGameLost("No more robots available!");
-                return true;
-            }
+        EH_RobotsDestroyed *e = new EH_RobotsDestroyed([](int a){
+            DE_DEBUG("Callback working!!");
+            return true;
+        });
 
-            return false;
-        }));
+        robotsManagement.setOnRobotsDestroyed(e);
 
-        villageStats.setOnStatusDecayed(new EH_StatsDecayed([=]() {
-            if (villageStats.getPopulation() <= 0)
-            {
-                this->OnGameLost("Your population reached 0!");
-                return true;
-            }
+        // robotsManagement.setOnRobotsDestroyed(new EH_RobotsDestroyed([=](int _) {
+        //     if (robotsManagement.getTotRobots() <= 0)
+        //     {
+        //         this->OnGameLost("No more robots available!");
+        //         return true;
+        //     }
 
-            return false;
-        }));
+        //     return false;
+        // }));
+
+        // villageStats.setOnStatusDecayed(new EH_StatsDecayed([=]() {
+        //     if (villageStats.getPopulation() <= 0)
+        //     {
+        //         this->OnGameLost("Your population reached 0!");
+        //         return true;
+        //     }
+
+        //     return false;
+        // }));
     }
 
     void GameRunner::ResetSave()

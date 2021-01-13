@@ -4,6 +4,8 @@
 #include "Application/ImGui/GameGuiLayer.hpp"
 #include "Application/header/ConstsMap.hpp"
 
+#include <filesystem>
+
 namespace Application
 {
     class MyApplication : public DampEngine::Application
@@ -19,7 +21,8 @@ namespace Application
         virtual void OnStart() override
         {
             DE_INFO("OSRobotsGame starting");
-            ConstsMap::initMapFromFile("constValues.cfg");
+            auto  a =  std::filesystem::current_path();
+            ConstsMap::initMapFromFile( + "Application/config/constValues.cfg");
             m_GameSave.reset(new GameSave());
         }
 

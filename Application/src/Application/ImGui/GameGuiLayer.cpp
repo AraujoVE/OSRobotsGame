@@ -11,22 +11,22 @@ namespace Application
     GameGuiLayer::GameGuiLayer(GameSave &gameSave)
         : m_GameRunner(std::make_shared<GameSave>())
     {
-        m_StatusWindow = new StatusWindow(gameSave.getVillageStats());
+        m_StatusWindow = new StatusWindow(gameSave.GetVillageStats());
 
-        m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::HUNT);
-        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::MEDICINE);
-        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::CONSTRUCTION);
-        m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::PROTECTION);
-        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
+        m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::HUNT);
+        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::MEDICINE);
+        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::CONSTRUCTION);
+        m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::PROTECTION);
+        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
 
-        m_RobotCreationWindow = new RobotCreationWindow(gameSave.getRobotsManagement());
+        m_RobotCreationWindow = new RobotCreationWindow(gameSave.GetRobotsManagement());
 
         m_GameRunner.setOnGameStarted(new EH_GameStarted([=](GameRunner& gameRunner) {
-            m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
             return false;
         }));
 

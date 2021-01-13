@@ -17,6 +17,9 @@ namespace Application
         int tokenPos;
         float val;
         myFile.open(srcFile, std::ios::in);
+
+        DE_ASSERT(!myFile.fail(), "(ConstsMap) FAILED TO OPEN FILE  '" + srcFile + "'");
+
         std::string line, name;
         while (std::getline(myFile, line))
         {
@@ -30,6 +33,7 @@ namespace Application
     }
 
     float ConstsMap::getValue(const std::string &key){
+        DE_ASSERT(constsMap.find(key) != constsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key+"'");
         return constsMap[key];
     }
 

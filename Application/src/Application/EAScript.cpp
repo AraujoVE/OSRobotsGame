@@ -60,35 +60,35 @@ namespace Application{
     }
 
 
-    void EAScript::scriptFunct0(std::vector<std::string> params){
-        m_GameRunner.GetSave().getRobotsManagement()->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
+    void EAScript::scriptFunct0(const std::vector<std::string>& params){
+        m_GameRunner.GetSave().GetRobotsManagement()->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
     }
 
-    void EAScript::scriptFunct1(std::vector<std::string> params){
-        // m_GameRunner.GetSave().getRobotsManagement()->
+    void EAScript::scriptFunct1(const std::vector<std::string>& params){
+        // m_GameRunner.GetSave().GetRobotsManagement()->
             // getTasks(static_cast<RobotFunction>(stoi(params.at(1)))).
             // find(stoi(params.at(2)))->second->stop();
     }
 
-    void EAScript::scriptFunct2(std::vector<std::string> params){
+    void EAScript::scriptFunct2(const std::vector<std::string>& params){
         Task& curTask = m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask();
-        m_GameRunner.GetSave().getRobotsManagement()->moveRobot(curTask,1);
+        m_GameRunner.GetSave().GetRobotsManagement()->moveRobot(curTask,1);
     }
 
-    void EAScript::scriptFunct3(std::vector<std::string> params){
+    void EAScript::scriptFunct3(const std::vector<std::string>& params){
         Task& curTask = m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask();
-        m_GameRunner.GetSave().getRobotsManagement()->moveRobot(curTask,-1);
+        m_GameRunner.GetSave().GetRobotsManagement()->moveRobot(curTask,-1);
     }
 
-    void EAScript::scriptFunct4(std::vector<std::string> params){
-        m_GameRunner.GetSave().getRobotsManagement()->createRobots(1);
+    void EAScript::scriptFunct4(const std::vector<std::string>& params){
+        m_GameRunner.GetSave().GetRobotsManagement()->createRobots(1);
     }
 
-    void EAScript::scriptFunct5(std::vector<std::string> params){
-        m_GameRunner.GetSave().getRobotsManagement()->destroyRobots(1);        
+    void EAScript::scriptFunct5(const std::vector<std::string>& params){
+        m_GameRunner.GetSave().GetRobotsManagement()->destroyRobots(1);        
     }
 
-    void EAScript::scriptFunct6(std::vector<std::string> params){
+    void EAScript::scriptFunct6(const std::vector<std::string>& params){
         int waitTime = (std::stoi(params.at(1)) > 1 ? std::stoi(params.at(1)) - 1 : 0);
         usleep(waitTime*WAIT_UNIT);
     }

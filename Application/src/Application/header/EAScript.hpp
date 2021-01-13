@@ -24,17 +24,17 @@ namespace Application{
         public:
             EAScript(GameRunner&,FunctionWindow*[],RobotCreationWindow*,std::string);
             ~EAScript();
-            void scriptLoop();
             
-            void scriptFunct0(std::vector<std::string>);
-            void scriptFunct1(std::vector<std::string>);
-            void scriptFunct2(std::vector<std::string>);
-            void scriptFunct3(std::vector<std::string>);
-            void scriptFunct4(std::vector<std::string>);
-            void scriptFunct5(std::vector<std::string>);
-            void scriptFunct6(std::vector<std::string>);
+            void scriptFunct0(const std::vector<std::string>& params);
+            void scriptFunct1(const std::vector<std::string>& params);
+            void scriptFunct2(const std::vector<std::string>& params);
+            void scriptFunct3(const std::vector<std::string>& params);
+            void scriptFunct4(const std::vector<std::string>& params);
+            void scriptFunct5(const std::vector<std::string>& params);
+            void scriptFunct6(const std::vector<std::string>& params);
+            void scriptLoop();
 
-            void (EAScript::*scriptLoopFuncts[DIRECTIONS_SIZE])(std::vector<std::string>) = {
+            void (EAScript::*scriptLoopFuncts[DIRECTIONS_SIZE])(const std::vector<std::string>&) = {
                 &EAScript::scriptFunct0,
                 &EAScript::scriptFunct1,
                 &EAScript::scriptFunct2,
