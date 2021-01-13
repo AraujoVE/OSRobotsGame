@@ -6,31 +6,35 @@
 
 namespace Application
 {
-    class TaskWindow;
     class RobotsManagement;
 
-    class FunctionWindow final : public Application::IGWindow
+    namespace GameWindows
     {
-    public:
-        FunctionWindow(std::unique_ptr<RobotsManagement> &robotsManagement, RobotFunction function);
+        class TaskWindow;
 
-        virtual void Render() override;
+        class FunctionWindow final : public Application::IGWindow
+        {
+        public:
+            FunctionWindow(std::unique_ptr<Application::RobotsManagement> &robotsManagement, RobotFunction function);
 
-        void OnTaskEnded(Task& endedTask);
-        void OnTaskEnded(int id);
+            virtual void Render() override;
 
-        void ClearTaskWindows();
-        TaskWindow * getTaskWindow(TaskID id);
+            void OnTaskEnded(Task &endedTask);
+            void OnTaskEnded(int id);
 
+            void ClearTaskWindows();
+            TaskWindow *getTaskWindow(TaskID id);
 
-        virtual void SetEventHandlers(std::unique_ptr<RobotsManagement>& robotManagement);
-    private:
+            virtual void SetEventHandlers(std::unique_ptr<Application::RobotsManagement> &robotManagement);
 
-    private:
-        RobotFunction m_Function;
-        std::unique_ptr<RobotsManagement> &m_RobotsManagement;
-        std::unordered_map<TaskID, TaskWindow *> m_TaskWindowMap;
-        std::queue<TaskID> m_TasksPendingDeletion;
-        pthread_mutex_t m_MutexMapRemoval;
-    };
+        private:
+        private:
+            RobotFunction m_Function;
+            std::unique_ptr<Application::RobotsManagement> &m_RobotsManagement;
+            std::unordered_map<TaskID, TaskWindow *> m_TaskWindowMap;
+            std::queue<TaskID> m_TasksPendingDeletion;
+            pthread_mutex_t m_MutexMapRemoval;
+        };
+    } // namespace GameWindows
+
 } // namespace Application

@@ -2,6 +2,7 @@
 #include <DampEngine/Core/EntryPoint.hpp>
 
 #include "Application/ImGui/GameGuiLayer.hpp"
+#include "Application/ImGui/EAGameGuiLayer.hpp"
 #include "Application/header/ConstsMap.hpp"
 
 #include <filesystem>
@@ -27,8 +28,10 @@ namespace Application
 
         virtual void InitLayers() override
         {
-            m_MainGuiLayer = new GameGuiLayer();
-            m_LayerStack.PushOverlay(m_MainGuiLayer);
+            // m_GameGuiLayer = new GameGuiLayer();
+            // m_LayerStack.PushOverlay(m_GameGuiLayer);
+            m_EAGameGuiLayer = new EAGameGuiLayer();
+            m_LayerStack.PushOverlay(m_EAGameGuiLayer);
         }
 
         virtual void OnUpdate() override
@@ -41,7 +44,8 @@ namespace Application
         }
         
     private:
-        GameGuiLayer *m_MainGuiLayer;
+        GameGuiLayer *m_GameGuiLayer;
+        EAGameGuiLayer *m_EAGameGuiLayer;
     };
 
 } // namespace Application

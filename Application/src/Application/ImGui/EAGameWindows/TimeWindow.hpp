@@ -3,12 +3,12 @@
 #include "Application/header/VillageStats.hpp"
 
 #include "Application/ImGui/IGWindow.hpp"
-namespace Application::GameWindows
+namespace Application::EAGameWindows
 {
-    class StatusWindow final : IGWindow
+    class TimeWindow final : IGWindow
     {
     public:
-        StatusWindow(const std::unique_ptr<VillageStats>& villageStats)
+        TimeWindow(const std::unique_ptr<VillageStats>& villageStats)
             : m_VillageStatus(villageStats)
         {
         }

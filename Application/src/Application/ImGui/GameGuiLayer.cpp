@@ -6,6 +6,7 @@
 #include "Application/ImGui/GameWindows/StatusWindow.hpp"
 #include "Application/ImGui/GameWindows/RobotCreationWindow.hpp"
 
+using namespace Application::GameWindows;
 namespace Application
 {
     GameGuiLayer::GameGuiLayer()

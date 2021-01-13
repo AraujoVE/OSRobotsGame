@@ -5,9 +5,10 @@
 #include "Application/ImGui/GameWindows/TaskWindow.hpp"
 #include "Application/header/RobotsManagement.hpp"
 
-namespace Application
+using namespace Application;
+namespace Application::GameWindows
 {
-    FunctionWindow::FunctionWindow(std::unique_ptr<RobotsManagement> &robotsManagement, RobotFunction function)
+    FunctionWindow::FunctionWindow(std::unique_ptr<Application::RobotsManagement> &robotsManagement, RobotFunction function)
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize),
           m_Function(function), m_RobotsManagement(robotsManagement)
     {

@@ -12,7 +12,7 @@ namespace Application
     {
     }
 
-    GameRunner::GameRunner(std::shared_ptr<GameSave> gameSave)
+    GameRunner::GameRunner(const std::shared_ptr<GameSave>& gameSave)
     {
         m_GameSave = gameSave;
         m_GameRunning = false;
@@ -62,6 +62,11 @@ namespace Application
         Stop();
     }
 
+    void GameRunner::ResetSave()
+    {
+        m_GameSave->Reset();
+    }
+
     //PRIVATE:
     void GameRunner::SetupGameOverConditions()
     {
@@ -89,9 +94,6 @@ namespace Application
         }));
     }
 
-    void GameRunner::ResetSave()
-    {
-        m_GameSave->Reset();
-    }
+    
 
 } // namespace Application

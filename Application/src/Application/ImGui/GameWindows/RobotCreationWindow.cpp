@@ -4,7 +4,8 @@
 
 #include "mypch.hpp"
 
-namespace Application
+using namespace Application;
+namespace Application::GameWindows
 {
     void RobotCreationWindow::Render()
     {

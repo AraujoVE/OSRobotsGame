@@ -13,8 +13,7 @@ namespace Application
 
     public:
         GameRunner();
-        GameRunner(GameRunner&&) = default;
-        GameRunner(std::shared_ptr<GameSave> gameSave);
+        GameRunner(const std::shared_ptr<GameSave>& gameSave);
         ~GameRunner();
 
         void SetOnGameStarted(EH_GameStarted *eventHandler);
@@ -22,6 +21,7 @@ namespace Application
 
         void Start();
         void Stop();
+        void ResetSave();
 
         void OnGameLost(const std::string& reason);
         inline bool IsGameLost() const { return m_GameLost; };
@@ -31,7 +31,6 @@ namespace Application
 
     private:
         void SetupGameOverConditions();
-        void ResetSave();
     private:
         std::shared_ptr<GameSave> m_GameSave;
         EventListener *m_EventListener;

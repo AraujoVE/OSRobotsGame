@@ -105,13 +105,15 @@ namespace Application
         return tasks[(int)function];
     }
 
-    Task &RobotsManagement::findTask(TaskID taskID) const {
+    Task &RobotsManagement::findTask(TaskID taskID, RobotFunction functionHint) const {
+        DE_ASSERT(FUNCTION_QTY > 0);
+
         tasksDown();
 
-        for (int i = 0; i < FUNCTION_QTY; i++)
+        for (int i = (int)functionHint; i < FUNCTION_QTY + (int) functionHint; i++)
         {
-            auto searchRes = tasks[i].find(taskID);
-            if (searchRes != tasks[i].end()) {
+            auto searchRes = tasks[i%FUNCTION_QTY].find(taskID);
+            if (searchRes != tasks[i%FUNCTION_QTY].end()) {
                 tasksUp();
                 return *(Task*)searchRes->second;
             }

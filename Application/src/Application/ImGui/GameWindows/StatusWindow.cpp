@@ -2,7 +2,7 @@
 
 #include "mypch.hpp"
 
-namespace Application
+namespace Application::GameWindows
 {
 
 } // namespace Application

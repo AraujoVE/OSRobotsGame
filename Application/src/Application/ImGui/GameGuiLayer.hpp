@@ -9,14 +9,19 @@ namespace Application
 {
 
     class GameSave;
-    class StatusWindow;
-    class FunctionWindow;
-    class RobotCreationWindow;
+
+    namespace GameWindows
+    {
+        class StatusWindow;
+        class FunctionWindow;
+        class RobotCreationWindow;
+    } // namespace GameWindows
 
     class GameGuiLayer final : public ImGuiLayer
     {
     public:
         GameGuiLayer();
+
     private:
         virtual void ImGuiDescription() override;
 
@@ -26,8 +31,8 @@ namespace Application
 
         GameRunner m_GameRunner;
 
-        StatusWindow* m_StatusWindow;
-        FunctionWindow* m_FunctionWindows[FUNCTION_QTY];
-        RobotCreationWindow* m_RobotCreationWindow;
+        GameWindows::StatusWindow *m_StatusWindow;
+        GameWindows::FunctionWindow *m_FunctionWindows[FUNCTION_QTY];
+        GameWindows::RobotCreationWindow *m_RobotCreationWindow;
     };
 } // namespace Application

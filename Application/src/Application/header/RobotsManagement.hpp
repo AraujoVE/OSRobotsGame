@@ -61,7 +61,7 @@ namespace Application
         void setOnRobotsMoved(EH_RobotsMoved*);
 
         const std::unordered_map<TaskID, Task*> &getTasks(RobotFunction function) const;
-        Task &findTask(TaskID taskID) const;
+        Task &findTask(TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;
 
         void onTaskCompleted(TaskID completedTaskID);
         void setTotRobots(int newTotRobots);

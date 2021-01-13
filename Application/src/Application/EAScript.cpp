@@ -10,17 +10,13 @@
 
 
 #include "mypch.hpp"
+
+#define EAS_SRM (m_GameRunner.GetSave().GetRobotsManagement())
+#define EAS_SVS (m_GameRunner.GetSave().GetVillageStats())
+
 namespace Application{
-    EAScript::EAScript(GameRunner& gameRunner,FunctionWindow *functionWindows[FUNCTION_QTY],RobotCreationWindow *robotCreationWindow,std::string filePath): 
+    EAScript::EAScript(GameRunner& gameRunner, std::string filePath): 
         m_GameRunner(gameRunner),
-        m_functionWindows{
-            functionWindows[0],
-            functionWindows[1],
-            functionWindows[2],
-            functionWindows[3],
-            functionWindows[4]
-        },
-        m_robotCreationWindow(robotCreationWindow),
         srcFile(filePath)
     {
         initScriptDirections();
@@ -61,42 +57,39 @@ namespace Application{
 
 
     void EAScript::scriptFunct0(const std::vector<std::string>& params){
-        m_GameRunner.GetSave().GetRobotsManagement()->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
+        EAS_SRM->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
     }
 
     void EAScript::scriptFunct1(const std::vector<std::string>& params){
-        // m_GameRunner.GetSave().GetRobotsManagement()->
-            // getTasks(static_cast<RobotFunction>(stoi(params.at(1)))).
-            // find(stoi(params.at(2)))->second->stop();
+        auto &curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction) stoi(params.at(1)));
+        EAS_SRM->endTask(curTask);
     }
 
     void EAScript::scriptFunct2(const std::vector<std::string>& params){
-        Task& curTask = m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask();
-        m_GameRunner.GetSave().GetRobotsManagement()->moveRobot(curTask,1);
+        auto &curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction) stoi(params.at(1)));
+        EAS_SRM->moveRobot(curTask,1);
     }
 
     void EAScript::scriptFunct3(const std::vector<std::string>& params){
-        Task& curTask = m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask();
-        m_GameRunner.GetSave().GetRobotsManagement()->moveRobot(curTask,-1);
+        auto &curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction) stoi(params.at(1)));
+        EAS_SRM->moveRobot(curTask,-1);
     }
 
     void EAScript::scriptFunct4(const std::vector<std::string>& params){
-        m_GameRunner.GetSave().GetRobotsManagement()->createRobots(1);
+        EAS_SRM->createRobots(1);
     }
 
     void EAScript::scriptFunct5(const std::vector<std::string>& params){
-        m_GameRunner.GetSave().GetRobotsManagement()->destroyRobots(1);        
+        EAS_SRM->destroyRobots(1);        
     }
 
     void EAScript::scriptFunct6(const std::vector<std::string>& params){
         int waitTime = (std::stoi(params.at(1)) > 1 ? std::stoi(params.at(1)) - 1 : 0);
         usleep(waitTime*WAIT_UNIT);
     }
-    //TODO: Definir callback de jogo acabou
-    //TODO: Callbacks da UI para atualizar a parte gráfica
+
     //TODO: Jogo versão normal ou calibração
     //TODO: Velocidade dos segundos do jogo -> slider 
-    //TODO: Limitar Tasks
 
     void EAScript::scriptLoop(){
         time_t initTime,endTime;

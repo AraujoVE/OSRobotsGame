@@ -3,27 +3,32 @@
 #include "Application/ImGui/IGWindow.hpp"
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
 
+#include <memory>
 
 namespace Application
 {
+    struct EAGameScriptData {
+        
+    };
+
     class GameSave;
+    class GameRunner;
     class StatusWindow;
     class FunctionWindow;
     class RobotCreationWindow;
     class EAScript;
-    class EAGuiLayer final : public DampEngine::ImGuiLayer
+    class EAGameGuiLayer final : public DampEngine::ImGuiLayer
     {
     public:
-        EAGuiLayer(GameSave &gameSave);
+        EAGameGuiLayer(const std::shared_ptr<GameSave> &gameSave);
+        EAGameGuiLayer();
     private:
         virtual void ImGuiDescription() override;
 
     private:
-        void LostScreenDescription();
-        const char *m_GameLostReason; 
         const static int SCRIPT_FUNCT_SIZE = 7;
 
         EAScript* m_scriptLoop;
-        GameSave &m_GameSave;
+        std::unique_ptr<GameRunner> m_GameRunner;
     };
 } // namespace Application
