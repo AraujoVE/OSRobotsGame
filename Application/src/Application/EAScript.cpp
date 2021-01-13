@@ -1,7 +1,18 @@
+#include "Application/header/EAScript.hpp"
+#include "Application/ImGui/GameWindows/FunctionWindow.hpp"
+#include "Application/ImGui/GameWindows/TaskWindow.hpp"
+
+
+#include "Application/Game/GameRunner.hpp"
+#include "Application/Game/GameSave.hpp"
+
+#include "Application/header/RobotsManagement.hpp"
+
+
 #include "mypch.hpp"
 namespace Application{
-    EAScript::EAScript(GameSave& gameSave,FunctionWindow *functionWindows[FUNCTION_QTY],RobotCreationWindow *robotCreationWindow,std::string filePath): 
-        m_gameSave(gameSave),
+    EAScript::EAScript(GameRunner& gameRunner,FunctionWindow *functionWindows[FUNCTION_QTY],RobotCreationWindow *robotCreationWindow,std::string filePath): 
+        m_GameRunner(gameRunner),
         m_functionWindows{
             functionWindows[0],
             functionWindows[1],
@@ -50,31 +61,31 @@ namespace Application{
 
 
     void EAScript::scriptFunct0(std::vector<std::string> params){
-        m_gameSave.getRobotsManagement()->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
+        m_GameRunner.GetSave().getRobotsManagement()->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
     }
 
     void EAScript::scriptFunct1(std::vector<std::string> params){
-        // m_gameSave.getRobotsManagement()->
+        // m_GameRunner.GetSave().getRobotsManagement()->
             // getTasks(static_cast<RobotFunction>(stoi(params.at(1)))).
             // find(stoi(params.at(2)))->second->stop();
     }
 
     void EAScript::scriptFunct2(std::vector<std::string> params){
         Task& curTask = m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask();
-        m_gameSave.getRobotsManagement()->moveRobot(curTask,1);
+        m_GameRunner.GetSave().getRobotsManagement()->moveRobot(curTask,1);
     }
 
     void EAScript::scriptFunct3(std::vector<std::string> params){
         Task& curTask = m_functionWindows[stoi(params.at(1))]->getTaskWindow(stoi(params.at(2)))->getTask();
-        m_gameSave.getRobotsManagement()->moveRobot(curTask,-1);
+        m_GameRunner.GetSave().getRobotsManagement()->moveRobot(curTask,-1);
     }
 
     void EAScript::scriptFunct4(std::vector<std::string> params){
-        m_gameSave.getRobotsManagement()->createRobots(1);
+        m_GameRunner.GetSave().getRobotsManagement()->createRobots(1);
     }
 
     void EAScript::scriptFunct5(std::vector<std::string> params){
-        m_gameSave.getRobotsManagement()->destroyRobots(1);        
+        m_GameRunner.GetSave().getRobotsManagement()->destroyRobots(1);        
     }
 
     void EAScript::scriptFunct6(std::vector<std::string> params){

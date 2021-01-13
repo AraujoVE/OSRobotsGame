@@ -68,6 +68,7 @@
         "regex": "cpp",
         "iomanip": "cpp",
         "shared_mutex": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "csignal": "cpp"
     }
 }

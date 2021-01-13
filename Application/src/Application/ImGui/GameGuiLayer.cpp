@@ -1,17 +1,16 @@
-#include "MainGuiLayer.hpp"
+#include "Application/ImGui/GameGuiLayer.hpp"
 
 #include "mypch.hpp"
 
-#include "Application/ImGui/Window/FunctionWindow.hpp"
-#include "Application/ImGui/Window/StatusWindow.hpp"
-#include "Application/ImGui/Window/RobotCreationWindow.hpp"
+#include "Application/ImGui/GameWindows/FunctionWindow.hpp"
+#include "Application/ImGui/GameWindows/StatusWindow.hpp"
+#include "Application/ImGui/GameWindows/RobotCreationWindow.hpp"
 
 namespace Application
 {
-    MainGuiLayer::MainGuiLayer(GameSave &gameSave)
-        : m_GameSave(gameSave)
+    GameGuiLayer::GameGuiLayer(GameSave &gameSave)
+        : m_GameRunner(std::make_shared<GameSave>())
     {
-
         m_StatusWindow = new StatusWindow(gameSave.getVillageStats());
 
         m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(gameSave.getRobotsManagement(), RobotFunction::HUNT);
@@ -22,22 +21,23 @@ namespace Application
 
         m_RobotCreationWindow = new RobotCreationWindow(gameSave.getRobotsManagement());
 
-        
-        m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameSave.getRobotsManagement());
-        m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameSave.getRobotsManagement());
-        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameSave.getRobotsManagement());
-        m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(gameSave.getRobotsManagement());
-        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameSave.getRobotsManagement());
+        m_GameRunner.setOnGameStarted(new EH_GameStarted([=](GameRunner& gameRunner) {
+            m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameRunner.GetSave().getRobotsManagement());
+            return false;
+        }));
 
-        m_GameLost = false;
-        m_GameLostReason = "You've lost, game over";
+        m_GameRunner.Start();
 
         // m_scriptLoop = new EAScript(m_GameSave, m_FunctionWindows, m_RobotCreationWindow, "gameScript.cfg");
     }
 
-    void MainGuiLayer::ImGuiDescription()
+    void GameGuiLayer::ImGuiDescription()
     {
-        if (m_GameLost) {
+        if (m_GameRunner.IsGameLost()) {
             LostScreenDescription();
             return;
         }
@@ -59,15 +59,6 @@ namespace Application
         ImGui::End();
 
 
-        //void (Application::VillageStats::*mudarPop)(int,int) = &VillageStats::changeStat; 
-        /*
-        if(m_GameSave.getVillageStats()->getPopulation() < 100000){
-            std::cout << "Pop Increased by 500" << std::endl;
-            ((m_GameSave.getVillageStats().get())->*mudarPop)(5,500);
-            //m_GameSave.getVillageStats()->changeStat(5,100);
-        }
-        */
-
         for (int i = 0; i < FUNCTION_QTY; i++)
         {
             m_FunctionWindows[i]->Render();
@@ -75,19 +66,9 @@ namespace Application
 
         m_StatusWindow->Render();
         m_RobotCreationWindow->Render();
-
-        //Check if game is lost
-        if (m_GameSave.getVillageStats()->getPopulation() <= 0) {
-            m_GameLostReason = "Your population reached 0!!";
-            m_GameLost = true;
-        }
-        else if (m_GameSave.getRobotsManagement()->getTotRobots() <= 0) {
-            m_GameLostReason = "All your robots were destroyed!!";
-            m_GameLost = true;
-        }
     }
 
-    void MainGuiLayer::LostScreenDescription() {
+    void GameGuiLayer::LostScreenDescription() {
         bool restart, quit;
         const static auto xSize = 300u, ySize = 125u;
         ImGui::SetNextWindowPos(
@@ -98,7 +79,8 @@ namespace Application
         ImGui::SetNextWindowSize({xSize, ySize});
         ImGui::Begin("Game Over", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
-            ImGui::Text("%s", m_GameLostReason);
+            //TODO!!
+            ImGui::Text("%s", "TODO!! lost message");
 
             ImGui::Text("Do you want to play again?");
 
@@ -111,16 +93,10 @@ namespace Application
 
         if (quit) DampEngine::Application::GetCurrent().Stop();
         else if (restart) {
-            m_GameLost = false;
             for (int i = 0; i < FUNCTION_QTY; i++)
                 m_FunctionWindows[i]->ClearTaskWindows();
-            m_GameSave.clear();
 
-            m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(m_GameSave.getRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(m_GameSave.getRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(m_GameSave.getRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(m_GameSave.getRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(m_GameSave.getRobotsManagement());
+            m_GameRunner.Start();
         }
 
     }

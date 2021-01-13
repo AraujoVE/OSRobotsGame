@@ -1,6 +1,7 @@
 #pragma once
 
-#include "IGWindow.hpp"
+#include "Application/ImGui/IGWindow.hpp"
+
 
 #include <memory>
 

@@ -1,6 +1,8 @@
 #include "Application/header/RobotsManagement.hpp"
-#include "mypch.hpp"
 
+#include "Application/header/ConstsMap.hpp"
+
+#include "mypch.hpp"
 //Inicialização e destruição da classe
 namespace Application
 {
@@ -87,11 +89,11 @@ namespace Application
         return canAdd;
     }
 
-    void RobotsManagement::setOnTaskCreated(EventHandler<bool(Task&)> *eHandler) { m_EventListener.Register(eHandler); }
-    void RobotsManagement::setOnTaskEnded(EventHandler<bool(Task&)> *eHandler) { m_EventListener.Register(eHandler); }
-    void RobotsManagement::setOnRobotsCreated(EventHandler<bool(int count)> *eHandler) { m_EventListener.Register(eHandler); }
-    void RobotsManagement::setOnRobotsDestroyed(EventHandler<bool(int count)> *eHandler) { m_EventListener.Register(eHandler); }
-    void RobotsManagement::setOnRobotsMoved(EventHandler<bool(Task& targetTask, int count)> *eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnTaskCreated(EH_TaskCreated* eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnTaskEnded(EH_TaskEnded* eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnRobotsCreated(EH_RobotsCreated* eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnRobotsDestroyed(EH_RobotsDestroyed* eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnRobotsMoved(EH_RobotsMoved* eHandler) { m_EventListener.Register(eHandler); }
 
 
     int RobotsManagement::getProdCost() const

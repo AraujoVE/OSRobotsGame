@@ -2,7 +2,8 @@
 
 #include "mypch.hpp"
 
-#include "Application/ImGui/Window/TaskWindow.hpp"
+#include "Application/ImGui/GameWindows/TaskWindow.hpp"
+#include "Application/header/RobotsManagement.hpp"
 
 namespace Application
 {

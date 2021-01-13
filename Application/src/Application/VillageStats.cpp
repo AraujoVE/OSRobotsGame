@@ -1,3 +1,6 @@
+#include "Application/header/VillageStats.hpp"
+#include "Application/header/ConstsMap.hpp"
+
 #include "mypch.hpp"
 
 namespace Application
@@ -131,6 +134,7 @@ namespace Application
         reduction = adjustStatsLimits((int)RobotFunction::PROTECTION,reduction,inAttackVar,false);
 
         statTax = 1.0 - reduction*TAX_REDUCT;
+
     }
 
     //THIRD
@@ -196,8 +200,9 @@ namespace Application
 
             decayPopulation();
 
-
             avenueVS[POPULATION_INDEX]->up();
+
+            m_EventListener.On<EH_StatsDecayed>();
             
             if (ATTACK_FREQUENCY == 0) it = -1;
             else it = (it+1+ATTACK_FREQUENCY)%ATTACK_FREQUENCY;
@@ -207,8 +212,7 @@ namespace Application
     }
 
     void VillageStats::decayResources(int,int,float&) 
-    {
-        
+    {   
         DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
     }
 

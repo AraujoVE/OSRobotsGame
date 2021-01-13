@@ -1,12 +1,12 @@
 #pragma once
 
-#include "IGWindow.hpp"
-
-class Task;
-class RobotsManagement;
+#include "Application/ImGui/IGWindow.hpp"
+#include "Application/header/Task.hpp"
 
 namespace Application
 {
+    class RobotsManagement;
+
     struct TaskWindowProps
     {
 

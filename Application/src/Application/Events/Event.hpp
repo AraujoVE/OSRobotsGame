@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Application/header/Task.hpp"
 #include <functional>
-
-
 namespace Application
 {
     template <typename signature>

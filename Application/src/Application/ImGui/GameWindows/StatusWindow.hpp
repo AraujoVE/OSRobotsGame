@@ -2,7 +2,7 @@
 
 #include "Application/header/VillageStats.hpp"
 
-#include "IGWindow.hpp"
+#include "Application/ImGui/IGWindow.hpp"
 namespace Application
 {
     class StatusWindow final : IGWindow

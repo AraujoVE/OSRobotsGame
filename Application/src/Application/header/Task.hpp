@@ -46,6 +46,7 @@ namespace Application
         Task(RobotFunction funct, OnFinishedCallback onFinishedCallback);
         void initializeParameters(RobotFunction funct);
         ~Task();
+        Task(Task&&) = default;
 
         TaskID getId() const;
         RobotFunction getType() const;

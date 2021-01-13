@@ -6,8 +6,9 @@
 #include "VillageStats.hpp"
 #include "Avenue.hpp"
 #include <vector>
-#include "Application/ImGui/Window/FunctionWindow.hpp"
+#include "Application/ImGui/GameWindows/FunctionWindow.hpp"
 #include "Application/Events/EventListener.hpp"
+#include "Application/Events/Events.hpp"
 
 #include <unordered_map>
 
@@ -53,11 +54,11 @@ namespace Application
         bool canRemoveRobots() const;
         bool canAddRobots() const;
 
-        void setOnTaskCreated(EventHandler<bool(Task&)>*);
-        void setOnTaskEnded(EventHandler<bool(Task&)>*);
-        void setOnRobotsCreated(EventHandler<bool(int count)>*);
-        void setOnRobotsDestroyed(EventHandler<bool(int count)>*);
-        void setOnRobotsMoved(EventHandler<bool(Task& targetTask, int count)>*);
+        void setOnTaskCreated(EH_TaskCreated*);
+        void setOnTaskEnded(EH_TaskEnded*);
+        void setOnRobotsCreated(EH_RobotsCreated*);
+        void setOnRobotsDestroyed(EH_RobotsDestroyed*);
+        void setOnRobotsMoved(EH_RobotsMoved*);
 
         const std::unordered_map<TaskID, Task*> &getTasks(RobotFunction function) const;
         Task &findTask(TaskID taskID) const;

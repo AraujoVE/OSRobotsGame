@@ -3,15 +3,17 @@
 
 #include "RobotFunctions.hpp"
 #include "Avenue.hpp"
-
 #include <pthread.h>
+
+#include "Application/Events/EventListener.hpp"
+#include "Application/Events/Events.hpp"
 
 namespace Application
 {
     class VillageStats
     {
     private:
-
+        EventListener m_EventListener;
         bool m_MarkedForDeletion = false;
 
     public:
@@ -70,6 +72,7 @@ namespace Application
 
 
         void decayStat(int,int);
+        void setOnStatusDecayed(EH_StatsDecayed *eventHandler) { m_EventListener.Register(eventHandler); }
 
         void decayDefenses(int,int,float&);
         void decayFood(int,int,float&);

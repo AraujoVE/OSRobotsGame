@@ -1,6 +1,8 @@
 #pragma once
 
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
+#include "Application/Game/GameRunner.hpp"
+#include "Application/header/RobotFunctions.hpp"
 
 using namespace DampEngine;
 namespace Application
@@ -10,21 +12,20 @@ namespace Application
     class StatusWindow;
     class FunctionWindow;
     class RobotCreationWindow;
-    class MainGuiLayer final : public ImGuiLayer
+
+    class GameGuiLayer final : public ImGuiLayer
     {
     public:
-        MainGuiLayer(GameSave &gameSave);
+        GameGuiLayer(GameSave &gameSave);
     private:
         virtual void ImGuiDescription() override;
 
     private:
         void LostScreenDescription();
-        bool m_GameLost;
-        const char *m_GameLostReason; 
-        const static int SCRIPT_FUNCT_SIZE = 7;
+        const static int SCRIPT_FUNCT_SIZEE = 7;
 
-        EAScript* m_scriptLoop;
-        GameSave &m_GameSave;
+        GameRunner m_GameRunner;
+
         StatusWindow* m_StatusWindow;
         FunctionWindow* m_FunctionWindows[FUNCTION_QTY];
         RobotCreationWindow* m_RobotCreationWindow;

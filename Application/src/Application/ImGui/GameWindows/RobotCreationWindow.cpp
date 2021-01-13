@@ -1,5 +1,7 @@
 #include "RobotCreationWindow.hpp"
 
+#include "Application/header/RobotsManagement.hpp"
+
 #include "mypch.hpp"
 
 namespace Application
