@@ -16,7 +16,7 @@
 1. Fazer a mutação só alterar um parâmetro de cada indivído ao invés de alterar todos os parâmetros
 [OK]
 2. Fazer "log" com os parâmetros, fitness etc. de cada geração (salvando, ao finalizar , a melhor versão dos parâmetros do jogo). No futuro, usar isso para plotar gráficos e tabelas
-[]
+[OK]
 3. Fazer a função de cálculo do fitness (em evaluatePop)
 []
 4. Testar diferentes métodos de seleção, variação da taxa de mutação, uso de genocídio e predação etc.
@@ -41,7 +41,13 @@
 
 #define NB_PARAMETERS 10 // number of parameters that will be adjusted
 #define POPULATION_SIZE 20
+
 #define MAX_MUTATION_RATE 0.04 // 4%
+#define MUTATION_DECAY_RATIO 0.125 // mutation decays 12.5% at a time
+#define BEGIN_DECAY_THRESHOLD 50 // after how many generations without improvement the mutation starts to decay
+#define APPLY_DECAY_MODULE 15 // decay will be applied when the generation index % APPLY_DECAY_MODULE = 0
+
+#define APPLY_PREDATION_INTERVAL 10 // interval (in generations) to apply predation
 
 #define MAX_PARAM_VALUE 1 // max value a parameter can reach
 
@@ -52,8 +58,10 @@ arma::mat::fixed<POPULATION_SIZE, NB_PARAMETERS> population; // arma::mat : arma
 // Each LINE (ROW) is the individual's parameters
 double fitness[POPULATION_SIZE];
 double maxFitness = 0, minFitness = 2000000000;
-int maxFitIndex = -1;
+int maxFitIndex = -1, minFitIndex = -1;
 double mutationRate = MAX_MUTATION_RATE;
+int noImprovementGens = 0; // number of generations in a row without any improvement (best individual remains the same)
+int generationIndex = 0;
 
 
 // 1st step: initialize population
@@ -87,7 +95,7 @@ double * normalizeFitness() {
 void evaluatePop() {
     std::cout << "EVALUATING POPULATION\n";
 
-    // I don't know how the population will be evaluated yet...
+    noImprovementGens++; // we begin considering there was no improvement in the generation
 
     for (int i = 0; i < POPULATION_SIZE; i++) { 
         // example of fitness calculation -> CHANGE!!!!
@@ -96,14 +104,18 @@ void evaluatePop() {
         if (maxFitness < fitness[i]) { // searching for the  max fitnnes from new generation
             maxFitness = fitness[i];
             maxFitIndex = i;
+            noImprovementGens = 0; // this generation shows improvement -> reset counter
         }
-        else if (fitness[i] < minFitness)
+        else if (fitness[i] < minFitness) {
             minFitness = fitness[i];
+            minFitIndex = i;
+        }
 
         // printf("fitness[%d] %lf\n", i, fitness[i]);
     }
 
     printf("MAX FITNESS: %lf - INDEX: %d\n", maxFitness, maxFitIndex);
+    printf("MIN FITNESS: %lf - INDEX: %d\n", minFitness, minFitIndex);
 
     return;
 }
@@ -210,7 +222,7 @@ void roulette() {
 
 
 // 3rd step: selection + mutation and crossover
-void selection() { // tournament, elitism, roulette...
+void selectionAndMutation() { // tournament, elitism, roulette...
     std::cout << "SELECTION\n";
     /* 
     https://en.wikipedia.org/wiki/Selection_(genetic_algorithm)
@@ -316,21 +328,63 @@ void saveGenerationData(int generation) {
     csvFileWriter << formatParamsString(maxFitIndex) << "," << maxFitness << "\n";
 }
 
+void checkDoMutationDecay() {
+    if (noImprovementGens > BEGIN_DECAY_THRESHOLD) {
+        if (noImprovementGens % APPLY_DECAY_MODULE)
+            mutationRate -= mutationRate * MUTATION_DECAY_RATIO;
+    }
+    else {
+        mutationRate = MAX_MUTATION_RATE;
+    }
+
+    return;
+}
+
+// Function that will kill all individuals (but the best) to reset the population and generate new individuals (without biases)
+void checkDoPopReset() {
+    if (noImprovementGens > 200) {
+        std::cout << "APPLYING POPULATION RESET\n";
+        noImprovementGens = 0;
+
+        arma::rowvec best = population.row(maxFitIndex);
+
+        initializePop();
+        population.row(0) = best;
+    }
+
+    return;
+}
+
+// Function that will kill the worst individual each "APPLY_PREDATION_INTERVAL" number of generations
+void checkSoftRandomPredation() {
+    if (generationIndex % APPLY_PREDATION_INTERVAL) {
+        arma::rowvec newInd(NB_PARAMETERS, arma::fill::randu); // creating totally new individual
+        newInd = newInd * MAX_PARAM_VALUE;
+        
+        population.row(minFitIndex) = newInd;
+    }
+
+    return;
+}
+
 int main(int argc, char * argv[]) {
     srand(time(NULL));
 
     system("clear");
     initializePop();
     createCSV();
-    int generationIndex = 0;
 
     while (true) {
         std::cout << "\n==== Generation " << generationIndex << " ====\n";
         // population.print("Current population:");
         evaluatePop();
-        selection();
+        checkDoMutationDecay(); // applies decay to mutation rate if necessary
+        selectionAndMutation();
         
         saveGenerationData(generationIndex);
+
+        checkSoftRandomPredation(); // checks if a worst individual should be substituted (and substitutes it)
+        checkDoPopReset(); // checks if a "population reset" should be applied (and applies it)
 
         generationIndex++;
         scanf("%*c");
