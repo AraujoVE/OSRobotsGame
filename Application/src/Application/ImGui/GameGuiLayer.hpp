@@ -16,7 +16,7 @@ namespace Application
     class GameGuiLayer final : public ImGuiLayer
     {
     public:
-        GameGuiLayer(GameSave &gameSave);
+        GameGuiLayer();
     private:
         virtual void ImGuiDescription() override;
 

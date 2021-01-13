@@ -18,6 +18,7 @@ namespace Application
 {
     /*  ROBOTS MANAGEMENT EVENT HANDLERS  */
     DA_EVENT(EH_TaskCreated, bool(Task&));
+    DA_EVENT(EH_TaskCancelled, bool(Task&));
     DA_EVENT(EH_TaskEnded, bool(Task&));
     DA_EVENT(EH_RobotsCreated, bool(int));
     DA_EVENT(EH_RobotsDestroyed, bool(int));

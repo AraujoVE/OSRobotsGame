@@ -66,7 +66,9 @@ namespace Application
             auto taskCanceledCallback = std::bind(&RobotsManagement::endTask, m_RobotsManagement.get(), std::placeholders::_1);
             TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};
             TaskWindow *associatedWindow = new TaskWindow(associatedWindowProps, m_RobotsManagement, createdTask, taskCanceledCallback);
+
             m_TaskWindowMap.insert({createdTask.getId(), associatedWindow});
+
             return true;
         }));
 
@@ -84,6 +86,7 @@ namespace Application
         
         for (auto deletePair : m_TaskWindowMap)
         {
+            deletePair.second->GetTask().detach();
             DE_DEBUG("Deleting TaskWindow ID={0}, Index={1}, Function={2}", deletePair.first, deletePair.second->GetIndex(), getRobotFunctionString(deletePair.second->GetTask().getType()));
             delete deletePair.second;
         }

@@ -8,20 +8,20 @@
 
 namespace Application
 {
-    GameGuiLayer::GameGuiLayer(GameSave &gameSave)
+    GameGuiLayer::GameGuiLayer()
         : m_GameRunner(std::make_shared<GameSave>())
     {
-        m_StatusWindow = new StatusWindow(gameSave.GetVillageStats());
+        m_StatusWindow = new StatusWindow(m_GameRunner.GetSave().GetVillageStats());
 
-        m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::HUNT);
-        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::MEDICINE);
-        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::CONSTRUCTION);
-        m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::PROTECTION);
-        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(gameSave.GetRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
+        m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::HUNT);
+        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::MEDICINE);
+        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::CONSTRUCTION);
+        m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::PROTECTION);
+        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
 
-        m_RobotCreationWindow = new RobotCreationWindow(gameSave.GetRobotsManagement());
+        m_RobotCreationWindow = new RobotCreationWindow(m_GameRunner.GetSave().GetRobotsManagement());
 
-        m_GameRunner.setOnGameStarted(new EH_GameStarted([=](GameRunner& gameRunner) {
+        m_GameRunner.SetOnGameStarted(new EH_GameStarted([=](GameRunner& gameRunner) {
             m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
             m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
             m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
@@ -79,8 +79,8 @@ namespace Application
         ImGui::SetNextWindowSize({xSize, ySize});
         ImGui::Begin("Game Over", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
-            //TODO!!
-            ImGui::Text("%s", "TODO!! lost message");
+            ImGui::Text("Game Over");
+            ImGui::Text("%s", m_GameRunner.GetGameLostReason().c_str());
 
             ImGui::Text("Do you want to play again?");
 

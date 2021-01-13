@@ -9,49 +9,64 @@
 #include "Application/Game/GameRunner.hpp"
 #include "Application/header/Task.hpp"
 
+#include <pthread.h>
+
 namespace Application
 {
     typedef std::unique_ptr<void *> GenericEventHandlerPtr;
     typedef std::vector<GenericEventHandlerPtr> HandlerQueue;
     class EventListener
     {
+        pthread_mutex_t mapMutex;
         std::unordered_map<std::string, HandlerQueue> handlerQueueMap;
 
     public:
+        EventListener() {
+            pthread_mutex_init(&mapMutex, NULL);
+        }
+    
+        ~EventListener() {
+            pthread_mutex_destroy(&mapMutex);
+        }
+
         template <typename E, typename... Args>
         void On(Args... args)
         {
             const std::string eventType = E::GetTypeStatic();
-            std::unordered_map<std::string, Application::HandlerQueue>::const_iterator mapIt = handlerQueueMap.find(eventType);
-            if (mapIt == handlerQueueMap.end())
-                return; // No handlers registered
-
-            const HandlerQueue &queue = mapIt->second;
-            if (queue.empty())
-                return;
-
             bool eventConsumed = false;
 
-            for (auto handlerIt = queue.begin(); !eventConsumed && handlerIt != queue.end(); handlerIt++)
-            {
+            pthread_mutex_lock(&mapMutex);
+            do {
+                const HandlerQueue &queue = handlerQueueMap[eventType];
+                if (queue.empty()) {
+                    DE_WARN("Ignoring unimplemented Event: {0}", eventType);
+                    break;
+                }
 
-                void *genericEventHandler = *handlerIt->get();
-                E *eventHandler = (E *)genericEventHandler;
-                eventConsumed = eventHandler->m_Handler(args...);
 
-                //TODO: remove need for typename Args
-                // Dispatcher::Dispatch<E, Args...>(eventHandler, args...);
-            }
+                for (auto handlerIt = queue.begin(); !eventConsumed && handlerIt != queue.end(); handlerIt++)
+                {
 
-            if (!eventConsumed)
-                DE_WARN("Ignoring unconsumed event @EventListener.On(): {0}", eventType);
+                    void *genericEventHandler = *handlerIt->get();
+                    E *eventHandler = (E *)genericEventHandler;
+                    eventConsumed = eventHandler->m_Handler(args...);
+
+                    //TODO: remove need for typename Args
+                    // Dispatcher::Dispatch<E, Args...>(eventHandler, args...);
+                }
+            } while(false);
+
+
+            pthread_mutex_unlock(&mapMutex);
         }
 
         template <typename E>
         void Register(EventHandler<E> *eventHandler)
         {
             std::string eventType = eventHandler->GetType();
-            handlerQueueMap[eventType].push_back(std::make_unique<void *>((void *)eventHandler));
+            pthread_mutex_lock(&mapMutex);
+                handlerQueueMap[eventType].push_back(std::make_unique<void *>((void *)eventHandler));
+            pthread_mutex_unlock(&mapMutex);
         }
     };
 } // namespace Application

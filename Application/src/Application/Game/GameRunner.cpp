@@ -16,6 +16,7 @@ namespace Application
     {
         m_GameSave = gameSave;
         m_GameRunning = false;
+        m_GameLost = false;
         m_EventListener = new EventListener();
     }
 
@@ -24,76 +25,73 @@ namespace Application
         delete m_EventListener;
     }
 
-    void GameRunner::setOnGameStarted(void *eventHandler) {} //m_EventListener.Register(eventHandler); }
-    void GameRunner::setOnGameEnded(void *eventHandler) {}   //m_EventListener.Register(eventHandler); }
+    void GameRunner::SetOnGameStarted(EH_GameStarted *eventHandler) { m_EventListener->Register(eventHandler); }
+    void GameRunner::SetOnGameEnded(EH_GameEnded *eventHandler) { m_EventListener->Register(eventHandler); }
 
     void GameRunner::Start()
     {
-        if (m_GameRunning)
+        DE_ASSERT(!m_GameRunning, "Trying to start the game 2 times in the same runner");
+
+        if (m_GameLost)
         {
-            DE_CRITICAL("Trying to start the game 2 times in the same runner");
-            std::raise(SIGINT);
-            return;
+            ResetSave();
+            m_GameLost = false;
         }
+
         m_GameRunning = true;
-        m_GameLost = false;
+
+        m_GameSave->GetVillageStats()->startStatsDecayment();
 
         SetupGameOverConditions();
+        m_EventListener->On<EH_GameStarted, GameRunner &>(*this);
     }
 
     void GameRunner::Stop()
     {
+        DE_ASSERT(m_GameRunning, "Trying to stop a game that is not running");
+        
+        m_EventListener->On<EH_GameEnded, GameRunner &>(*this);
         m_GameRunning = false;
+        //TODO: stop village stats decayment
     }
 
     void GameRunner::OnGameLost(const std::string &reason)
     {
         m_GameLost = true;
-        ResetSave();
+        m_GameLostReason = reason;
         Stop();
     }
 
     //PRIVATE:
     void GameRunner::SetupGameOverConditions()
     {
-        auto &robotsManagement = *m_GameSave->GetRobotsManagement().get();
-        auto &villageStats = *m_GameSave->GetVillageStats().get();
+        auto *robotsManagement = m_GameSave->GetRobotsManagement().get();
+        auto *villageStats = m_GameSave->GetVillageStats().get();
 
-        EH_RobotsDestroyed *e = new EH_RobotsDestroyed([](int a){
-            DE_DEBUG("Callback working!!");
-            return true;
-        });
+        robotsManagement->setOnRobotsDestroyed(new EH_RobotsDestroyed([=](int _) {
+            if (robotsManagement->getTotRobots() <= 0 && !IsGameLost())
+            {
+                this->OnGameLost("No more robots available!");
+                return true;
+            }
 
-        robotsManagement.setOnRobotsDestroyed(e);
+            return false;
+        }));
 
-        // robotsManagement.setOnRobotsDestroyed(new EH_RobotsDestroyed([=](int _) {
-        //     if (robotsManagement.getTotRobots() <= 0)
-        //     {
-        //         this->OnGameLost("No more robots available!");
-        //         return true;
-        //     }
+        villageStats->setOnStatusDecayed(new EH_StatsDecayed([=]() {
+            if (villageStats->getPopulation() <= 0 && !IsGameLost())
+            {
+                this->OnGameLost("Your population reached 0!");
+                return true;
+            }
 
-        //     return false;
-        // }));
-
-        // villageStats.setOnStatusDecayed(new EH_StatsDecayed([=]() {
-        //     if (villageStats.getPopulation() <= 0)
-        //     {
-        //         this->OnGameLost("Your population reached 0!");
-        //         return true;
-        //     }
-
-        //     return false;
-        // }));
+            return false;
+        }));
     }
 
     void GameRunner::ResetSave()
     {
         m_GameSave->Reset();
-    }
-
-    void GameRunner::Tick()
-    {
     }
 
 } // namespace Application

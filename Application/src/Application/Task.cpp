@@ -127,43 +127,39 @@ namespace Application
     //TODO: Implmentar a criação e destruição da thread e como ela funciona
 
     void Task::threadLoop() {
-        DE_DEBUG("THREADLOOP INIT {0}", id);
         
         while (true) {
-            // DE_TRACE("Threadloop vive {0}", id);
-            if (!updateTask() || !m_Running) break;
+            if (!m_Running || !updateTask()) break;
             sleep(1);
         }
 
         DE_DEBUG("(Task) fim da thread {0}", id);
         try{
-            m_OnFinishedCallback(*this);
+            if (m_OnFinishedCallback != nullptr)
+                m_OnFinishedCallback(*this);
         } catch (const std::exception &e) {
-            DE_ERROR("Task::m_OnFinishedCallback exception emmitted an exception\n: {0}", e.what());
+            DE_ERROR("Task::m_OnFinishedCallback emmitted an exception\n: {0}", e.what());
         }
     }
 
     void Task::start() {
+        DE_TRACE("Starting Task #{0} (Function:{1})", id, getRobotFunctionString(type) );
         m_Running = true;
         pthread_create(&m_TaskThread, NULL, runThreadLoop, this);
     }
 
     void Task::stop() {
-        DE_DEBUG("(Task) Solicitada stop()");
-
+        DE_TRACE("Stopping Task #{0} (Function:{1})", id, getRobotFunctionString(type) );
         m_Running = false;
     }
 
     void Task::detach() {
-        DE_DEBUG("(Task) Solicitada stop()");
-
+        DE_TRACE("Detaching Task #{0} (Function:{1})", id, getRobotFunctionString(type));
         m_OnFinishedCallback = nullptr;
     }
 
-
     void *runThreadLoop(void *taskObject) {
         Task *task = (Task*)taskObject;
-        DE_DEBUG("PTHREAD START");
         task->threadLoop();
         return NULL;
     }

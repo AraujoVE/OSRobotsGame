@@ -54,9 +54,6 @@ namespace Application
         std::srand(std::time(nullptr)); // use current time as seed for random generator
         initializeStats();
         initializeVSAvenues();
-    
-        //TODO: onGameStarted()
-        pthread_create(&decayThread, NULL, runDecay, this);
 
         return;
     }
@@ -171,6 +168,10 @@ namespace Application
         if(population>maxPop) population = maxPop;
     }
 
+    void VillageStats::startStatsDecayment() {
+        pthread_create(&decayThread, NULL, runDecay, this);
+    }
+
     void VillageStats::decayStat(int it,int pos){
         avenueVS[pos]->down();
 
@@ -234,9 +235,9 @@ namespace Application
     VillageStats::~VillageStats() {
         m_MarkedForDeletion = true;
 
-        DE_DEBUG("IN: join @VillageStats::~VillageStats");
+        DE_DEBUG("Danger: joining decayThread... @VillageStats::~VillageStats");
         pthread_join(decayThread, NULL);
-        DE_DEBUG("OUT: join @VillageStats::~VillageStats");
+        DE_DEBUG("Success: decayThread ended @VillageStats::~VillageStats");
 
         
         for (int i = 0; i < BASE_STATS_NO+1; i++)

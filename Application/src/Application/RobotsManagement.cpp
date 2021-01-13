@@ -193,12 +193,13 @@ namespace Application
             totRobots -= no;
             freeRobots -= no;
             hasDestroyed = true;
-        }
+        } else DE_WARN("Trying to destroy {0} from {1} robots, ignoring...", no, totRobots);
         
         robotsAvenues[TOT_ROBOTS]->up();
         robotsAvenues[FREE_ROBOTS]->up();
 
-        m_EventListener.On<EH_RobotsDestroyed>(no);
+        if (hasDestroyed)
+            m_EventListener.On<EH_RobotsDestroyed>(no);
 
         return hasDestroyed;
     }
@@ -227,6 +228,8 @@ namespace Application
 
     void RobotsManagement::endTask(Task &task) {
         task.stop();
+
+        m_EventListener.On<EH_TaskCancelled, Task&>(task);
     }
 
     void RobotsManagement::onTaskEnded(Task &endedTask)
@@ -241,7 +244,6 @@ namespace Application
             prodCost = (int)((float)prodCost * increase);
             robotsAvenues[PROD_COST]->up();
         }
-
         villageStats->changeStat((int)endedTask.getType(), (int)endedTask.getGainedGoods());
 
         m_EventListener.On<EH_TaskEnded, Task&>(endedTask);
@@ -250,7 +252,7 @@ namespace Application
     bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)
     {   
         if (!robotsNo)
-            return true; //If no robots are add or removed, nothing to do
+            return true; //If no robots are added or removed, nothing to do
         
         bool returnValue = true;
 

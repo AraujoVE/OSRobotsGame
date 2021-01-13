@@ -21,19 +21,18 @@ namespace Application
         virtual void OnStart() override
         {
             DE_INFO("OSRobotsGame starting");
-            auto  a =  std::filesystem::current_path();
-            ConstsMap::initMapFromFile( + "Application/config/constValues.cfg");
-            m_GameSave.reset(new GameSave());
+            auto cwd =  std::filesystem::current_path();
+            ConstsMap::initMapFromFile(cwd.concat("/Application/config/constValues.cfg"));
         }
 
         virtual void InitLayers() override
         {
-            m_MainGuiLayer = new GameGuiLayer(*m_GameSave.get());
+            m_MainGuiLayer = new GameGuiLayer();
             m_LayerStack.PushOverlay(m_MainGuiLayer);
         }
 
         virtual void OnUpdate() override
-        { 
+        {
         }
 
         virtual void OnStop() override
@@ -42,7 +41,6 @@ namespace Application
         }
         
     private:
-        std::unique_ptr<GameSave> m_GameSave;
         GameGuiLayer *m_MainGuiLayer;
     };
 

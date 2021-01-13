@@ -70,6 +70,7 @@ namespace Application
         float calcRatio(int);
         float adjustStatsLimits(int,float,float,bool);
 
+        void startStatsDecayment();
 
         void decayStat(int,int);
         void setOnStatusDecayed(EH_StatsDecayed *eventHandler) { m_EventListener.Register(eventHandler); }
