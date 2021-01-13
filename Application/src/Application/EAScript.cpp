@@ -62,7 +62,7 @@ namespace Application{
 
     void EAScript::scriptFunct1(const std::vector<std::string>& params){
         auto &curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction) stoi(params.at(1)));
-        EAS_SRM->endTask(curTask);
+        EAS_SRM->cancelTask(curTask);
     }
 
     void EAScript::scriptFunct2(const std::vector<std::string>& params){

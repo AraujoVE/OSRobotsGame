@@ -70,6 +70,7 @@
         "shared_mutex": "cpp",
         "*.rh": "cpp",
         "csignal": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "*.inc": "cpp"
     }
 }

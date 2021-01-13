@@ -32,8 +32,6 @@ namespace Application
         }));
 
         m_GameRunner.Start();
-
-        // m_scriptLoop = new EAScript(m_GameSave, m_FunctionWindows, m_RobotCreationWindow, "gameScript.cfg");
     }
 
     void GameGuiLayer::ImGuiDescription()

@@ -1,36 +1,53 @@
 #ifndef TASK
 #define TASK
 
-#include "RobotFunctions.hpp"
-#include <functional>
+#include "Application/header/RobotFunctions.hpp"
+#include "Application/Events/EventListener.hpp"
+
+#include "Application/Threads/ThreadLoop.hpp"
 
 namespace Application
 {
-    using TaskID = unsigned long int;
 
-    class Task
+    class Task final
     {
     public:
-        using OnFinishedCallback = std::function<void(Task&)>;
+        Task(RobotFunction funct);
+        ~Task();
+        Task(Task &&) = default;
 
+        using TaskID = unsigned long int;
+
+        inline TaskID GetID() const { return id; }
+        inline RobotFunction GetRobotFunction() const { return function; }
+
+        inline int GetRobotsNo() const { return robotsNo; }
+        inline int GetCurProgress() const { return curProgress; }
+        inline int GetProgressLength() const { return progressLength; }
+
+        inline time_t GetRemainingTime() const { return remainingTime; }
+        inline float GetGainedGoods() const { return gainedGoods; }
+
+        inline int GetAvgReward() const { return AVG_REWARD; }
+        inline time_t GetLastUpdate() const { return lastUpdateTime; }
     private:
-        OnFinishedCallback m_OnFinishedCallback;
+        EventListener m_EventListener;
 
-        const int TIME_STEP;
+        int TIME_STEP;
         const int INIT_TIME_STEP;
         const int MAX_TIME_STEPS;
         const int MIN_REWARD;
         const int REWARD_RANGE;
         const float FAILURE_TAX;
-        const int AVG_REWARD = (int)(((float)TIME_STEP)*((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0)/2.0)*((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0)/2.0));
+        const int AVG_REWARD = (int)(((float)TIME_STEP) * ((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0) / 2.0) * ((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0) / 2.0));
 
         static TaskID s_NextID;
 
-        pthread_t m_TaskThread;
+        ThreadLoop m_ThreadLoop;
         bool m_Running;
-            
-        int id;
-        RobotFunction type;
+
+        const int id;
+        const RobotFunction function;
         int robotsNo;
         int progressLength;
         int curProgress;
@@ -41,36 +58,24 @@ namespace Application
         int rewardMultiplier;
         float gainedGoods;
 
-
-    public:
-
-        Task(RobotFunction funct, OnFinishedCallback onFinishedCallback);
-        void initializeParameters(RobotFunction funct);
-        ~Task();
-        Task(Task&&) = default;
-
-        TaskID getId() const;
-        RobotFunction getType() const;
-        int getRobotsNo() const;
-        int getProgressLength() const;
-        int getCurProgress() const;
-        time_t getLastUpdate() const;
-        time_t getRemainingTime() const;
-        float getGainedGoods() const;
-        int getAvgReward() const;
+    private:
 
         void setRobotsNo(int newRobotsNo);
-        bool updateTask();
+        void UpdateTask();
+        inline bool IsTaskCompleted() { return remainingTime == 0; }
 
-        int calcLostRobots();
+        int CalcLostRobots();
 
-        void threadLoop();
-        void start();
-        void stop();
+        void Start();
+        void Cancel();
+        void MarkAsIgnored();
 
-        void detach();
+
+        bool OnThreadLoopStarted();
+        bool OnThreadLoopEnded(ThreadEndedReason::ThreadEndedReason_t reason);
+
+
+        friend class RobotsManagement;
     };
-
-    void *runThreadLoop(void *taskObject);
 } // namespace Application
 #endif

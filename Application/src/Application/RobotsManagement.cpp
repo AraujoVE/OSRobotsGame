@@ -101,11 +101,11 @@ namespace Application
         return prodCost;
     }
 
-    inline const std::unordered_map<TaskID, Task*> &RobotsManagement::getTasks(RobotFunction function) const {
+    inline const std::unordered_map<Task::TaskID, Task*> &RobotsManagement::getTasks(RobotFunction function) const {
         return tasks[(int)function];
     }
 
-    Task &RobotsManagement::findTask(TaskID taskID, RobotFunction functionHint) const {
+    Task &RobotsManagement::findTask(Task::TaskID taskID, RobotFunction functionHint) const {
         DE_ASSERT(FUNCTION_QTY > 0);
 
         tasksDown();
@@ -215,45 +215,53 @@ namespace Application
         }
 
         //Cria nova task com o id Incrementado
-        Task *newTask = new Task(funct, std::bind(&RobotsManagement::onTaskEnded, this, std::placeholders::_1));
+        Task *newTask = new Task(funct);
+
+        newTask->m_EventListener.Register(new EH_TaskEnded(std::bind(&RobotsManagement::onTaskEnded, this, std::placeholders::_1)));
 
         tasksDown();
-        tasks[(int)funct][newTask->getId()] = newTask;
+        tasks[(int)funct][newTask->GetID()] = newTask;
         tasksUp();
 
-        newTask->start();
+        auto *el = &m_EventListener;
+        newTask->m_EventListener.Register(new EH_TaskStarted([=](Task& task){
+            el->On<EH_TaskStarted, Task&>(task);
+            return false;
+        }));
 
         m_EventListener.On<EH_TaskCreated, Task&>(*newTask);
+        newTask->Start();
 
         return true;
     }
 
-    void RobotsManagement::endTask(Task &task) {
-        task.stop();
+    void RobotsManagement::cancelTask(Task &task) {
+        task.Cancel();
 
         m_EventListener.On<EH_TaskCancelled, Task&>(task);
     }
 
-    void RobotsManagement::onTaskEnded(Task &endedTask)
+    bool RobotsManagement::onTaskEnded(Task &endedTask)
     {
-        int lostRobots = endedTask.calcLostRobots();
-        moveRobot(endedTask, -1 * endedTask.getRobotsNo());
+        int lostRobots = endedTask.CalcLostRobots();
+        moveRobot(endedTask, -1 * endedTask.GetRobotsNo());
         destroyRobots(lostRobots);
 
-        if(endedTask.getType() == RobotFunction::RESOURCE_GATHERING){
+        if(endedTask.GetRobotFunction() == RobotFunction::RESOURCE_GATHERING){
             robotsAvenues[PROD_COST]->down();
-            float increase = 1.0 + PROD_COST_INCREASE_TAX*(endedTask.getGainedGoods()/(float)endedTask.getAvgReward()) ;
+            float increase = 1.0 + PROD_COST_INCREASE_TAX*(endedTask.GetGainedGoods()/(float)endedTask.GetAvgReward()) ;
             prodCost = (int)((float)prodCost * increase);
             robotsAvenues[PROD_COST]->up();
         }
-        villageStats->changeStat((int)endedTask.getType(), (int)endedTask.getGainedGoods());
+        villageStats->changeStat((int)endedTask.GetRobotFunction(), (int)endedTask.GetGainedGoods());
 
         m_EventListener.On<EH_TaskEnded, Task&>(endedTask);
+        return true;
     }
 
     bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)
     {   
-        if (!robotsNo)
+        if (robotsNo == 0)
             return true; //If no robots are added or removed, nothing to do
         
         bool returnValue = true;
@@ -262,16 +270,16 @@ namespace Application
 
         if (robotsNo > 0 && freeRobots < robotsNo)
             returnValue = false; // Can't add robots to a task if there are not enough free robots
-        else if (robotsNo < 0 && choosenTask.getRobotsNo() + robotsNo < 0)
+        else if (robotsNo < 0 && choosenTask.GetRobotsNo() + robotsNo < 0)
             returnValue = false; //Can't remove robots from a task if there are not enough robots in the given task
-        else if (tasks[(int)choosenTask.getType()].find(choosenTask.getId()) == tasks[(int)choosenTask.getType()].end())
+        else if (tasks[(int)choosenTask.GetRobotFunction()].find(choosenTask.GetID()) == tasks[(int)choosenTask.GetRobotFunction()].end())
             returnValue = false; //Can't move or remove robots from an inexistent task.
         else
             freeRobots -= robotsNo;
 
         //Add or remove a robot from a given task
         if (returnValue == true)
-            choosenTask.setRobotsNo(choosenTask.getRobotsNo() + robotsNo);
+            choosenTask.setRobotsNo(choosenTask.GetRobotsNo() + robotsNo);
             
         robotsAvenues[FREE_ROBOTS]->up(); 
 

@@ -32,7 +32,7 @@ namespace Application
         const int PROD_COST_INI;
 
         VillageStats *villageStats;
-        std::unordered_map<TaskID, Task*> tasks[FUNCTION_QTY];
+        std::unordered_map<Task::TaskID, Task*> tasks[FUNCTION_QTY];
         Avenue *robotsAvenues[3];
         pthread_t consumers[3];
         pthread_mutex_t tasksMutex;
@@ -60,10 +60,10 @@ namespace Application
         void setOnRobotsDestroyed(EH_RobotsDestroyed*);
         void setOnRobotsMoved(EH_RobotsMoved*);
 
-        const std::unordered_map<TaskID, Task*> &getTasks(RobotFunction function) const;
-        Task &findTask(TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;
+        const std::unordered_map<Task::TaskID, Task*> &getTasks(RobotFunction function) const;
+        Task &findTask(Task::TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;
 
-        void onTaskCompleted(TaskID completedTaskID);
+        void onTaskCompleted(Task::TaskID completedTaskID);
         void setTotRobots(int newTotRobots);
         void setFreeRobots(int newFreeRobots);
         void setProdCost(int newProdCost);
@@ -77,8 +77,8 @@ namespace Application
         void tasksUp() const;
         void tasksDown() const;
         
-        void endTask(Task &);
-        void onTaskEnded(Task &);
+        void cancelTask(Task &);
+        bool onTaskEnded(Task &);
     };
 } // namespace Application
 #endif

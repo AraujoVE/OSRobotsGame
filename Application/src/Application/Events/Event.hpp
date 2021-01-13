@@ -1,6 +1,14 @@
 #pragma once
 
 #include <functional>
+
+#define DA_EVENT(name, signature) \
+    class name: public EventHandler<signature> { \
+    public: \
+        name(std::function<signature> handler): EventHandler::EventHandler(handler, #name ) {} \
+        static const std::string GetTypeStatic() { return #name; } \
+    };
+
 namespace Application
 {
     template <typename signature>

@@ -12,7 +12,7 @@ namespace Application::GameWindows
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings),
           m_TaskWindowProps(taskWindowProps),
           m_RobotsManagement(robotsManagement), m_Task(task),
-          m_WindowName(std::string("Task_") + std::to_string(task.getId())),
+          m_WindowName(std::string("Task_") + std::to_string(task.GetID())),
           m_OnTaskCancelledFn(onTaskCancelledFn)
     {
         UpdateProps();
@@ -34,15 +34,15 @@ namespace Application::GameWindows
             cancelIssued = ImGui::Button("x");
 
             //Second line
-            ImGui::Text("Robot count: %d", m_Task.getRobotsNo());
+            ImGui::Text("Robot count: %d", m_Task.GetRobotsNo());
 
             //Third line
             deltaRobots += -ImGui::ButtonEx("-", {0,0}, ImGuiButtonFlags_Repeat);
             ImGui::SameLine(30);
             deltaRobots += +ImGui::ButtonEx("+", {0,0}, ImGuiButtonFlags_Repeat);
             ImGui::SameLine(110);
-            ImGui::Text("Goods: %.2f", m_Task.getGainedGoods());
-            time_t remainingTime = m_Task.getRemainingTime();
+            ImGui::Text("Goods: %.2f", m_Task.GetGainedGoods());
+            time_t remainingTime = m_Task.GetRemainingTime();
 
             const char *endTimeStr = "--";
             if (remainingTime >= 0) {
@@ -58,7 +58,7 @@ namespace Application::GameWindows
         if (cancelIssued)
         {
             //This callback destroys the current object
-            DE_DEBUG("(click) Pedindo para parar task {0}", m_Task.getId());
+            DE_DEBUG("(click) Pedindo para parar task {0}", m_Task.GetID());
             m_OnTaskCancelledFn(m_Task);
             return;
         }
@@ -71,7 +71,7 @@ namespace Application::GameWindows
     {
         constexpr static float padding = 0;
 
-        m_WindowName = std::string("Task (") + getRobotFunctionString(m_Task.getType()) + ") #" + std::to_string(m_Task.getId());  
+        m_WindowName = std::string("Task (") + getRobotFunctionString(m_Task.GetRobotFunction()) + ") #" + std::to_string(m_Task.GetID());  
 
         DE_ASSERT(m_TaskWindowProps.ParentProps.size.y >= padding, "Padding is greater than root window size");
 
@@ -87,10 +87,6 @@ namespace Application::GameWindows
         m_WindowProps = {
             {xPos, yPos},
             {xSize, ySize}};
-    }
-
-    Task& TaskWindow::getTask(){
-        return m_Task;
     }
 
 } // namespace Application

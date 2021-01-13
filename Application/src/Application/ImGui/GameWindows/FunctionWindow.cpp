@@ -62,19 +62,19 @@ namespace Application::GameWindows
     void FunctionWindow::SetEventHandlers(std::unique_ptr<RobotsManagement>& robotsManagement) {
         RobotFunction thisFunction = m_Function;
         robotsManagement->setOnTaskCreated(new EH_TaskCreated([=](Task& createdTask) {
-            if (createdTask.getType() != thisFunction) return false;
+            if (createdTask.GetRobotFunction() != thisFunction) return false;
 
-            auto taskCanceledCallback = std::bind(&RobotsManagement::endTask, m_RobotsManagement.get(), std::placeholders::_1);
+            auto taskCanceledCallback = std::bind(&RobotsManagement::cancelTask, m_RobotsManagement.get(), std::placeholders::_1);
             TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};
             TaskWindow *associatedWindow = new TaskWindow(associatedWindowProps, m_RobotsManagement, createdTask, taskCanceledCallback);
 
-            m_TaskWindowMap.insert({createdTask.getId(), associatedWindow});
+            m_TaskWindowMap.insert({createdTask.GetID(), associatedWindow});
 
             return true;
         }));
 
         robotsManagement->setOnTaskEnded(new EH_TaskEnded([=](Task& endedTask) {
-            if (endedTask.getType() != thisFunction) return false;
+            if (endedTask.GetRobotFunction() != thisFunction) return false;
 
             this->OnTaskEnded(endedTask);
             return true;
@@ -87,8 +87,8 @@ namespace Application::GameWindows
         
         for (auto deletePair : m_TaskWindowMap)
         {
-            deletePair.second->GetTask().detach();
-            DE_DEBUG("Deleting TaskWindow ID={0}, Index={1}, Function={2}", deletePair.first, deletePair.second->GetIndex(), getRobotFunctionString(deletePair.second->GetTask().getType()));
+            m_RobotsManagement->cancelTask(deletePair.second->GetTask());
+            DE_DEBUG("Deleting TaskWindow ID={0}, Index={1}, Function={2}", deletePair.first, deletePair.second->GetIndex(), getRobotFunctionString(deletePair.second->GetTask().GetRobotFunction()));
             delete deletePair.second;
         }
         m_TaskWindowMap.clear();
@@ -97,7 +97,7 @@ namespace Application::GameWindows
 
     void FunctionWindow::OnTaskEnded(Task &endedTask)
     {
-        OnTaskEnded(endedTask.getId());
+        OnTaskEnded(endedTask.GetID());
     }
 
     void FunctionWindow::OnTaskEnded(int id)
@@ -127,7 +127,7 @@ namespace Application::GameWindows
     }
 
 
-    TaskWindow * FunctionWindow::getTaskWindow(TaskID id){
+    TaskWindow *FunctionWindow::GetTaskWindow(Task::TaskID id){
         return m_TaskWindowMap[id];
     }
 

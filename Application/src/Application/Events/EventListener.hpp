@@ -7,7 +7,6 @@
 #include "Application/Events/Event.hpp"
 
 #include "Application/Game/GameRunner.hpp"
-#include "Application/header/Task.hpp"
 
 #include <pthread.h>
 
@@ -21,11 +20,13 @@ namespace Application
         std::unordered_map<std::string, HandlerQueue> handlerQueueMap;
 
     public:
-        EventListener() {
+        EventListener()
+        {
             pthread_mutex_init(&mapMutex, NULL);
         }
-    
-        ~EventListener() {
+
+        ~EventListener()
+        {
             pthread_mutex_destroy(&mapMutex);
         }
 
@@ -36,13 +37,14 @@ namespace Application
             bool eventConsumed = false;
 
             pthread_mutex_lock(&mapMutex);
-            do {
+            do
+            {
                 const HandlerQueue &queue = handlerQueueMap[eventType];
-                if (queue.empty()) {
+                if (queue.empty())
+                {
                     DE_WARN("Ignoring unimplemented Event: {0}", eventType);
                     break;
                 }
-
 
                 for (auto handlerIt = queue.begin(); !eventConsumed && handlerIt != queue.end(); handlerIt++)
                 {
@@ -54,8 +56,7 @@ namespace Application
                     //TODO: remove need for typename Args
                     // Dispatcher::Dispatch<E, Args...>(eventHandler, args...);
                 }
-            } while(false);
-
+            } while (false);
 
             pthread_mutex_unlock(&mapMutex);
         }
@@ -65,7 +66,14 @@ namespace Application
         {
             std::string eventType = eventHandler->GetType();
             pthread_mutex_lock(&mapMutex);
-                handlerQueueMap[eventType].push_back(std::make_unique<void *>((void *)eventHandler));
+            handlerQueueMap[eventType].push_back(std::make_unique<void *>((void *)eventHandler));
+            pthread_mutex_unlock(&mapMutex);
+        }
+
+        void Clear()
+        {
+            pthread_mutex_lock(&mapMutex);
+                handlerQueueMap.clear();
             pthread_mutex_unlock(&mapMutex);
         }
     };

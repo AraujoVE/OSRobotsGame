@@ -23,7 +23,7 @@ namespace Application
             void OnTaskEnded(int id);
 
             void ClearTaskWindows();
-            TaskWindow *getTaskWindow(TaskID id);
+            TaskWindow *GetTaskWindow(Task::TaskID id);
 
             virtual void SetEventHandlers(std::unique_ptr<Application::RobotsManagement> &robotManagement);
 
@@ -31,8 +31,8 @@ namespace Application
         private:
             RobotFunction m_Function;
             std::unique_ptr<Application::RobotsManagement> &m_RobotsManagement;
-            std::unordered_map<TaskID, TaskWindow *> m_TaskWindowMap;
-            std::queue<TaskID> m_TasksPendingDeletion;
+            std::unordered_map<Task::TaskID, TaskWindow *> m_TaskWindowMap;
+            std::queue<Task::TaskID> m_TasksPendingDeletion;
             pthread_mutex_t m_MutexMapRemoval;
         };
     } // namespace GameWindows

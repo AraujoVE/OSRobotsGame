@@ -28,10 +28,10 @@ namespace Application
 
         virtual void InitLayers() override
         {
-            // m_GameGuiLayer = new GameGuiLayer();
-            // m_LayerStack.PushOverlay(m_GameGuiLayer);
-            m_EAGameGuiLayer = new EAGameGuiLayer();
-            m_LayerStack.PushOverlay(m_EAGameGuiLayer);
+            m_GameGuiLayer = new GameGuiLayer();
+            m_LayerStack.PushOverlay(m_GameGuiLayer);
+            // m_EAGameGuiLayer = new EAGameGuiLayer();
+            // m_LayerStack.PushOverlay(m_EAGameGuiLayer);
         }
 
         virtual void OnUpdate() override

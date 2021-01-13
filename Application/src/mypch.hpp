@@ -1,4 +1,5 @@
 #include <DampEngine.hpp>
+#include <DampEngine/Core/Macros/Log.hpp>
 
 #include "imgui.h"
 #include "imgui_internal.h"

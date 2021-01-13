@@ -37,21 +37,14 @@ namespace Application
 
             ~TaskWindow()
             {
-                //Make orphan
-                m_Task.detach();
-
-                //Issue stop with no callback
-                m_Task.stop();
             }
 
             inline Task &GetTask() const { return m_Task; }
-            inline TaskID GetTaskID() const { return m_Task.getId(); }
             inline void SetIndex(unsigned long newIndex)
             {
                 m_TaskWindowProps.FunctionTaskVecIdx = newIndex;
                 UpdateProps();
             }
-            Task &getTask();
 
             inline unsigned long GetIndex() const { return m_TaskWindowProps.FunctionTaskVecIdx; }
 
