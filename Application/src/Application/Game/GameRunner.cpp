@@ -74,7 +74,7 @@ namespace Application
         auto *villageStats = m_GameSave->GetVillageStats().get();
 
         robotsManagement->setOnRobotsDestroyed(new EH_RobotsDestroyed([=](int _) {
-            if (robotsManagement->getTotRobots() <= 0 && !IsGameLost())
+            if (robotsManagement->getTotRobots() <= 0 && villageStats->getResources() <= 0 && !IsGameLost())
             {
                 this->OnGameLost("No more robots available!");
                 return true;
