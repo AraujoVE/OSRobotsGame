@@ -93,7 +93,7 @@ namespace Application
     }
 
     void RobotsManagement::setOnTaskCreated(EH_TaskCreated* eHandler) { m_EventListener.Register(eHandler); }
-    void RobotsManagement::setOnTaskEnded(EH_TaskEnded* eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnTaskEnded(EH_TaskFinished* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnTaskCancelled(EH_TaskCancelled* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnRobotsCreated(EH_RobotsCreated* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnRobotsDestroyed(EH_RobotsDestroyed* eHandler) { m_EventListener.Register(eHandler); }
@@ -221,13 +221,8 @@ namespace Application
         //Cria nova task com o id Incrementado
         Task *newTask = new Task(funct);
 
-        auto& thisEL = m_EventListener;
-
-        newTask->m_EventListener.Register(new EH_TaskEnded(std::bind(&RobotsManagement::onTaskEnded, this, std::placeholders::_1)));
-        newTask->m_EventListener.Register(new EH_TaskCancelled([&thisEL](Task& cancelledTask){
-            thisEL.On<EH_TaskCancelled>(cancelledTask);
-            return false;
-        }));
+        newTask->m_EventListener.Register(new EH_TaskFinished(std::bind(&RobotsManagement::onTaskEnded<EH_TaskFinished>, this, std::placeholders::_1)));
+        newTask->m_EventListener.Register(new EH_TaskCancelled(std::bind(&RobotsManagement::onTaskEnded<EH_TaskCancelled>, this, std::placeholders::_1)));
 
         tasksDown();
         tasks[(int)funct][newTask->GetID()] = newTask;
@@ -249,7 +244,7 @@ namespace Application
         task.Cancel();
     }
 
-    bool RobotsManagement::onTaskEnded(Task &endedTask)
+    void RobotsManagement::taskEndedRoutine(Task &endedTask)
     {
         int lostRobots = endedTask.CalcLostRobots();
         moveRobot(endedTask, -1 * endedTask.GetRobotsNo());
@@ -263,8 +258,12 @@ namespace Application
         }
         villageStats->changeStat((int)endedTask.GetRobotFunction(), (int)endedTask.GetGainedGoods());
 
-        m_EventListener.On<EH_TaskEnded>(endedTask);
-        return true;
+        auto &map = tasks[(int)endedTask.GetRobotFunction()];
+        Task::TaskID id = endedTask.GetID();
+        //TODO: fix free 
+        // delete &endedTask;
+
+        map.erase(id); 
     }
 
     bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)

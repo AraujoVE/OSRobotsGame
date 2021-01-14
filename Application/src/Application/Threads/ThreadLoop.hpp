@@ -13,7 +13,7 @@ namespace Application
         enum ThreadEndedReason_t
         {
             STOP,
-            ALIVE_CHECK
+            FINISHED
         };
     }
 
@@ -39,7 +39,7 @@ namespace Application
             }
             bool forcedStop = !m_Running;
             m_Running = false;
-            m_EventListener.On<EH_ThreadEnded>(forcedStop ? ThreadEndedReason::STOP : ThreadEndedReason::ALIVE_CHECK);
+            m_EventListener.On<EH_ThreadEnded>(forcedStop ? ThreadEndedReason::STOP : ThreadEndedReason::FINISHED);
         }
 
         friend void *threadRountine(void *threadLoopV);

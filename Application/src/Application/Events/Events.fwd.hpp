@@ -5,7 +5,7 @@ namespace Application
 {
 
     class EH_TaskCreated;
-    class EH_TaskEnded;
+    class EH_TaskFinished;
     class EH_RobotsCreated;
     class EH_RobotsDestroyed;
     class EH_RobotsMoved;

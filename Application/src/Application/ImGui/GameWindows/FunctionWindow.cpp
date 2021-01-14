@@ -81,7 +81,7 @@ namespace Application::GameWindows
             return true;
         };
 
-        robotsManagement->setOnTaskEnded(new EH_TaskEnded(removeTaskFromGUI));
+        robotsManagement->setOnTaskEnded(new EH_TaskFinished(removeTaskFromGUI));
         robotsManagement->setOnTaskCancelled(new EH_TaskCancelled(removeTaskFromGUI));
     }
 

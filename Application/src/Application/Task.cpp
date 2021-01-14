@@ -104,7 +104,7 @@ namespace Application
     {
         switch (reason) {
             case ThreadEndedReason::STOP: m_EventListener.On<EH_TaskCancelled>(*this); break;
-            case ThreadEndedReason::ALIVE_CHECK: m_EventListener.On<EH_TaskEnded>(*this); break;
+            case ThreadEndedReason::FINISHED: m_EventListener.On<EH_TaskFinished>(*this); break;
         }
         
         return false;

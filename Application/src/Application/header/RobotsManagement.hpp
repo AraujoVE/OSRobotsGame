@@ -55,16 +55,14 @@ namespace Application
         bool canAddRobots() const;
 
         void setOnTaskCreated(EH_TaskCreated*);
-        void setOnTaskEnded(EH_TaskEnded*);
+        void setOnTaskEnded(EH_TaskFinished*);
         void setOnTaskCancelled(EH_TaskCancelled*);
         void setOnRobotsCreated(EH_RobotsCreated*);
         void setOnRobotsDestroyed(EH_RobotsDestroyed*);
         void setOnRobotsMoved(EH_RobotsMoved*);
 
-        const std::unordered_map<Task::TaskID, Task*> &getTasks(RobotFunction function) const;
-        Task &findTask(Task::TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;
+        
 
-        void onTaskCompleted(Task::TaskID completedTaskID);
         void setTotRobots(int newTotRobots);
         void setFreeRobots(int newFreeRobots);
         void setProdCost(int newProdCost);
@@ -72,14 +70,22 @@ namespace Application
         
         bool createRobots(int);
         bool destroyRobots(int);
-        bool createTask(RobotFunction);
         bool moveRobot(Task &, int);
 
+        const std::unordered_map<Task::TaskID, Task*> &getTasks(RobotFunction function) const;
+        Task &findTask(Task::TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;
+        
+        bool createTask(RobotFunction);
+        void cancelTask(Task &);
+
+    private:
         void tasksUp() const;
         void tasksDown() const;
+
+        void taskEndedRoutine(Task &);
         
-        void cancelTask(Task &);
-        bool onTaskEnded(Task &);
+        template<typename Event> //Event == EH_TaskFinished | EH_TaskCancelled
+        inline bool onTaskEnded(Task& task) { m_EventListener.On<Event>(task); taskEndedRoutine(task); return false; }
     };
 } // namespace Application
 #endif
