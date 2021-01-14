@@ -1,54 +1,54 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
-#define DA_EVENT(name, signature) \
-    class name: public EventHandler<signature> { \
+#define DA_EVAL(x) x
+#define DA_EXPAND_ARGS(...) __VA_ARGS__
+#define DA_EVENT(name, R, Arglist) \
+    class name: public EventHandler<R, DA_EVAL( DA_EXPAND_ARGS Arglist) > { \
     public: \
-        name(std::function<signature> handler): EventHandler::EventHandler(handler, #name ) {} \
+        name(std::function< R Arglist > handler): EventHandler::EventHandler(handler, #name ) {} \
         static const std::string GetTypeStatic() { return #name; } \
     };
 
 namespace Application
 {
-    template <typename signature>
-    struct EventHandlerSignature;
-
-    template <typename R, typename A>
-    struct EventHandlerSignature<R(A)> {
-        typedef R Return;
-        typedef A Args;
-    };
-
-
-
-    template <typename T>
+    template <typename R, typename... Args>
     class EventHandler
     {
     public:
-        std::function<T> m_Handler;
+        std::function< R ( Args ... )> m_Handler;
+
+        typedef R ReturnType;
+        using ArgumentsTuple = std::tuple<Args...>;
+    private:
+        const std::string m_Type;
+
+
+    public:
+        const std::string GetType() { return m_Type; }
+        static const std::string GetTypeStatic() { return "EventHandler"; }
+        EventHandler(std::function< R ( Args ... )> handler, std::string type) : m_Handler(handler), m_Type(type) {}
+        EventHandler(EventHandler&&) = default;
+        friend class Dispatcher;
+    };
+
+    template <typename R>
+    class EventHandler<R, void>
+    {
+    public:
+        std::function<R ()> m_Handler;
+        typedef R ReturnType;
+        using ArgumentsTuple = std::tuple<>;
     private:
         const std::string m_Type;
 
     public:
         const std::string GetType() { return m_Type; }
         static const std::string GetTypeStatic() { return "EventHandler"; }
-        EventHandler(std::function<T> handler, std::string type) : m_Handler(handler), m_Type(type) {}
+        EventHandler(std::function< R ()> handler, std::string type) : m_Handler(handler), m_Type(type) {}
         EventHandler(EventHandler&&) = default;
         friend class Dispatcher;
     };
-
-    class Dispatcher
-    {
-    public:
-        template <typename T, typename... Args>
-        static bool Dispatch(const EventHandler<T>& event, Args... args )
-        {
-            if (event.m_Handler != nullptr)
-                event.m_Handler(args...);
-
-            return true;
-        }
-    };
-
 } // namespace Application

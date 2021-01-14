@@ -84,7 +84,7 @@ namespace Application
     void Task::Cancel()
     {
         DE_TRACE("Stopping Task #{0} (Function:{1})", id, getRobotFunctionString(function));
-
+        
         m_ThreadLoop.Stop();
     }
 
@@ -97,14 +97,14 @@ namespace Application
 
     bool Task::OnThreadLoopStarted()
     {
-        m_EventListener.On<EH_TaskStarted, Task &>(*this);
+        m_EventListener.On<EH_TaskStarted>(*this);
         return true;
     }
     bool Task::OnThreadLoopEnded(ThreadEndedReason::ThreadEndedReason_t reason)
     {
         switch (reason) {
-            case ThreadEndedReason::STOP: m_EventListener.On<EH_TaskCancelled, Task &>(*this); break;
-            case ThreadEndedReason::ALIVE_CHECK: m_EventListener.On<EH_TaskEnded, Task &>(*this); break;
+            case ThreadEndedReason::STOP: m_EventListener.On<EH_TaskCancelled>(*this); break;
+            case ThreadEndedReason::ALIVE_CHECK: m_EventListener.On<EH_TaskEnded>(*this); break;
         }
         
         return false;

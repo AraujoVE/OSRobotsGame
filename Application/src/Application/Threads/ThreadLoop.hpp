@@ -17,8 +17,8 @@ namespace Application
         };
     }
 
-    DA_EVENT(EH_ThreadStarted, bool(void));
-    DA_EVENT(EH_ThreadEnded, bool(ThreadEndedReason::ThreadEndedReason_t endReason));
+    DA_EVENT(EH_ThreadStarted, bool, (void));
+    DA_EVENT(EH_ThreadEnded, bool, (ThreadEndedReason::ThreadEndedReason_t));
 
     void *threadRountine(void *threadLoopV);
 
@@ -59,9 +59,10 @@ namespace Application
         {
             m_Running = true;
             pthread_create(&m_Thread, NULL, &threadRountine, this);
+
             m_EventListener.On<EH_ThreadStarted>();
         }
         inline void Stop() { m_Running = false; }
     };
-    
+
 } // namespace Application

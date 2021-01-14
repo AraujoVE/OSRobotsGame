@@ -43,14 +43,14 @@ namespace Application
         m_GameSave->GetVillageStats()->startStatsDecayment();
 
         SetupGameOverConditions();
-        m_EventListener->On<EH_GameStarted, GameRunner &>(*this);
+        m_EventListener->On<EH_GameStarted>(*this);
     }
 
     void GameRunner::Stop()
     {
         DE_ASSERT(m_GameRunning, "Trying to stop a game that is not running");
         
-        m_EventListener->On<EH_GameEnded, GameRunner &>(*this);
+        m_EventListener->On<EH_GameEnded>(*this);
         m_GameRunning = false;
         //TODO: stop village stats decayment
     }

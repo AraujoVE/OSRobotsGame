@@ -55,8 +55,8 @@ namespace Application::GameWindows
             m_RobotsManagement->createTask(m_Function);
 
         //Render children
-        for (auto taskWindowPair : m_TaskWindowMap)
-            taskWindowPair.second->Render();
+        for (auto taskWindowPairIt = m_TaskWindowMap.begin(); taskWindowPairIt != m_TaskWindowMap.end(); taskWindowPairIt++)
+            taskWindowPairIt->second->Render();
     }
 
     void FunctionWindow::SetEventHandlers(std::unique_ptr<RobotsManagement>& robotsManagement) {
@@ -73,12 +73,16 @@ namespace Application::GameWindows
             return true;
         }));
 
-        robotsManagement->setOnTaskEnded(new EH_TaskEnded([=](Task& endedTask) {
+
+        auto removeTaskFromGUI = [=](Task& endedTask) {
             if (endedTask.GetRobotFunction() != thisFunction) return false;
 
             this->OnTaskEnded(endedTask);
             return true;
-        }));
+        };
+
+        robotsManagement->setOnTaskEnded(new EH_TaskEnded(removeTaskFromGUI));
+        robotsManagement->setOnTaskCancelled(new EH_TaskCancelled(removeTaskFromGUI));
     }
 
 
@@ -119,11 +123,6 @@ namespace Application::GameWindows
         }
 
         pthread_mutex_unlock(&m_MutexMapRemoval);
-        
-        
-        DE_DEBUG("INSERINDO O {0}", id);
-        m_TasksPendingDeletion.push(id);
-
     }
 
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <utility>
 #include "Application/Events/Event.hpp"
 
 #include "Application/Game/GameRunner.hpp"
@@ -30,10 +31,16 @@ namespace Application
             pthread_mutex_destroy(&mapMutex);
         }
 
-        template <typename E, typename... Args>
-        void On(Args... args)
-        {
-            const std::string eventType = E::GetTypeStatic();
+        template <class EventHandlerType>
+        void On() {
+            static_assert(std::is_same<typename EventHandlerType::ArgumentsTuple,std::tuple<>>::value, "Missing parameters");
+            On<EventHandlerType>(std::tuple<>());
+        }
+
+        template <class EventHandlerType>
+        void On(typename EventHandlerType::ArgumentsTuple argTuple)
+        {                
+            const std::string eventType = EventHandlerType::GetTypeStatic();
             bool eventConsumed = false;
 
             pthread_mutex_lock(&mapMutex);
@@ -50,19 +57,17 @@ namespace Application
                 {
 
                     void *genericEventHandler = *handlerIt->get();
-                    E *eventHandler = (E *)genericEventHandler;
-                    eventConsumed = eventHandler->m_Handler(args...);
-
-                    //TODO: remove need for typename Args
-                    // Dispatcher::Dispatch<E, Args...>(eventHandler, args...);
+                    EventHandlerType *eventHandler = (EventHandlerType *)genericEventHandler;
+                        
+                    eventConsumed = std::apply(eventHandler->m_Handler, argTuple);
                 }
             } while (false);
 
             pthread_mutex_unlock(&mapMutex);
         }
 
-        template <typename E>
-        void Register(EventHandler<E> *eventHandler)
+        template <typename R, typename... Args>
+        void Register(EventHandler<R, Args...> *eventHandler)
         {
             std::string eventType = eventHandler->GetType();
             pthread_mutex_lock(&mapMutex);

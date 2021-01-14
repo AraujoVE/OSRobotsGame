@@ -56,6 +56,7 @@ namespace Application
 
         void setOnTaskCreated(EH_TaskCreated*);
         void setOnTaskEnded(EH_TaskEnded*);
+        void setOnTaskCancelled(EH_TaskCancelled*);
         void setOnRobotsCreated(EH_RobotsCreated*);
         void setOnRobotsDestroyed(EH_RobotsDestroyed*);
         void setOnRobotsMoved(EH_RobotsMoved*);

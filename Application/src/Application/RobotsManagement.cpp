@@ -57,6 +57,9 @@ namespace Application
             }
             taskMap.clear();
         }
+
+        //Assures no one is going to receive zombie objects events
+        m_EventListener.Clear();
     }
 
     //Gets de cada um dos parâmetros
@@ -91,6 +94,7 @@ namespace Application
 
     void RobotsManagement::setOnTaskCreated(EH_TaskCreated* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnTaskEnded(EH_TaskEnded* eHandler) { m_EventListener.Register(eHandler); }
+    void RobotsManagement::setOnTaskCancelled(EH_TaskCancelled* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnRobotsCreated(EH_RobotsCreated* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnRobotsDestroyed(EH_RobotsDestroyed* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnRobotsMoved(EH_RobotsMoved* eHandler) { m_EventListener.Register(eHandler); }
@@ -217,7 +221,13 @@ namespace Application
         //Cria nova task com o id Incrementado
         Task *newTask = new Task(funct);
 
+        auto& thisEL = m_EventListener;
+
         newTask->m_EventListener.Register(new EH_TaskEnded(std::bind(&RobotsManagement::onTaskEnded, this, std::placeholders::_1)));
+        newTask->m_EventListener.Register(new EH_TaskCancelled([&thisEL](Task& cancelledTask){
+            thisEL.On<EH_TaskCancelled>(cancelledTask);
+            return false;
+        }));
 
         tasksDown();
         tasks[(int)funct][newTask->GetID()] = newTask;
@@ -225,11 +235,11 @@ namespace Application
 
         auto *el = &m_EventListener;
         newTask->m_EventListener.Register(new EH_TaskStarted([=](Task& task){
-            el->On<EH_TaskStarted, Task&>(task);
+            el->On<EH_TaskStarted>(task);
             return false;
         }));
 
-        m_EventListener.On<EH_TaskCreated, Task&>(*newTask);
+        m_EventListener.On<EH_TaskCreated>(*newTask);
         newTask->Start();
 
         return true;
@@ -237,8 +247,6 @@ namespace Application
 
     void RobotsManagement::cancelTask(Task &task) {
         task.Cancel();
-
-        m_EventListener.On<EH_TaskCancelled, Task&>(task);
     }
 
     bool RobotsManagement::onTaskEnded(Task &endedTask)
@@ -255,7 +263,7 @@ namespace Application
         }
         villageStats->changeStat((int)endedTask.GetRobotFunction(), (int)endedTask.GetGainedGoods());
 
-        m_EventListener.On<EH_TaskEnded, Task&>(endedTask);
+        m_EventListener.On<EH_TaskEnded>(endedTask);
         return true;
     }
 
@@ -284,7 +292,7 @@ namespace Application
         robotsAvenues[FREE_ROBOTS]->up(); 
 
         if (returnValue == true)
-            m_EventListener.On<EH_RobotsMoved, Task&, int>(choosenTask, robotsNo);
+            m_EventListener.On<EH_RobotsMoved>({choosenTask, robotsNo});
 
 
         return returnValue;
