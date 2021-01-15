@@ -17,15 +17,28 @@
 [OK]
 2. Fazer "log" com os parâmetros, fitness etc. de cada geração (salvando, ao finalizar , a melhor versão dos parâmetros do jogo). No futuro, usar isso para plotar gráficos e tabelas
 [OK]
-3. Fazer a função de cálculo do fitness (em evaluatePop)
+3. Fazer a função de cálculo do fitness (em evaluatePop) (fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado)
 []
-4. Testar diferentes métodos de seleção, variação da taxa de mutação, uso de genocídio e predação etc.
-[]
+4. Fazer diferentes métodos de seleção, variação da taxa de mutação, uso de genocídio e predação etc.
+[OK]
 5. Fazer geração com os melhores dos outros AGs
+Fazer POPULATION_SIZE+1 AGs. O último é um AG com os melhores de cada AG anterior
 []
 6. Fazer o AGs gerar o arquivo de configuração com os parâmetros do jogo (em initializePop)
 []
 
+7. Passar pointeiro para fitness em normalizeFitness() e alterar o vetor fitness[] diretamente
+[]
+8. Fazer taxa de mutação crescer conforme noImprovementGens aumenta (no momento, ela diminui)
+[]
+9. Checar se a variância é pequena para aplicar alteração mutação. Além disso, trocar em "if(noImprovementGens > 200)", o 200 por um parâmetro (usar #define)
+[]
+10. Criar função de "genocídio" total
+[] 
+11. Salvar o melhor de cada AG em um vetor de "melhores globais" e trocar o while(true) da main por outra condição (o AG deve finalizar em algum momento - salvando seu melhor no vetor de "melhores globais")
+[]
+12. Em checkSoftRandomPredation, remover if(generationIndex) e colocar if(noImprevementGens)
+[]
 */
 #include <stdlib.h>  /* srand, rand */
 #include <iostream>
@@ -82,7 +95,7 @@ void initializePop() {
 
 
 double * normalizeFitness() {
-    double normalizedFitness[POPULATION_SIZE];
+    double normalizedFitness[POPULATION_SIZE]; // trocar por alocação dinâmica
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
         normalizedFitness[i] = (fitness[i]-minFitness)/(maxFitness-minFitness);
@@ -99,6 +112,8 @@ void evaluatePop() {
 
     for (int i = 0; i < POPULATION_SIZE; i++) { 
         // example of fitness calculation -> CHANGE!!!!
+        // Fitness calculado a partir da diferença entre o tempo de término esperado e o tempo de término real
+        // fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado
         fitness[i] = arma::sum(population.row(i));
 
         if (maxFitness < fitness[i]) { // searching for the  max fitnnes from new generation
@@ -228,8 +243,6 @@ void selectionAndMutation() { // tournament, elitism, roulette...
     https://en.wikipedia.org/wiki/Selection_(genetic_algorithm)
     https://medium.com/datadriveninvestor/genetic-algorithms-selection-5634cfc45d78
     https://www.researchgate.net/publication/259461147_Selection_Methods_for_Genetic_Algorithms
-
-    Stochastic Uniform (Fitness Proportionate) -> PROB THE BEST?
     */
 
     // Selection method (+ crossover)
@@ -328,7 +341,7 @@ void saveGenerationData(int generation) {
     csvFileWriter << formatParamsString(maxFitIndex) << "," << maxFitness << "\n";
 }
 
-void checkDoMutationDecay() {
+void checkDoMutationDecay() { // TODO: mutation should increase!! 
     if (noImprovementGens > BEGIN_DECAY_THRESHOLD) {
         if (noImprovementGens % APPLY_DECAY_MODULE)
             mutationRate -= mutationRate * MUTATION_DECAY_RATIO;
@@ -340,9 +353,16 @@ void checkDoMutationDecay() {
     return;
 }
 
+// TODO: create popReset() killing the best
+// mutOccours = 10
+// predOccurs = mutOccours * 10
+// genOccours = predOccours * 10
+// if(noImprovementGens % mutOccours) mutar
+// ...
+
 // Function that will kill all individuals (but the best) to reset the population and generate new individuals (without biases)
 void checkDoPopReset() {
-    if (noImprovementGens > 200) {
+    if (noImprovementGens > 200) { // TODO: check if (std deviation)² is small to apply this
         std::cout << "APPLYING POPULATION RESET\n";
         noImprovementGens = 0;
 
@@ -356,6 +376,7 @@ void checkDoPopReset() {
 }
 
 // Function that will kill the worst individual each "APPLY_PREDATION_INTERVAL" number of generations
+// TODO: remove if(generationIndex), insert if(noImprevementGens)
 void checkSoftRandomPredation() {
     if (generationIndex % APPLY_PREDATION_INTERVAL) {
         arma::rowvec newInd(NB_PARAMETERS, arma::fill::randu); // creating totally new individual
