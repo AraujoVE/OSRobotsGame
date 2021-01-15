@@ -2,7 +2,7 @@
 #define EA_SCRIPT
 
 #include "Application/header/RobotFunctions.hpp"
-
+#include <vector>
 #include <pthread.h>
 
 namespace Application{

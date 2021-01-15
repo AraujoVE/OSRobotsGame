@@ -1,4 +1,4 @@
-#include "Application/header/EAScript.hpp"
+#include "EAScript.hpp"
 #include "Application/ImGui/GameWindows/FunctionWindow.hpp"
 #include "Application/ImGui/GameWindows/TaskWindow.hpp"
 
