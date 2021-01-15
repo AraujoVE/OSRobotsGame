@@ -6,15 +6,19 @@
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Game/GameSave.hpp"
 
+#include "Application/Events/Events.hpp"
+
 #include "Application/header/RobotsManagement.hpp"
 
 
 #include "mypch.hpp"
 
+using namespace Application;
+
 #define EAS_SRM (m_GameRunner.GetSave().GetRobotsManagement())
 #define EAS_SVS (m_GameRunner.GetSave().GetVillageStats())
 
-namespace Application{
+namespace EAAlgorithm {
     EAScript::EAScript(GameRunner& gameRunner, std::string filePath): 
         m_GameRunner(gameRunner),
         srcFile(filePath)
@@ -94,11 +98,26 @@ namespace Application{
     void EAScript::scriptLoop(){
         time_t initTime,endTime;
         int fitness,it = 0;
+
+        std::vector<std::pair<time_t,time_t>> gameplaysResults;
+
         while(true){
             fitness = 0;
             for(auto gameplay : gameScript){
-                initTime = time(0);
                 std::cout << "Gameplay " << ++it << std::endl;
+
+                m_GameRunner.SetOnGameStarted(new EH_GameStarted([&initTime](GameRunner& _) {
+                    initTime = time(0);
+                    return false;
+                }));
+
+                m_GameRunner.SetOnGameEnded(new EH_GameEnded([&endTime](GameRunner& _) {
+                    endTime = time(0);
+                    return false;
+                }));
+
+                m_GameRunner.Start();
+
                 for(int i=1;i < (int)gameplay.size();i++){
                     std::cout << "\tAction " << i << std::endl;
                     (this->*(scriptLoopFuncts[stoi(gameplay.at(i).at(0))]))(gameplay.at(i));
@@ -107,10 +126,13 @@ namespace Application{
                 std::cout << "Acabou a primeira Gameplay";
                 //Callback para saber quando acaba o jogo
                 //quando isso acontece : endTime = time(0)
-                endTime = time(0);
-                fitness += std::abs((int)(initTime - endTime));
+                time_t targetDuration = stol(gameplay.at(0).at(0));
+                
+                gameplaysResults.push_back({endTime-initTime, targetDuration});
             }
-            //EAFunction(fitness);
+
+            //TODO: chamar o guerra
+            // EAFunction(gameplayResults);
         }
     }
 
