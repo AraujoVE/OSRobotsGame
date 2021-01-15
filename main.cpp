@@ -80,7 +80,6 @@ void initializePop() {
     return;
 }
 
-
 double * normalizeFitness() {
     double normalizedFitness[POPULATION_SIZE];
 
@@ -352,6 +351,14 @@ void checkDoPopReset() {
         population.row(0) = best;
     }
 
+    return;
+}
+
+void hardPopReset() {
+    std::cout << "HARD POPULATION RESET"
+    noImprovementGens = 0;
+
+    initializePop();
     return;
 }
 
