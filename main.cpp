@@ -11,38 +11,19 @@
 [-lpthread -ldl -lglut -lGLU -lGL (-lm)] -> not used for now
 // Warning flags: -Wall -Wextra -Werror
  
-
--> O que fazer agora?
-1. Fazer a mutação só alterar um parâmetro de cada indivído ao invés de alterar todos os parâmetros
-[OK]
-2. Fazer "log" com os parâmetros, fitness etc. de cada geração (salvando, ao finalizar , a melhor versão dos parâmetros do jogo). No futuro, usar isso para plotar gráficos e tabelas
-[OK]
-3. Fazer a função de cálculo do fitness (em evaluatePop) (fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado)
-[]
-4. Fazer diferentes métodos de seleção, variação da taxa de mutação, uso de genocídio e predação etc.
-[OK]
-5. Fazer geração com os melhores dos outros AGs
-Fazer POPULATION_SIZE+1 AGs. O último é um AG com os melhores de cada AG anterior
-[ALTERADO]
--> Atualmente existem as finais e as semifinais. A final é composta de TOURNMENT_RATE semi-finais e cada semi-final é composta de TOURNMENT_RATE evolutionaryAlgorithms.
+-> Atualmente existem as finais e as semifinais entre AGs (AEs). A final é composta de TOURNMENT_RATE semi-finais e cada semi-final é composta de TOURNMENT_RATE evolutionaryAlgorithms.
 -> apos a ocorrencia de TOURNMENT_RATE EAS em uma semi-final, uma outra EA é feita, onde TOURNMENT_RATE dos individuos são os melhores individuos dessas EAs anteriores.
 -> Na final é feito algo análogo à semi-final, só que ao invés dos melhores indivíduos virem das EAs, eles vem das semi-finais.
 
-6. Fazer o AGs gerar o arquivo de configuração com os parâmetros do jogo (em initializePop)
+-> O que fazer agora?
+1. Fazer a função de cálculo do fitness (em evaluatePop) (fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado)
 []
-
-7. Passar pointeiro para fitness em normalizeFitness() e alterar o vetor fitness[] diretamente
-[OK]
-8. Fazer taxa de mutação crescer conforme nbNoImprovementGens aumenta (no momento, ela diminui)
-[OK]
-9. Checar se a variância é pequena para aplicar alteração mutação. Além disso, trocar em "if(nbNoImprovementGens > 200)", o 200 por um parâmetro (usar #define)
+2. Fazer o AGs gerar o arquivo de configuração com os parâmetros do jogo (em initializePop)
+[]
+3. Checar se a variância é pequena para aplicar alteração mutação. Além disso, trocar em "if(nbNoImprovementGens > 200)", o 200 por um parâmetro (usar #define)
 [NÂO NECESSARIO/A DISCUTIR]
-10. Criar função de "genocídio" total
-[OK] 
-11. Salvar o melhor de cada AG em um vetor de "melhores globais" e trocar o while(true) da main por outra condição (o AG deve finalizar em algum momento - salvando seu melhor no vetor de "melhores globais")
+4. Salvar o melhor de cada AG em um vetor de "melhores globais" e trocar o while(true) da main por outra condição (o AG deve finalizar em algum momento - salvando seu melhor no vetor de "melhores globais")
 [PARCIAL]
-12. Em predationOfOne, remover if(generationIndex) e colocar if(noImprevementGens)
-[OK]
 
 */
 #include <stdlib.h>  /* srand, rand */
