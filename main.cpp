@@ -19,7 +19,7 @@
 1. Fazer a função de cálculo do fitness (em evaluatePop) (fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado)
 []
 2. Fazer o AGs gerar o arquivo de configuração com os parâmetros do jogo (em initializePop)
-[]
+[OK]
 3. Checar se a variância é pequena para aplicar alteração mutação. Além disso, trocar em "if(nbNoImprovementGens > 200)", o 200 por um parâmetro (usar #define)
 [NÂO NECESSARIO/A DISCUTIR]
 4. Salvar o melhor de cada AG em um vetor de "melhores globais" e trocar o while(true) da main por outra condição (o AG deve finalizar em algum momento - salvando seu melhor no vetor de "melhores globais")
@@ -88,7 +88,7 @@ double fitness[POPULATION_SIZE];
 double maxFitness = 0, minFitness = 2000000000;
 int maxFitIndex = -1, minFitIndex = -1;
 double mutationRate = INITIAL_MUTATION;
-int nbNoImprovementGens = 0; // number of generations in a row without any improvement (best individual remains the same)
+int nbNoImprovementGens = 0; // number of generations in a row without any improvement (best indiviNdual remains the same)
 int generationIndex = 0;
 bool continueEA;
 
@@ -110,6 +110,52 @@ void initializePop() {
     population.randu(); // initialize with values between 0 and 1
     population = population * MAX_PARAM_VALUE;
 
+    FILE* fp;
+    fp = fopen("constValues.cfg", "w");
+
+    char valueNames[NB_PARAMETERS][30]{
+        "ON_ATTACK_MULTIPLIER",
+        "POP_INCREASE_TAX",
+        "POP_PER_CONSTRUCTION",
+        "INIT_POP_VALUE",
+        "INIT_STAT_VALUE",
+        "ON_ATTACK_DECAY_TAX",
+        "NORMAL_DECAY_TAX",
+        "ATTACK_FREQUENCY",
+        "INIT_RESOURCES_VALUE",
+        "TAX_REDUCT",
+        "DECAY_DELAY_MICRO",
+        "MIN_LOSS_0",
+        "MIN_LOSS_1",
+        "MIN_LOSS_2",
+        "MIN_LOSS_3",
+        "MAX_LOSS_0",
+        "MAX_LOSS_1",
+        "MAX_LOSS_2",
+        "MAX_LOSS_3",
+        "TOT_ROBOTS_INI",
+        "FREE_ROBOTS_INI",
+        "PROD_COST_INI",
+        "TIME_STEP",
+        "INIT_TIME_STEP",
+        "MAX_TIME_STEPS",
+        "MIN_REWARD",
+        "REWARD_RANGE",
+        "FAILURE_TAX"
+    };
+    
+    int len;
+    for (size_t i = 0; i < NB_PARAMETERS; i++)
+    {
+        int len = strlen(valueNames[i]);
+        fwrite(valueNames[i], len, sizeof(char), fp);
+        fwrite(" = ", sizeof(char), 3, fp);
+        fwrite(&population(0, i), sizeof(double), 1, fp);
+        fwrite("\n", 1, 1, fp);
+        printf("k%sk\n", valueNames[i]);
+    }
+
+    fclose(fp);
     population.print("Population matrix initialized:");
 
     return;
