@@ -23,28 +23,33 @@
 [OK]
 5. Fazer geração com os melhores dos outros AGs
 Fazer POPULATION_SIZE+1 AGs. O último é um AG com os melhores de cada AG anterior
-[]
+[ALTERADO]
+-> Atualmente existem as finais e as semifinais. A final é composta de TOURNMENT_RATE semi-finais e cada semi-final é composta de TOURNMENT_RATE evolutionaryAlgorithms.
+-> apos a ocorrencia de TOURNMENT_RATE EAS em uma semi-final, uma outra EA é feita, onde TOURNMENT_RATE dos individuos são os melhores individuos dessas EAs anteriores.
+-> Na final é feito algo análogo à semi-final, só que ao invés dos melhores indivíduos virem das EAs, eles vem das semi-finais.
+
 6. Fazer o AGs gerar o arquivo de configuração com os parâmetros do jogo (em initializePop)
 []
 
 7. Passar pointeiro para fitness em normalizeFitness() e alterar o vetor fitness[] diretamente
 []
 8. Fazer taxa de mutação crescer conforme noImprovementGens aumenta (no momento, ela diminui)
-[]
+[OK]
 9. Checar se a variância é pequena para aplicar alteração mutação. Além disso, trocar em "if(noImprovementGens > 200)", o 200 por um parâmetro (usar #define)
-[]
+[NÂO NECESSARIO/A DISCUTIR]
 10. Criar função de "genocídio" total
-[] 
+[OK] 
 11. Salvar o melhor de cada AG em um vetor de "melhores globais" e trocar o while(true) da main por outra condição (o AG deve finalizar em algum momento - salvando seu melhor no vetor de "melhores globais")
-[]
-12. Em checkSoftRandomPredation, remover if(generationIndex) e colocar if(noImprevementGens)
-[]
+[PARCIAL]
+12. Em predationOfOne, remover if(generationIndex) e colocar if(noImprevementGens)
+[OK]
 */
 #include <stdlib.h>  /* srand, rand */
 #include <iostream>
 #include <fstream> // creating (.csv) files
 #include <vector>
 #include <cstring>
+#include <functional>
 #include <armadillo> // http://arma.sourceforge.net/docs.html
 // #include <unistd.h>
 // #include <thread>   /* std::this_thread::sleep_for */
@@ -55,8 +60,35 @@ Fazer POPULATION_SIZE+1 AGs. O último é um AG com os melhores de cada AG anter
 #define NB_PARAMETERS 10 // number of parameters that will be adjusted
 #define POPULATION_SIZE 20
 
-#define MAX_MUTATION_RATE 0.04 // 4%
-#define MUTATION_DECAY_RATIO 0.125 // mutation decays 12.5% at a time
+bool continueEA;
+int easNo = 0;
+
+enum events{
+    BASE_RATE = 0,
+    MUTA_RATE,
+    PRED_RATE,
+    PART_RATE,
+    GENO_RATE,
+    EV_A_RATE,
+};
+
+const int TOURNMENT_RATE = 10;
+
+arma::rowvec semiFinals[TOURNMENT_RATE];
+arma::rowvec finals[TOURNMENT_RATE];
+
+
+
+const int eventListBase[] = {1,10,5,10,2,10};
+int eventList[6];
+
+void (*eventTypes[])() = {increaseMutation,predationOfOne,partIncrease,oneRemainingPopReset,fullPopReset};
+
+#define MAX_MUTATION_RATE 1
+#define MUTATION_INCREASE_RATIO 1.1 // mutation increase 10% at a time
+#define INITIAL_MUTATION 0.05
+
+
 #define BEGIN_DECAY_THRESHOLD 50 // after how many generations without improvement the mutation starts to decay
 #define APPLY_DECAY_MODULE 15 // decay will be applied when the generation index % APPLY_DECAY_MODULE = 0
 
@@ -65,16 +97,43 @@ Fazer POPULATION_SIZE+1 AGs. O último é um AG com os melhores de cada AG anter
 #define MAX_PARAM_VALUE 1 // max value a parameter can reach
 
 enum selectionMethods { TOURNAMENT, ELITISM, ROULETTE };
-selectionMethods selectionMethod = ELITISM;
+
+void (*selectionType[])() = {tournament,elitism,roulette};
+
+selectionMethods partsSelectionMethods[] = {
+    TOURNAMENT,TOURNAMENT,TOURNAMENT,TOURNAMENT,TOURNAMENT,TOURNAMENT,TOURNAMENT,TOURNAMENT,TOURNAMENT,TOURNAMENT,
+    ELITISM,ELITISM,ELITISM,ELITISM,ELITISM,ELITISM,ELITISM,ELITISM,ELITISM,ELITISM
+};
+
+int partPos = 0;
+
+selectionMethods selectionMethod = partsSelectionMethods[partPos];
+
 
 arma::mat::fixed<POPULATION_SIZE, NB_PARAMETERS> population; // arma::mat : armadillo matrix (Mat<double>)
 // Each LINE (ROW) is the individual's parameters
 double fitness[POPULATION_SIZE];
 double maxFitness = 0, minFitness = 2000000000;
 int maxFitIndex = -1, minFitIndex = -1;
-double mutationRate = MAX_MUTATION_RATE;
+double mutationRate = INITIAL_MUTATION;
 int noImprovementGens = 0; // number of generations in a row without any improvement (best individual remains the same)
 int generationIndex = 0;
+
+
+enum evalTypes{ BY_MIN, BY_MAX };
+
+evalTypes evalType = BY_MIN;
+
+bool greater(double par1,double par2){
+    return par1 > par2;
+}
+
+bool less(double par1,double par2){
+    return par1 < par2;
+}
+
+
+bool (*evaluateType[])(double,double) = {less,greater};
 
 
 // 1st step: initialize population
@@ -115,12 +174,12 @@ void evaluatePop() {
         // fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado
         fitness[i] = arma::sum(population.row(i));
 
-        if (maxFitness < fitness[i]) { // searching for the  max fitnnes from new generation
+        if ((*evaluateType[evalType])(maxFitness,fitness[i])){ // searching for the  max fitnnes from new generation
             maxFitness = fitness[i];
             maxFitIndex = i;
             noImprovementGens = 0; // this generation shows improvement -> reset counter
         }
-        else if (fitness[i] < minFitness) {
+        else if ((*evaluateType[evalType])(fitness[i],minFitness)){
             minFitness = fitness[i];
             minFitIndex = i;
         }
@@ -245,17 +304,9 @@ void selectionAndMutation() { // tournament, elitism, roulette...
     */
 
     // Selection method (+ crossover)
-    switch (selectionMethod) {
-        case TOURNAMENT:
-            tournament();
-            break;
-        case ELITISM:
-            elitism();
-            break;
-        case ROULETTE:
-            roulette();
-            break;
-    }
+    
+    
+    (*selectionType[selectionMethod])();
 
     // Isso aqui pode mudar, ou não, a mutação pode ocorrer em todos os parametros, ou não.
     // Isso depende de caso a caso, normalmente é feito a mutação em cada indivíduo, mas em 
@@ -277,31 +328,32 @@ void selectionAndMutation() { // tournament, elitism, roulette...
     // population.transform( [](double x) { return ((x < 0 || x > MAX_PARAM_VALUE) ? abs(MAX_PARAM_VALUE-abs(x)) : x); } );
     
     // Mutating only one parameter from each individual
-    for (int i = 0; i < POPULATION_SIZE; i++) { 
-        if (i == maxFitIndex)
-            continue; // don't mutate the best from last generation
-
-        int mutateParamIndex = rand() % NB_PARAMETERS; // index of parameter that will be mutated
-        population(i, mutateParamIndex) += (((double) (rand() % MAX_PARAM_VALUE) - MAX_PARAM_VALUE/2.0) * (mutationRate));
-
-        if (population(i, mutateParamIndex) < 0)
-            population(i, mutateParamIndex) += MAX_PARAM_VALUE;
-        else if (population(i, mutateParamIndex) > MAX_PARAM_VALUE)
-            population(i, mutateParamIndex) -= MAX_PARAM_VALUE;
-    }
     
+    for(int i = 0;i<maxFitIndex;i++) mutate(i);
+    for(int i = maxFitIndex+1;i< POPULATION_SIZE;i++) mutate(i);
+
     return;
 }
+
+
+void mutate(int ind){
+    int plusMinusSign = (rand()%2 ? 1 : -1);
+    int mutateParamIndex = rand() % NB_PARAMETERS; // index of parameter that will be mutated
+
+    population(ind, mutateParamIndex) += population(ind, mutateParamIndex) * mutationRate * plusMinusSign;
+
+}
+
 
 // Initialize .csv file to sabe data from the EA
 // Creates the column's headers
 // generation, paramsIndv1, fitnessIndv1 ..., paramsIndvN, fitnessIndvN, bestParams, bestFitness
-void createCSV() {
+void createCSV(std::string pathPos) {
     std::ofstream csvFileWriter;
 
-    csvFileWriter.open("historyEA.csv");
+    csvFileWriter.open("historyEA" + pathPos + ".csv");
     if (!csvFileWriter.good()) {
-        std::cout << "[!] Error occurred while trying to create historyEA.csv!\n";
+        std::cout << "[!] Error occurred while trying to create historyEA" << pathPos << ".csv!\n";
         return;
     }
     
@@ -340,16 +392,29 @@ void saveGenerationData(int generation) {
     csvFileWriter << formatParamsString(maxFitIndex) << "," << maxFitness << "\n";
 }
 
-void checkDoMutationDecay() { // TODO: mutation should increase!! 
-    if (noImprovementGens > BEGIN_DECAY_THRESHOLD) {
-        if (noImprovementGens % APPLY_DECAY_MODULE)
-            mutationRate -= mutationRate * MUTATION_DECAY_RATIO;
+void increaseMutation() { // TODO: mutation should increase!! 
+
+    if(!mutationRate){
+        mutationRate = INITIAL_MUTATION;
     }
-    else {
-        mutationRate = MAX_MUTATION_RATE;
+    else{
+        mutationRate = (mutationRate*MUTATION_INCREASE_RATIO > MAX_MUTATION_RATE ? MAX_MUTATION_RATE : mutationRate*MUTATION_INCREASE_RATIO);
     }
 
     return;
+}
+
+void predationOfOne() {
+    arma::rowvec newInd(NB_PARAMETERS, arma::fill::randu); // creating totally new individual
+    newInd = newInd * MAX_PARAM_VALUE;
+    
+    population.row(minFitIndex) = newInd;
+
+    return;
+}
+
+void partIncrease(){
+    selectionMethod = partsSelectionMethods[++partPos];
 }
 
 // TODO: create popReset() killing the best
@@ -360,61 +425,108 @@ void checkDoMutationDecay() { // TODO: mutation should increase!!
 // ...
 
 // Function that will kill all individuals (but the best) to reset the population and generate new individuals (without biases)
-void checkDoPopReset() {
-    if (noImprovementGens > 200) { // TODO: check if (std deviation)² is small to apply this
-        std::cout << "APPLYING POPULATION RESET\n";
-        noImprovementGens = 0;
+void oneRemainingPopReset() {
+    std::cout << "APPLYING POPULATION RESET\n";
 
-        arma::rowvec best = population.row(maxFitIndex);
+    arma::rowvec best = population.row(maxFitIndex);
 
-        initializePop();
-        population.row(0) = best;
-    }
+    initializePop();
+    population.row(0) = best;
+    partIncrease();
 
     return;
 }
 
-void hardPopReset() {
-    std::cout << "HARD POPULATION RESET"
-    noImprovementGens = 0;
+void fullPopReset() {
+    std::cout << "HARD POPULATION RESET";
+    easNo++;
 
-    initializePop();
+    continueEA = false;
     return;
 }
 
 // Function that will kill the worst individual each "APPLY_PREDATION_INTERVAL" number of generations
 // TODO: remove if(generationIndex), insert if(noImprevementGens)
-void checkSoftRandomPredation() {
-    if (generationIndex % APPLY_PREDATION_INTERVAL) {
-        arma::rowvec newInd(NB_PARAMETERS, arma::fill::randu); // creating totally new individual
-        newInd = newInd * MAX_PARAM_VALUE;
-        
-        population.row(minFitIndex) = newInd;
-    }
 
-    return;
+bool eventHappens(int eventType){
+    if(noImprovementGens%eventList[eventType]) return false;
+    return true;
+}
+
+void checkEvents(){
+    if(!noImprovementGens) return;
+    for(int i=1;i<6;i++){
+        if(eventHappens(i)){
+            (*eventTypes[i-1])();
+            return;
+        }
+    }
+}
+
+
+
+void startEventList(){
+    eventList[0] = eventListBase[0];
+    for(int i=1;i<6;i++)
+        eventList[i] = eventList[i-1] * eventListBase[i];
 }
 
 int main(int argc, char * argv[]) {
+    startEventList();
     srand(time(NULL));
 
-    system("clear");
-    initializePop();
-    createCSV();
+    arma::rowvec bestIndividual = finalTournment();
 
-    while (true) {
+    system("clear");
+}
+
+void replaceByBests(arma::rowvec bestsList[TOURNMENT_RATE]){
+    for(int i=0;i<TOURNMENT_RATE;i++) population.row(i) = bestsList[i];
+}
+
+void semiFinalsTournment(int semiFinalPos){
+    for(int i=0;i<TOURNMENT_RATE;i++){
+        initializePop();
+        evolutionaryAlgorithm();
+        semiFinals[i] = population.row(maxFitIndex);
+    }
+    initializePop();
+    replaceByBests(semiFinals);
+    evolutionaryAlgorithm();
+    finals[semiFinalPos] = population.row(maxFitIndex);
+    return;
+}
+
+arma::rowvec finalTournment(){
+    for(int i=0;i<TOURNMENT_RATE;i++) semiFinalsTournment(i);
+    initializePop();
+    replaceByBests(finals);
+    evolutionaryAlgorithm();
+    
+    return population.row(maxFitIndex);
+}
+
+
+
+void evolutionaryAlgorithm(){
+    noImprovementGens = 0;
+    createCSV("1");
+    partPos = -1;
+    partIncrease();
+    continueEA = true;
+    generationIndex = 0;
+    while (continueEA) {
         std::cout << "\n==== Generation " << generationIndex << " ====\n";
         // population.print("Current population:");
         evaluatePop();
-        checkDoMutationDecay(); // applies decay to mutation rate if necessary
         selectionAndMutation();
         
         saveGenerationData(generationIndex);
 
-        checkSoftRandomPredation(); // checks if a worst individual should be substituted (and substitutes it)
-        checkDoPopReset(); // checks if a "population reset" should be applied (and applies it)
+        checkEvents();
 
         generationIndex++;
         scanf("%*c");
     }
+    return;
 }
