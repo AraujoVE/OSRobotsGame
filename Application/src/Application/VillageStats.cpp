@@ -172,6 +172,10 @@ namespace Application
         pthread_create(&decayThread, NULL, runDecay, this);
     }
 
+    void VillageStats::setStatsDecaymentPaused(bool paused) {
+        m_DecaymentPaused = paused;
+    }
+
     void VillageStats::decayStat(int it,int pos){
         avenueVS[pos]->down();
 
@@ -209,8 +213,9 @@ namespace Application
             if (ATTACK_FREQUENCY == 0) it = -1;
             else it = (it+1+ATTACK_FREQUENCY)%ATTACK_FREQUENCY;
 
-            //TODO: fixed time (adjusting for lag)
-            usleep(DECAY_DELAY_MICRO);
+            do {
+                usleep(DECAY_DELAY_MICRO);
+            } while(m_DecaymentPaused);
         }
     }
 

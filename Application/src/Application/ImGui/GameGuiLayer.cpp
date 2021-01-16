@@ -9,8 +9,8 @@
 using namespace Application::GameWindows;
 namespace Application
 {
-    GameGuiLayer::GameGuiLayer()
-        : m_GameRunner(std::make_shared<GameSave>())
+    GameGuiLayer::GameGuiLayer(GameRunner& gameRunner)
+        : m_GameRunner(gameRunner)
     {
         m_StatusWindow = new StatusWindow(m_GameRunner.GetSave().GetVillageStats());
 

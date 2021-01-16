@@ -15,6 +15,7 @@ namespace Application
     private:
         EventListener m_EventListener;
         bool m_MarkedForDeletion = false;
+        bool m_DecaymentPaused = false;
 
     public:
         const static int BASE_STATS_NO = FUNCTION_QTY;
@@ -58,7 +59,6 @@ namespace Application
 
 
         int population; // if population reaches zero, the game is over -> pop calculated based on other village stats
-        //TODO: Aumentar e Diminuir tamanho da população
 
         void initializeVSAvenues();
 
@@ -71,6 +71,8 @@ namespace Application
         float adjustStatsLimits(int,float,float,bool);
 
         void startStatsDecayment();
+        void setStatsDecaymentPaused(bool paused);
+        inline bool isStatusDecaymentPaused() { return m_DecaymentPaused; }
 
         void decayStat(int,int);
         void setOnStatusDecayed(EH_StatsDecayed *eventHandler) { m_EventListener.Register(eventHandler); }

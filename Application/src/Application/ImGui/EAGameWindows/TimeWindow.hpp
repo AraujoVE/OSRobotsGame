@@ -24,7 +24,7 @@ namespace Application::EAGameWindows
             unsigned construction = m_VillageStatus->getStat((int) RobotFunction::CONSTRUCTION);
             unsigned resource_gathering = m_VillageStatus->getStat((int) RobotFunction::RESOURCE_GATHERING);
 
-            ImGui::Begin("Status");
+            ImGui::Begin("EAStatus");
             {
                 ImGui::Text("Population: %d", population); ImGui::SameLine();
                 ImGui::Text("Protection: %d", protection); ImGui::SameLine();

@@ -20,7 +20,7 @@ namespace Application
     class GameGuiLayer final : public ImGuiLayer
     {
     public:
-        GameGuiLayer();
+        GameGuiLayer(GameRunner&);
 
     private:
         virtual void ImGuiDescription() override;
@@ -29,7 +29,7 @@ namespace Application
         void LostScreenDescription();
         const static int SCRIPT_FUNCT_SIZEE = 7;
 
-        GameRunner m_GameRunner;
+        GameRunner &m_GameRunner;
 
         GameWindows::StatusWindow *m_StatusWindow;
         GameWindows::FunctionWindow *m_FunctionWindows[FUNCTION_QTY];

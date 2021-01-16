@@ -8,20 +8,26 @@
 #include "EAAlgorithm/ConvertScripts.hpp"
 
 #ifndef BOOST_VERSION
-    #error "Boost needs to be installed on the system (tested with version 1.75)"
-#endif  //!BOOST_VERSION
-
+#error "Boost needs to be installed on the system (tested with version 1.75)"
+#endif //!BOOST_VERSION
 
 namespace Application
 {
-    class MyApplication : public DampEngine::Application
+    class MyApplication final : public DampEngine::Application
     {
     private:
         MyApplication *s_Instance = nullptr;
+        GameRunner *m_GameRunner;
 
     public:
         MyApplication() : DampEngine::Application({"OSRobotGame"})
         {
+            m_GameRunner = new GameRunner();
+        }
+
+        ~MyApplication()
+        {
+            delete m_GameRunner;
         }
 
         virtual void OnStart() override
@@ -37,20 +43,26 @@ namespace Application
 
         virtual void InitLayers() override
         {
-            m_GameGuiLayer = new GameGuiLayer();
+            m_GameGuiLayer = new GameGuiLayer(*m_GameRunner);
             m_EAGameGuiLayer = new EAGameGuiLayer();
 
-            
-            
             m_LayerStack.PushOverlay(m_EAGameGuiLayer);
 
-            auto *layerStack = &m_LayerStack;
-            auto gameLayer = m_GameGuiLayer;
-            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGameSettingsChanged([layerStack, gameLayer](EAGameSettings newSettings) {
+            auto *l_LayerStack = &m_LayerStack;
+            auto *l_GameGuiLayer = m_GameGuiLayer;
+            auto *l_GameRunner = m_GameRunner;
+
+            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGameSettingsChanged([=](EAGameSettings newSettings) {
                 if (newSettings.ShowGame)
-                    layerStack->PushOverlay(gameLayer);
+                    l_LayerStack->PushOverlay(l_GameGuiLayer);
                 else
-                    layerStack->PopOverlay(gameLayer);
+                    l_LayerStack->PopOverlay(l_GameGuiLayer);
+
+                if (newSettings.PauseGame)
+                    l_GameRunner->Pause();
+                else
+                    l_GameRunner->Unpause();
+
                 return false;
             }));
         }

@@ -23,8 +23,12 @@ namespace Application
         void Stop();
         void ResetSave();
 
+        void Pause();
+        void Unpause();
+
         void OnGameLost(const std::string& reason);
         inline bool IsGameLost() const { return m_GameLost; };
+        inline bool IsGamePaused() const { return !m_GameRunning && !m_GameLost; };
         inline const std::string& GetGameLostReason() const { return m_GameLostReason; };
 
         inline GameSave &GetSave() { return *m_GameSave.get(); } 

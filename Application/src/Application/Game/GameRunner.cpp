@@ -12,7 +12,7 @@ namespace Application
     {
     }
 
-    GameRunner::GameRunner(const std::shared_ptr<GameSave>& gameSave)
+    GameRunner::GameRunner(const std::shared_ptr<GameSave> &gameSave)
     {
         m_GameSave = gameSave;
         m_GameRunning = false;
@@ -49,10 +49,22 @@ namespace Application
     void GameRunner::Stop()
     {
         DE_ASSERT(m_GameRunning, "Trying to stop a game that is not running");
-        
+
         m_EventListener->On<EH_GameEnded>(*this);
         m_GameRunning = false;
+
         //TODO: stop village stats decayment
+    }
+
+    void GameRunner::Pause()
+    {
+        m_GameRunning = false;
+        m_GameSave->GetVillageStats()->setStatsDecaymentPaused(true);
+    }
+    void GameRunner::Unpause()
+    {
+        m_GameRunning = true;
+        m_GameSave->GetVillageStats()->setStatsDecaymentPaused(false);
     }
 
     void GameRunner::OnGameLost(const std::string &reason)
@@ -93,7 +105,5 @@ namespace Application
             return false;
         }));
     }
-
-    
 
 } // namespace Application
