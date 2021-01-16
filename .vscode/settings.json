@@ -71,6 +71,8 @@
         "*.rh": "cpp",
         "csignal": "cpp",
         "codecvt": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "complex": "cpp",
+        "typeindex": "cpp"
     }
 }

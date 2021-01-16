@@ -1,6 +1,7 @@
 #pragma once
 
-#include "DampEngine/Core/Layer.hpp"
+#include "DampEngine/ImGui/ImGuiLayer.hpp"
+#include "DampEngine/Threads/Mutex.hpp"
 
 #include <vector>
 
@@ -11,20 +12,23 @@ namespace DampEngine
     public:
         LayerStack();
 
-        void PushLayer(Layer *layer);
-        void PushOverlay(Layer *overlay);
+        void PushLayer(ImGuiLayer *layer);
+        void PushOverlay(ImGuiLayer *overlay);
 
-        void PopLayer(Layer *layer);
-        void PopOverlay(Layer *overlay);
+        void PopLayer(ImGuiLayer *layer);
+        void PopOverlay(ImGuiLayer *overlay);
 
         void OnUpdate();
 
-        void OnEvent(Event &) const;
+        void OnEvent(Event &);
 
         ~LayerStack();
 
     private:
-        std::vector<Layer *> m_LayerStack;
+        std::vector<ImGuiLayer *> m_LayerStack;
         unsigned int m_OverlayStartIndex = 0;
+
+        //Avoid layer changes while rendering
+        Mutex m_LayerStackMutex;
     };
 } // namespace DampEngine

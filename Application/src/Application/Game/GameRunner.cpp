@@ -1,8 +1,8 @@
 #include "Application/Game/GameRunner.hpp"
 #include "Application/header/RobotsManagement.hpp"
 #include "Application/header/VillageStats.hpp"
-#include "Application/Events/Events.hpp"
-#include "Application/Events/EventListener.hpp"
+#include "Application/Events/EventHandler/DefaultHandlers.hpp"
+#include "Application/Events/EventListener/EventListener.hpp"
 
 #include "mypch.hpp"
 namespace Application

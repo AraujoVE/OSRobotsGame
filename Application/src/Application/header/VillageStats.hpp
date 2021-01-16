@@ -5,8 +5,8 @@
 #include "Avenue.hpp"
 #include <pthread.h>
 
-#include "Application/Events/EventListener.hpp"
-#include "Application/Events/Events.hpp"
+#include "Application/Events/EventListener/EventListener.hpp"
+#include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
 namespace Application
 {

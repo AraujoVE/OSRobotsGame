@@ -6,7 +6,7 @@
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Game/GameSave.hpp"
 
-#include "Application/Events/Events.hpp"
+#include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
 #include "Application/header/RobotsManagement.hpp"
 
@@ -97,12 +97,11 @@ namespace EAAlgorithm {
 
     void EAScript::scriptLoop(){
         time_t initTime,endTime;
-        int fitness,it = 0;
+        int it = 0;
 
         std::vector<std::pair<time_t,time_t>> gameplaysResults;
 
         while(true){
-            fitness = 0;
             for(auto gameplay : gameScript){
                 std::cout << "Gameplay " << ++it << std::endl;
 

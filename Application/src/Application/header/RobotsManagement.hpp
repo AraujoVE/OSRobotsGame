@@ -7,8 +7,8 @@
 #include "Avenue.hpp"
 #include <vector>
 #include "Application/ImGui/GameWindows/FunctionWindow.hpp"
-#include "Application/Events/EventListener.hpp"
-#include "Application/Events/Events.hpp"
+#include "Application/Events/EventListener/EventListener.hpp"
+#include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
 #include <unordered_map>
 

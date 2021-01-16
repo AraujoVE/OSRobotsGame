@@ -1,0 +1,384 @@
+Building configurations...
+Running action 'gmake2'...
+Done (236ms).
+> Premake executed with 0 errors
+==== Building GLFW (debug) ====
+==== Building Glad (debug) ====
+==== Building ImGui (debug) ====
+==== Building DampEngine (debug) ====
+==== Building Application (debug) ====
+EAGameGuiLayer.cpp
+EAScript.cpp
+FunctionWindow.cpp
+GameGuiLayer.cpp
+GameRunner.cpp
+GameSave.cpp
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/Game/GameSave.cpp:3:
+src/Application/Threads/Action.hpp: In member function ‘void Application::Action<Args>::Invoke(Args ...)’:
+src/Application/Threads/Action.hpp:26:43: error: invalid use of incomplete type ‘class Application::EventListener’ [-Werror]
+   26 |             newThreadLoop->m_EventListener->Register(new EH_ThreadEnded(onTLEnded));
+      |                                           ^~
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/Application/Game/GameRunner.cpp:2:
+src/Application/Threads/Action.hpp: In member function ‘void Application::Action<Args>::Invoke(Args ...)’:
+src/Application/Threads/Action.hpp:26:43: error: invalid use of incomplete type ‘class Application::EventListener’ [-Werror]
+   26 |             newThreadLoop->m_EventListener->Register(new EH_ThreadEnded(onTLEnded));
+      |                                           ^~
+In file included from src/Application/Events/EventListener/EventListener.hpp:10,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/Game/GameSave.cpp:3:
+src/Application/Game/GameRunner.hpp:10:11: note: forward declaration of ‘class Application::EventListener’
+   10 |     class EventListener;
+      |           ^~~~~~~~~~~~~
+In file included from src/Application/Game/GameRunner.cpp:1:
+src/Application/Game/GameRunner.hpp:10:11: note: forward declaration of ‘class Application::EventListener’
+   10 |     class EventListener;
+      |           ^~~~~~~~~~~~~
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/Game/GameSave.cpp:3:
+src/Application/Threads/Action.hpp:28:52: error: no matching function for call to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::push_back(Application::ThreadLoop*&)’
+   28 |             m_ThreadLoopVec.push_back(newThreadLoop);
+      |                                                    ^
+In file included from /usr/include/c++/10.2.0/vector:67,
+                 from /usr/include/c++/10.2.0/functional:62,
+                 from ../DampEngine/src/DampEngine/Events/Event.hpp:7,
+                 from ../DampEngine/src/DampEngine/Core/Window.hpp:3,
+                 from ../DampEngine/src/DampEngine/Core/Application.hpp:3,
+                 from ../DampEngine/src/DampEngine.hpp:22,
+                 from src/mypch.hpp:1:
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1187 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:35: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘const value_type&’ {aka ‘const std::unique_ptr<Application::ThreadLoop>&’}
+ 1187 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(std::vector<_Tp, _Alloc>::value_type&&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1203 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:30: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::value_type&&’ {aka ‘std::unique_ptr<Application::ThreadLoop>&&’}
+ 1203 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/Application/Game/GameRunner.cpp:2:
+src/Application/Threads/Action.hpp:28:52: error: no matching function for call to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::push_back(Application::ThreadLoop*&)’
+   28 |             m_ThreadLoopVec.push_back(newThreadLoop);
+      |                                                    ^
+In file included from /usr/include/c++/10.2.0/vector:67,
+                 from /usr/include/c++/10.2.0/functional:62,
+                 from ../DampEngine/src/DampEngine/Events/Event.hpp:7,
+                 from ../DampEngine/src/DampEngine/Core/Window.hpp:3,
+                 from ../DampEngine/src/DampEngine/Core/Application.hpp:3,
+                 from ../DampEngine/src/DampEngine.hpp:22,
+                 from src/mypch.hpp:1:
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1187 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:35: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘const value_type&’ {aka ‘const std::unique_ptr<Application::ThreadLoop>&’}
+ 1187 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(std::vector<_Tp, _Alloc>::value_type&&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1203 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:30: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::value_type&&’ {aka ‘std::unique_ptr<Application::ThreadLoop>&&’}
+ 1203 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/EAAlgorithm/EAScript.cpp:11:
+src/Application/Threads/Action.hpp: In member function ‘void Application::Action<Args>::Invoke(Args ...)’:
+src/Application/Threads/Action.hpp:26:43: error: invalid use of incomplete type ‘class Application::EventListener’ [-Werror]
+   26 |             newThreadLoop->m_EventListener->Register(new EH_ThreadEnded(onTLEnded));
+      |                                           ^~
+In file included from src/Application/header/Task.hpp:5,
+                 from src/Application/ImGui/GameWindows/FunctionWindow.hpp:4,
+                 from src/EAAlgorithm/EAScript.cpp:2:
+src/Application/Threads/ThreadLoop.hpp:9:11: note: forward declaration of ‘class Application::EventListener’
+    9 |     class EventListener;
+      |           ^~~~~~~~~~~~~
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/Application/ImGui/GameWindows/FunctionWindow.cpp:6:
+src/Application/Threads/Action.hpp: In member function ‘void Application::Action<Args>::Invoke(Args ...)’:
+src/Application/Threads/Action.hpp:26:43: error: invalid use of incomplete type ‘class Application::EventListener’ [-Werror]
+   26 |             newThreadLoop->m_EventListener->Register(new EH_ThreadEnded(onTLEnded));
+      |                                           ^~
+In file included from src/Application/header/Task.hpp:5,
+                 from src/Application/ImGui/GameWindows/FunctionWindow.hpp:4,
+                 from src/Application/ImGui/GameWindows/FunctionWindow.cpp:1:
+src/Application/Threads/ThreadLoop.hpp:9:11: note: forward declaration of ‘class Application::EventListener’
+    9 |     class EventListener;
+      |           ^~~~~~~~~~~~~
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/ImGui/EAGameGuiLayer.hpp:6,
+                 from src/Application/ImGui/EAGameGuiLayer.cpp:1:
+src/Application/Threads/Action.hpp: In member function ‘void Application::Action<Args>::Invoke(Args ...)’:
+src/Application/Threads/Action.hpp:26:43: error: invalid use of incomplete type ‘class Application::EventListener’ [-Werror]
+   26 |             newThreadLoop->m_EventListener->Register(new EH_ThreadEnded(onTLEnded));
+      |                                           ^~
+In file included from src/Application/Events/EventListener/EventListener.hpp:10,
+                 from src/Application/ImGui/EAGameGuiLayer.hpp:6,
+                 from src/Application/ImGui/EAGameGuiLayer.cpp:1:
+src/Application/Game/GameRunner.hpp:10:11: note: forward declaration of ‘class Application::EventListener’
+   10 |     class EventListener;
+      |           ^~~~~~~~~~~~~
+In file included from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/Application/Game/GameRunner.cpp:2:
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync()’:
+src/Application/Events/EventListener/EventListener.hpp:75:40: error: expected identifier before ‘typename’
+   75 |             auto actionLambda = [this, typename EventHandlerType]()
+      |                                        ^~~~~~~~
+In file included from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/Game/GameSave.cpp:3:
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync()’:
+src/Application/Events/EventListener/EventListener.hpp:75:40: error: expected identifier before ‘typename’
+   75 |             auto actionLambda = [this, typename EventHandlerType]()
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:20: error: request for member ‘Invoke’ in ‘Application::action’, which is of non-class type ‘Application::Action<>()’
+   81 |             action.Invoke(argTuple);
+      |                    ^~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:20: error: request for member ‘Invoke’ in ‘Application::action’, which is of non-class type ‘Application::Action<>()’
+   81 |             action.Invoke(argTuple);
+      |                    ^~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:27: error: ‘argTuple’ was not declared in this scope
+   81 |             action.Invoke(argTuple);
+      |                           ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:27: error: ‘argTuple’ was not declared in this scope
+   81 |             action.Invoke(argTuple);
+      |                           ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync(typename EventHandlerType::ArgumentsTuple)’:
+src/Application/Events/EventListener/EventListener.hpp:88:40: error: expected identifier before ‘typename’
+   88 |             auto actionLambda = [this, typename EventHandlerType](typename EventHandlerType::ArgumentsTuple _argTuple)
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync(typename EventHandlerType::ArgumentsTuple)’:
+src/Application/Events/EventListener/EventListener.hpp:88:40: error: expected identifier before ‘typename’
+   88 |             auto actionLambda = [this, typename EventHandlerType](typename EventHandlerType::ArgumentsTuple _argTuple)
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:93:52: error: to refer to a type member of a template parameter, use ‘typename EventHandlerType::ArgumentsTuple’ [-fpermissive]
+   93 |             Action<EventHandlerType::ArgumentsTuple> action(actionLambda);
+      |                                                    ^
+src/Application/Events/EventListener/EventListener.hpp:93:52: error: to refer to a type member of a template parameter, use ‘typename EventHandlerType::ArgumentsTuple’ [-fpermissive]
+   93 |             Action<EventHandlerType::ArgumentsTuple> action(actionLambda);
+      |                                                    ^
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/ImGui/EAGameGuiLayer.hpp:6,
+                 from src/Application/ImGui/EAGameGuiLayer.cpp:1:
+src/Application/Threads/Action.hpp:28:52: error: no matching function for call to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::push_back(Application::ThreadLoop*&)’
+   28 |             m_ThreadLoopVec.push_back(newThreadLoop);
+      |                                                    ^
+In file included from /usr/include/c++/10.2.0/vector:67,
+                 from /usr/include/c++/10.2.0/functional:62,
+                 from ../DampEngine/src/DampEngine/Events/Event.hpp:7,
+                 from ../DampEngine/src/DampEngine/Core/Window.hpp:3,
+                 from ../DampEngine/src/DampEngine/Core/Application.hpp:3,
+                 from ../DampEngine/src/DampEngine.hpp:22,
+                 from src/mypch.hpp:1:
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1187 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:35: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘const value_type&’ {aka ‘const std::unique_ptr<Application::ThreadLoop>&’}
+ 1187 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(std::vector<_Tp, _Alloc>::value_type&&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1203 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:30: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::value_type&&’ {aka ‘std::unique_ptr<Application::ThreadLoop>&&’}
+ 1203 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/Application/ImGui/GameWindows/FunctionWindow.cpp:6:
+src/Application/Threads/Action.hpp:28:52: error: no matching function for call to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::push_back(Application::ThreadLoop*&)’
+   28 |             m_ThreadLoopVec.push_back(newThreadLoop);
+      |                                                    ^
+In file included from /usr/include/c++/10.2.0/vector:67,
+                 from /usr/include/c++/10.2.0/functional:62,
+                 from ../DampEngine/src/DampEngine/Events/Event.hpp:7,
+                 from ../DampEngine/src/DampEngine/Core/Window.hpp:3,
+                 from ../DampEngine/src/DampEngine/Core/Application.hpp:3,
+                 from ../DampEngine/src/DampEngine.hpp:22,
+                 from src/mypch.hpp:1:
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1187 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:35: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘const value_type&’ {aka ‘const std::unique_ptr<Application::ThreadLoop>&’}
+ 1187 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(std::vector<_Tp, _Alloc>::value_type&&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1203 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:30: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::value_type&&’ {aka ‘std::unique_ptr<Application::ThreadLoop>&&’}
+ 1203 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/EAAlgorithm/EAScript.cpp:11:
+src/Application/Threads/Action.hpp:28:52: error: no matching function for call to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::push_back(Application::ThreadLoop*&)’
+   28 |             m_ThreadLoopVec.push_back(newThreadLoop);
+      |                                                    ^
+In file included from /usr/include/c++/10.2.0/vector:67,
+                 from /usr/include/c++/10.2.0/functional:62,
+                 from ../DampEngine/src/DampEngine/Events/Event.hpp:7,
+                 from ../DampEngine/src/DampEngine/Core/Window.hpp:3,
+                 from ../DampEngine/src/DampEngine/Core/Application.hpp:3,
+                 from ../DampEngine/src/DampEngine.hpp:22,
+                 from src/mypch.hpp:1:
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1187 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:35: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘const value_type&’ {aka ‘const std::unique_ptr<Application::ThreadLoop>&’}
+ 1187 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(std::vector<_Tp, _Alloc>::value_type&&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1203 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:30: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::value_type&&’ {aka ‘std::unique_ptr<Application::ThreadLoop>&&’}
+ 1203 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+In file included from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/Application/ImGui/GameWindows/FunctionWindow.cpp:6:
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync()’:
+src/Application/Events/EventListener/EventListener.hpp:75:40: error: expected identifier before ‘typename’
+   75 |             auto actionLambda = [this, typename EventHandlerType]()
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:20: error: request for member ‘Invoke’ in ‘Application::action’, which is of non-class type ‘Application::Action<>()’
+   81 |             action.Invoke(argTuple);
+      |                    ^~~~~~
+In file included from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/header/RobotsManagement.hpp:6,
+                 from src/EAAlgorithm/EAScript.cpp:11:
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync()’:
+src/Application/Events/EventListener/EventListener.hpp:75:40: error: expected identifier before ‘typename’
+   75 |             auto actionLambda = [this, typename EventHandlerType]()
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:20: error: request for member ‘Invoke’ in ‘Application::action’, which is of non-class type ‘Application::Action<>()’
+   81 |             action.Invoke(argTuple);
+      |                    ^~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:27: error: ‘argTuple’ was not declared in this scope
+   81 |             action.Invoke(argTuple);
+      |                           ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync(typename EventHandlerType::ArgumentsTuple)’:
+src/Application/Events/EventListener/EventListener.hpp:88:40: error: expected identifier before ‘typename’
+   88 |             auto actionLambda = [this, typename EventHandlerType](typename EventHandlerType::ArgumentsTuple _argTuple)
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:93:52: error: to refer to a type member of a template parameter, use ‘typename EventHandlerType::ArgumentsTuple’ [-fpermissive]
+   93 |             Action<EventHandlerType::ArgumentsTuple> action(actionLambda);
+      |                                                    ^
+src/Application/Events/EventListener/EventListener.hpp:81:27: error: ‘argTuple’ was not declared in this scope
+   81 |             action.Invoke(argTuple);
+      |                           ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync(typename EventHandlerType::ArgumentsTuple)’:
+src/Application/Events/EventListener/EventListener.hpp:88:40: error: expected identifier before ‘typename’
+   88 |             auto actionLambda = [this, typename EventHandlerType](typename EventHandlerType::ArgumentsTuple _argTuple)
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:93:52: error: to refer to a type member of a template parameter, use ‘typename EventHandlerType::ArgumentsTuple’ [-fpermissive]
+   93 |             Action<EventHandlerType::ArgumentsTuple> action(actionLambda);
+      |                                                    ^
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/ImGui/GameWindows/StatusWindow.hpp:3,
+                 from src/Application/ImGui/GameGuiLayer.cpp:6:
+src/Application/Threads/Action.hpp: In member function ‘void Application::Action<Args>::Invoke(Args ...)’:
+src/Application/Threads/Action.hpp:26:43: error: invalid use of incomplete type ‘class Application::EventListener’ [-Werror]
+   26 |             newThreadLoop->m_EventListener->Register(new EH_ThreadEnded(onTLEnded));
+      |                                           ^~
+In file included from src/Application/ImGui/GameGuiLayer.hpp:4,
+                 from src/Application/ImGui/GameGuiLayer.cpp:1:
+src/Application/Game/GameRunner.hpp:10:11: note: forward declaration of ‘class Application::EventListener’
+   10 |     class EventListener;
+      |           ^~~~~~~~~~~~~
+In file included from src/Application/ImGui/EAGameGuiLayer.hpp:6,
+                 from src/Application/ImGui/EAGameGuiLayer.cpp:1:
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync()’:
+src/Application/Events/EventListener/EventListener.hpp:75:40: error: expected identifier before ‘typename’
+   75 |             auto actionLambda = [this, typename EventHandlerType]()
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:20: error: request for member ‘Invoke’ in ‘Application::action’, which is of non-class type ‘Application::Action<>()’
+   81 |             action.Invoke(argTuple);
+      |                    ^~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:27: error: ‘argTuple’ was not declared in this scope
+   81 |             action.Invoke(argTuple);
+      |                           ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync(typename EventHandlerType::ArgumentsTuple)’:
+src/Application/Events/EventListener/EventListener.hpp:88:40: error: expected identifier before ‘typename’
+   88 |             auto actionLambda = [this, typename EventHandlerType](typename EventHandlerType::ArgumentsTuple _argTuple)
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:93:52: error: to refer to a type member of a template parameter, use ‘typename EventHandlerType::ArgumentsTuple’ [-fpermissive]
+   93 |             Action<EventHandlerType::ArgumentsTuple> action(actionLambda);
+      |                                                    ^
+In file included from src/Application/Events/EventListener/EventListener.hpp:11,
+                 from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/ImGui/GameWindows/StatusWindow.hpp:3,
+                 from src/Application/ImGui/GameGuiLayer.cpp:6:
+src/Application/Threads/Action.hpp:28:52: error: no matching function for call to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::push_back(Application::ThreadLoop*&)’
+   28 |             m_ThreadLoopVec.push_back(newThreadLoop);
+      |                                                    ^
+In file included from /usr/include/c++/10.2.0/vector:67,
+                 from /usr/include/c++/10.2.0/functional:62,
+                 from ../DampEngine/src/DampEngine/Events/Event.hpp:7,
+                 from ../DampEngine/src/DampEngine/Core/Window.hpp:3,
+                 from ../DampEngine/src/DampEngine/Core/Application.hpp:3,
+                 from ../DampEngine/src/DampEngine.hpp:22,
+                 from src/mypch.hpp:1:
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1187 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1187:35: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘const value_type&’ {aka ‘const std::unique_ptr<Application::ThreadLoop>&’}
+ 1187 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(std::vector<_Tp, _Alloc>::value_type&&) [with _Tp = std::unique_ptr<Application::ThreadLoop>; _Alloc = std::allocator<std::unique_ptr<Application::ThreadLoop> >; std::vector<_Tp, _Alloc>::value_type = std::unique_ptr<Application::ThreadLoop>]’
+ 1203 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/10.2.0/bits/stl_vector.h:1203:30: note:   no known conversion for argument 1 from ‘Application::ThreadLoop*’ to ‘std::vector<std::unique_ptr<Application::ThreadLoop> >::value_type&&’ {aka ‘std::unique_ptr<Application::ThreadLoop>&&’}
+ 1203 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+In file included from src/Application/header/VillageStats.hpp:8,
+                 from src/Application/ImGui/GameWindows/StatusWindow.hpp:3,
+                 from src/Application/ImGui/GameGuiLayer.cpp:6:
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync()’:
+src/Application/Events/EventListener/EventListener.hpp:75:40: error: expected identifier before ‘typename’
+   75 |             auto actionLambda = [this, typename EventHandlerType]()
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:20: error: request for member ‘Invoke’ in ‘Application::action’, which is of non-class type ‘Application::Action<>()’
+   81 |             action.Invoke(argTuple);
+      |                    ^~~~~~
+src/Application/Events/EventListener/EventListener.hpp:81:27: error: ‘argTuple’ was not declared in this scope
+   81 |             action.Invoke(argTuple);
+      |                           ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp: In member function ‘void Application::EventListener::OnAsync(typename EventHandlerType::ArgumentsTuple)’:
+src/Application/Events/EventListener/EventListener.hpp:88:40: error: expected identifier before ‘typename’
+   88 |             auto actionLambda = [this, typename EventHandlerType](typename EventHandlerType::ArgumentsTuple _argTuple)
+      |                                        ^~~~~~~~
+src/Application/Events/EventListener/EventListener.hpp:93:52: error: to refer to a type member of a template parameter, use ‘typename EventHandlerType::ArgumentsTuple’ [-fpermissive]
+   93 |             Action<EventHandlerType::ArgumentsTuple> action(actionLambda);
+      |                                                    ^
+cc1plus: all warnings being treated as errors
+make[1]: *** [Makefile:194: ../bin-int/Debug-linux-x86_64/Application/GameSave.o] Error 1
+make[1]: *** Waiting for unfinished jobs....
+cc1plus: all warnings being treated as errors
+cc1plus: all warnings being treated as errors
+cc1plus: all warnings being treated as errors
+make[1]: *** [Makefile:197: ../bin-int/Debug-linux-x86_64/Application/EAGameGuiLayer.o] Error 1
+make[1]: *** [Makefile:200: ../bin-int/Debug-linux-x86_64/Application/GameGuiLayer.o] Error 1
+make[1]: *** [Makefile:203: ../bin-int/Debug-linux-x86_64/Application/FunctionWindow.o] Error 1
+cc1plus: all warnings being treated as errors
+make[1]: *** [Makefile:191: ../bin-int/Debug-linux-x86_64/Application/GameRunner.o] Error 1
+cc1plus: all warnings being treated as errors
+make[1]: *** [Makefile:236: ../bin-int/Debug-linux-x86_64/Application/EAScript.o] Error 1
+make: *** [Makefile:71: Application] Error 2
+*** ERRORS HAVE OCCURRED! ***
+
+
+Premake FAILED :( status=2

@@ -2,12 +2,13 @@
 #define TASK
 
 #include "Application/header/RobotFunctions.hpp"
-#include "Application/Events/EventListener.hpp"
-
 #include "Application/Threads/ThreadLoop.hpp"
+
+#include <memory>
 
 namespace Application
 {
+    class EventListener;
 
     class Task final
     {
@@ -31,7 +32,7 @@ namespace Application
         inline int GetAvgReward() const { return AVG_REWARD; }
         inline time_t GetLastUpdate() const { return lastUpdateTime; }
     private:
-        EventListener m_EventListener;
+        std::unique_ptr<EventListener> m_EventListener;
 
         int TIME_STEP;
         const int INIT_TIME_STEP;

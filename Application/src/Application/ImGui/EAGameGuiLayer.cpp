@@ -17,18 +17,22 @@ namespace Application
     {
     }
 
-
     void EAGameGuiLayer::ImGuiDescription()
     {
-        ImGui::Begin("Teste1");
+
+        bool changed = false;
+        ImGui::Begin("Settings");
         {
-            ImGui::Text("Population: %d", m_GameRunner->GetSave().GetVillageStats()->getPopulation());
-            bool s = ImGui::Button("Start decay");
-            bool r = ImGui::Button("Restart");
-            if (s) m_GameRunner->GetSave().GetVillageStats()->startStatsDecayment();
-            if (r) m_GameRunner->ResetSave();
+            changed |= ImGui::Checkbox("Show game", &m_Settings.ShowGame);
+            changed |= ImGui::Checkbox("Pause game and EA", &m_Settings.PauseGame);
+
+            changed |= ImGui::Checkbox("Manual mode", &m_Settings.ManualMode);
         }
         ImGui::End();
+        if (changed)
+        {
+            m_EventListener.OnAsync<EH_EAGameSettingsChanged>(m_Settings);
+        }
     }
 
 } // namespace Application

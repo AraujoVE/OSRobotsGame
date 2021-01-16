@@ -1,7 +1,8 @@
 #include "Application/header/Task.hpp"
 #include "Application/header/ConstsMap.hpp"
 
-#include "Application/Events/Events.hpp"
+#include "Application/Events/EventListener/EventListener.hpp"
+#include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
 #include "DampEngine/Core/Macros/Log.hpp"
 
@@ -37,8 +38,10 @@ namespace Application
 
         m_Running = false;
 
-        m_ThreadLoop.m_EventListener.Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
-        m_ThreadLoop.m_EventListener.Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
+        m_EventListener.reset(new EventListener());
+
+        m_ThreadLoop.m_EventListener->Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
+        m_ThreadLoop.m_EventListener->Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
     }
 
     Task::~Task()
@@ -91,20 +94,20 @@ namespace Application
     void Task::MarkAsIgnored()
     {
         DE_TRACE("Detaching Task #{0} (Function:{1})", id, getRobotFunctionString(function));
-        m_ThreadLoop.m_EventListener.Clear();
+        m_ThreadLoop.m_EventListener->Clear();
         m_ThreadLoop.Stop();
     }
 
     bool Task::OnThreadLoopStarted()
     {
-        m_EventListener.On<EH_TaskStarted>(*this);
+        m_EventListener->On<EH_TaskStarted>(*this);
         return true;
     }
     bool Task::OnThreadLoopEnded(ThreadEndedReason::ThreadEndedReason_t reason)
     {
         switch (reason) {
-            case ThreadEndedReason::STOP: m_EventListener.On<EH_TaskCancelled>(*this); break;
-            case ThreadEndedReason::FINISHED: m_EventListener.On<EH_TaskFinished>(*this); break;
+            case ThreadEndedReason::STOP: m_EventListener->On<EH_TaskCancelled>(*this); break;
+            case ThreadEndedReason::FINISHED: m_EventListener->On<EH_TaskFinished>(*this); break;
         }
         
         return false;

@@ -221,15 +221,15 @@ namespace Application
         //Cria nova task com o id Incrementado
         Task *newTask = new Task(funct);
 
-        newTask->m_EventListener.Register(new EH_TaskFinished(std::bind(&RobotsManagement::onTaskEnded<EH_TaskFinished>, this, std::placeholders::_1)));
-        newTask->m_EventListener.Register(new EH_TaskCancelled(std::bind(&RobotsManagement::onTaskEnded<EH_TaskCancelled>, this, std::placeholders::_1)));
+        newTask->m_EventListener->Register(new EH_TaskFinished(std::bind(&RobotsManagement::onTaskEnded<EH_TaskFinished>, this, std::placeholders::_1)));
+        newTask->m_EventListener->Register(new EH_TaskCancelled(std::bind(&RobotsManagement::onTaskEnded<EH_TaskCancelled>, this, std::placeholders::_1)));
 
         tasksDown();
         tasks[(int)funct][newTask->GetID()] = newTask;
         tasksUp();
 
         auto *el = &m_EventListener;
-        newTask->m_EventListener.Register(new EH_TaskStarted([=](Task& task){
+        newTask->m_EventListener->Register(new EH_TaskStarted([=](Task& task){
             el->On<EH_TaskStarted>(task);
             return false;
         }));

@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Application/Events/EventListener.hpp"
-
 #include <functional>
 #include <memory>
 #include <pthread.h>
 
 namespace Application
 {
+    class EventListener;
     namespace ThreadEndedReason
     {
         enum ThreadEndedReason_t
@@ -16,11 +15,6 @@ namespace Application
             FINISHED
         };
     }
-
-    DA_EVENT(EH_ThreadStarted, bool, (void));
-    DA_EVENT(EH_ThreadEnded, bool, (ThreadEndedReason::ThreadEndedReason_t));
-
-    void *threadRountine(void *threadLoopV);
 
     class ThreadLoop
     {
@@ -31,38 +25,19 @@ namespace Application
         std::function<bool()> m_AliveCheckFunction;
         bool m_Running;
 
-        void InnerLoop()
-        {
-            while (m_Running && m_AliveCheckFunction())
-            {
-                m_TickFunction();
-            }
-            bool forcedStop = !m_Running;
-            m_Running = false;
-            m_EventListener.On<EH_ThreadEnded>(forcedStop ? ThreadEndedReason::STOP : ThreadEndedReason::FINISHED);
-        }
-
+        void InnerLoop();
         friend void *threadRountine(void *threadLoopV);
         const static std::function<bool()> s_DefaultAliveCheckFunction;
 
     public:
-        EventListener m_EventListener;
+        std::unique_ptr<EventListener> m_EventListener;
 
         ThreadLoop(
             std::function<void()> loopFunction,
-            std::function<bool()> aliveCheckFunction = s_DefaultAliveCheckFunction)
-            : m_TickFunction(loopFunction), m_AliveCheckFunction(aliveCheckFunction)
-        {
-        }
+            std::function<bool()> aliveCheckFunction = s_DefaultAliveCheckFunction);
 
-        void Start()
-        {
-            m_Running = true;
-            pthread_create(&m_Thread, NULL, &threadRountine, this);
-
-            m_EventListener.On<EH_ThreadStarted>();
-        }
-        inline void Stop() { m_Running = false; }
+        void Start();
+        void Stop();
     };
 
 } // namespace Application

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DampEngine/Core/Layer.hpp"
+#include "DampEngine/Threads/Mutex.hpp"
 
 namespace DampEngine
 {
@@ -18,9 +19,15 @@ namespace DampEngine
         virtual ~ImGuiLayer() override;
     protected:
         virtual void ImGuiDescription();
+    public:
+        static void BeginFrame();
+        static void EndFrame();
     private:
-        void Begin();
-        void End();
+        //TODO: CURRENTLY SUPPORTS ONLY ONE GLFW WINDOW
+        static int s_InstanceCount;
+        static bool s_FrameBegun;
+        static Mutex s_FrameControlMutex;
+        static Mutex s_AttachDetachMutex;
     };
 
 } // namespace DampEngine

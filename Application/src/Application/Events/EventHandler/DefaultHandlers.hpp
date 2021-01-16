@@ -1,11 +1,13 @@
 #pragma once
 
-#include "Application/Events/Event.hpp"
-#include "Application/header/Task.hpp"
+#include "Application/Events/EventHandler/EventHandler.template.hpp"
+
 #include "Application/Game/GameRunner.hpp"
+#include "Application/header/Task.hpp"
 
 namespace Application
 {
+    struct EAGameSettings;
 
     /*  ROBOTS MANAGEMENT EVENT HANDLERS  */
     DA_EVENT(EH_TaskCreated, bool, (Task&));
@@ -22,6 +24,15 @@ namespace Application
     /* GAME RUNNER EVENT HANDLERS */
     DA_EVENT(EH_GameStarted, bool, (GameRunner&));
     DA_EVENT(EH_GameEnded, bool, (GameRunner&));
+    
+
+    /* THREADLOOP EVENTS */
+    DA_EVENT(EH_ThreadStarted, bool, (void));
+    DA_EVENT(EH_ThreadEnded, bool, (ThreadEndedReason::ThreadEndedReason_t));
+
+    /* EAGAME GUI LAYER EVENTS */
+    DA_EVENT(EH_EAGameSettingsChanged, bool, (EAGameSettings));
+
     
 } // namespace Application
 

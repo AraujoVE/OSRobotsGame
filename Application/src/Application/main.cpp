@@ -38,19 +38,21 @@ namespace Application
         virtual void InitLayers() override
         {
             m_GameGuiLayer = new GameGuiLayer();
-            m_LayerStack.PushOverlay(m_GameGuiLayer);
-            // m_EAGameGuiLayer = new EAGameGuiLayer();
-            // m_LayerStack.PushOverlay(m_EAGameGuiLayer);
+            m_EAGameGuiLayer = new EAGameGuiLayer();
 
-            // auto *layerStack = &m_LayerStack;
-            // auto gameLayer = m_GameGuiLayer;
-            // m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGameSettingsChanged([layerStack, gameLayer](EAGameSettings &newSettings) {
-            //     if (newSettings.ShowGame)
-            //         layerStack->PushOverlay(gameLayer);
-            //     else
-            //         layerStack->PopOverlay(gameLayer);
-            //     return false;
-            // }));
+            
+            
+            m_LayerStack.PushOverlay(m_EAGameGuiLayer);
+
+            auto *layerStack = &m_LayerStack;
+            auto gameLayer = m_GameGuiLayer;
+            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGameSettingsChanged([layerStack, gameLayer](EAGameSettings newSettings) {
+                if (newSettings.ShowGame)
+                    layerStack->PushOverlay(gameLayer);
+                else
+                    layerStack->PopOverlay(gameLayer);
+                return false;
+            }));
         }
 
         virtual void OnUpdate() override
