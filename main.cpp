@@ -24,6 +24,8 @@
 [NÂO NECESSARIO/A DISCUTIR]
 4. Salvar o melhor de cada AG em um vetor de "melhores globais" e trocar o while(true) da main por outra condição (o AG deve finalizar em algum momento - salvando seu melhor no vetor de "melhores globais")
 [PARCIAL]
+5. Fazer nas semi-finais e finais initializePop com valores não puramente randomicos e sim com valores limitados entre o min e o max dos valores já descobertos para cada parametro
+[OK]
 
 */
 #include <stdlib.h>  /* srand, rand */
@@ -31,6 +33,7 @@
 #include <fstream> // creating (.csv) files
 #include <vector>
 #include <cstring>
+#include <string>
 #include <functional>
 #include <armadillo> // http://arma.sourceforge.net/docs.html
 // #include <unistd.h>
@@ -65,8 +68,15 @@
 //     EV_A_RATE,
 // };
 
-arma::rowvec indvSemiFinals[TOURNMENT_RATE];
-arma::rowvec indvFinals[TOURNMENT_RATE];
+enum tournments{ INITIALS,SEMI_FINALS, FINALS};
+
+arma::mat::fixed<TOURNMENT_RATE, NB_PARAMETERS> indvSemiFinals; // arma::mat : armadillo matrix (Mat<double>)
+arma::mat::fixed<TOURNMENT_RATE, NB_PARAMETERS> indvFinals; // arma::mat : armadillo matrix (Mat<double>)
+
+arma::mat::fixed<TOURNMENT_RATE, NB_PARAMETERS> tournments[2] = {indvSemiFinals,indvFinals};
+
+//arma::rowvec indvSemiFinals[TOURNMENT_RATE];
+//arma::rowvec indvFinals[TOURNMENT_RATE];
 
 const int eventTriggerModuleBase[] = {1, 10, 5, 10, 2, 10};
 int eventTriggerModule[6];
@@ -100,7 +110,8 @@ bool less(double par1,double par2) { return par1 < par2; }
 bool (*evaluateType[])(double,double) = {less,greater};
 
 // 1st step: initialize population
-void initializePop() {
+void initializePop(int tournmentType) {
+    double minVal,maxVal;
     std::cout << "INITIALIZING POPULATION\n";
     // for (int i = 0; i < POPULATION_SIZE; i++) {
     //     for (int j = 0; j < NB_PARAMETERS; j++) {
@@ -108,7 +119,18 @@ void initializePop() {
     //     }
     // }
     population.randu(); // initialize with values between 0 and 1
-    population = population * MAX_PARAM_VALUE;
+    if(!tournmentType) population = population * MAX_PARAM_VALUE; // if a normal EA is taking place, just multiply the population by a givern value
+    else{ // if not
+        int middle = (POPULATION_SIZE - TOURNMENT_RATE)/2;
+        for(int i = TOURNMENT_RATE + 1;i< middle;i++){ // Min and max values are defined for each col, and converting the current col values to a number between this constraints.
+            // this starts after the first TOURNMENT_RATE individuls, and the remaining is divided into two pars, one with biased rand values, and other without
+            minVal = 0.5 * tournments[tournmentType].col(i).min();
+            maxVal = 1.5 * tournments[tournmentType].col(i).max();
+            population.col(i) = minVal + (maxVal - minVal)*(population.col(i));
+        }
+        for(int i = middle + 1;i < POPULATION_SIZE;i++) 
+            population.col(i) = population.col(i) * MAX_PARAM_VALUE;
+    }
 
     FILE* fp;
     fp = fopen("constValues.cfg", "w");
@@ -348,7 +370,7 @@ void mutate(int indIndex) {
 void createCSV(std::string pathPos) {
     std::ofstream csvFileWriter;
 
-    csvFileWriter.open("historyEA" + pathPos + ".csv");
+    csvFileWriter.open("historyEA-" + pathPos + ".csv");
     if (!csvFileWriter.good()) {
         std::cout << "[!] Error occurred while trying to create historyEA" << pathPos << ".csv!\n";
         return;
@@ -428,7 +450,7 @@ void oneRemainingPopReset() {
 
     arma::rowvec best = population.row(maxFitIndex);
 
-    initializePop();
+    initializePop(INITIALS);
     population.row(0) = best;
     partIncrease();
 
@@ -471,9 +493,9 @@ void startEventTriggerList(){
         eventTriggerModule[i] = eventTriggerModule[i-1] * eventTriggerModuleBase[i];
 }
 
-void evolutionaryAlgorithm(){
+void evolutionaryAlgorithm(std::string csvStr){
     nbNoImprovementGens = 0;
-    createCSV("1");
+    createCSV(csvStr);
     
     partPos = 0; // defines selection method of current batch of generations
 
@@ -497,22 +519,22 @@ void evolutionaryAlgorithm(){
     return;
 }
 
-void replaceByBests(arma::rowvec * bestsList){
+void replaceByBests(int tournmentType){
     for(int i = 0; i < TOURNMENT_RATE; i++) 
-        population.row(i) = bestsList[i];
+        population.row(i) = tournments[tournmentType - 1].row(i);
 }
 
 void semiFinalsTournment(int semiFinalPos){
     for(int i = 0; i < TOURNMENT_RATE; i++){
-        initializePop();
-        evolutionaryAlgorithm();
-        indvSemiFinals[i] = population.row(maxFitIndex); // saves the best individual from current EA
+        initializePop(INITIALS);
+        evolutionaryAlgorithm("SF-" + std::to_string(semiFinalPos) + "_EA-" + std::to_string(i));
+        indvSemiFinals.row(i) = population.row(maxFitIndex); // saves the best individual from current EA
     }
 
-    initializePop();
-    replaceByBests(indvSemiFinals);
-    evolutionaryAlgorithm(); // this EA will use the best individuals from each previous EA
-    indvFinals[semiFinalPos] = population.row(maxFitIndex); // saves the best individual from current EA 
+    initializePop(SEMI_FINALS);
+    replaceByBests(SEMI_FINALS);
+    evolutionaryAlgorithm("SF-" + std::to_string(semiFinalPos)); // this EA will use the best individuals from each previous EA
+    indvFinals.row(semiFinalPos) = population.row(maxFitIndex); // saves the best individual from current EA 
     return;
 }
 
@@ -520,9 +542,9 @@ arma::rowvec finalTournment(){
     for(int i = 0; i < TOURNMENT_RATE; i++) 
         semiFinalsTournment(i);
     
-    initializePop();
-    replaceByBests(indvFinals); 
-    evolutionaryAlgorithm(); // this EA will use the best individuals from each semifinal
+    initializePop(FINALS);
+    replaceByBests(FINALS); 
+    evolutionaryAlgorithm("Main"); // this EA will use the best individuals from each semifinal
     
     return population.row(maxFitIndex);
 }
