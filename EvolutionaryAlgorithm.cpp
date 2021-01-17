@@ -22,9 +22,16 @@
 
 //arma::rowvec semiFinalsAndFinals[SEMI_FINALS][TOURNMENT_RATE];
 //arma::rowvec indvFinals[TOURNMENT_RATE];
+void EvolutionaryAlgorithm::saveBestIndvParamsCSV(){
+    std::fstream myFile;
+    myFile.open("constValues.cfg", std::ios_base::app);    
 
-bool EvolutionaryAlgorithm::greater(double par1,double par2) { return par1 > par2; }
-bool EvolutionaryAlgorithm::less(double par1,double par2) { return par1 < par2; }
+    myFile << parametersList[0] << " = " << population(bestFitIndex,0);
+    for (size_t i = 1; i < NB_PARAMETERS; i++) myFile << std::endl << parametersList[i] << " = " << population(bestFitIndex,i);
+    //printf("k%sk\n", parametersList[i]);
+    myFile.close();
+}
+
 
 
 // 1st step: initialize population
@@ -37,26 +44,23 @@ void EvolutionaryAlgorithm::initializePop(int tournmentType) {
     //     }
     // }
     population.randu(); // initialize with values between 0 and 1
-    if(tournmentType > 1) population *= MAX_PARAM_VALUE; // if a normal EA is taking place, just multiply the population by a givern value
-    else{ // if not
-        int middle = (POPULATION_SIZE - TOURNMENT_RATE)/2;
-        for(int i = TOURNMENT_RATE + 1;i< middle;i++){ // Min and max values are defined for each col, and converting the current col values to a number between this constraints.
+    if(tournmentType == INITIALS) population *= MAX_PARAM_VALUE; // if a normal EA is taking place, just multiply the population by a givern value
+    else{
+        int middle = TOURNMENT_RATE + (POPULATION_SIZE - TOURNMENT_RATE)/2;
+        fillInitialsWithBests(tournmentType);
+        for(int j = 0;j< NB_PARAMETERS;j++){ // Min and max values are defined for each col, and converting the current col values to a number between this constraints.
             // this starts after the first TOURNMENT_RATE individuls, and the remaining is divided into two pars, one with biased rand values, and other without
-            minVal = MIN_MULT * semiFinalsAndFinals[tournmentType].col(i).min();
-            maxVal = MAX_MULT * semiFinalsAndFinals[tournmentType].col(i).max();
-            population.col(i) = minVal + (maxVal - minVal)*(population.col(i));
-        }
-        for(int i = middle + 1;i < POPULATION_SIZE;i++) 
-            population.col(i) *= MAX_PARAM_VALUE;
-    }
+            minVal = MIN_MULT * bestTournmentIndv[tournmentType].col(j).min();
+            maxVal = MAX_MULT * bestTournmentIndv[tournmentType].col(j).max();
 
-    std::fstream myFile;
-    myFile.open("constValues.cfg", std::ios_base::app);
-    
-    myFile << parametersList[0] << " = " << population(0,0);
-    for (size_t i = 1; i < NB_PARAMETERS; i++) myFile << std::endl << parametersList[i] << " = " << population(0,i);
-    //printf("k%sk\n", parametersList[i]);
-    myFile.close();
+            for(int i = TOURNMENT_RATE;i<middle;i++){
+                population(i,j) = minVal + (maxVal - minVal)*(population(i,j));
+            }
+        }
+        for(int i = middle;i < POPULATION_SIZE;i++) 
+            population.row(i) *= MAX_PARAM_VALUE;
+        
+    }
 
     population.print("Population matrix initialized:");
 
@@ -69,7 +73,7 @@ void EvolutionaryAlgorithm::normalizeFitness(double * normalizedFitness) {
         return;
     
     for (int i = 0; i < POPULATION_SIZE; i++)
-        normalizedFitness[i] = (fitness[i]-minFitness)/(maxFitness-minFitness);
+        normalizedFitness[i] = (fitness[i]-bestFitness)/(worstFitness-bestFitness);
 
     return;
 }
@@ -79,32 +83,37 @@ void EvolutionaryAlgorithm::evaluatePop() {
     std::cout << "EVALUATING POPULATION\n";
 
     nbNoImprovementGens++; // we begin considering there was no improvement in the generation
+    pthread_mutex_lock(&mutex);
+    remainingFitnessToCalc = POPULATION_SIZE;
+    pthread_mutex_unlock(&mutex);
 
+    for (int i = 0; i<POPULATION_SIZE; i++){
+        m_eaGameControler.startGame(i,arma::conv_to<std::vector<double>>::from(population.row(i)));
+    }
+    for (int i = 0; i< POPULATION_SIZE; i++){
+        pthread_mutex_lock(&mutex2);
+    }
+
+    
     for (int i = 0; i < POPULATION_SIZE; i++) { 
         // example of fitness calculation -> CHANGE!!!!
         // fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado
-        while(!continueEA) sleep(100);
 
-        pthread_mutex_unlock(&mutex);
-        fitness[i] = indvFitness;
-        continueEA = false;
-        pthread_mutex_lock(&mutex);
-
-        if ((this->*(evaluateType[EVAL_TYPE]))(maxFitness,fitness[i])){ // searching for the  max fitnnes from new generation
-            maxFitness = fitness[i];
-            maxFitIndex = i;
+        if (fitness[i] < bestFitness){ // searching for the  max fitnnes from new generation
+            bestFitness = fitness[i];
+            bestFitIndex = i;
             nbNoImprovementGens = 0; // this generation shows improvement -> reset counter
         }
-        else if ((this->*(evaluateType[EVAL_TYPE]))(fitness[i],minFitness)){
-            minFitness = fitness[i];
-            minFitIndex = i;
+        else if (fitness[i] > worstFitness){
+            worstFitness = fitness[i];
+            worstFitIndex = i;
         }
 
         // printf("fitness[%d] %lf\n", i, fitness[i]);
     }
 
-    printf("MAX FITNESS: %lf - INDEX: %d\n", maxFitness, maxFitIndex);
-    printf("MIN FITNESS: %lf - INDEX: %d\n", minFitness, minFitIndex);
+    printf("BEST FITNESS: %lf - INDEX: %d\n", bestFitness, bestFitIndex);
+    printf("WORST FITNESS: %lf - INDEX: %d\n", worstFitness, worstFitIndex);
 
     return;
 }
@@ -120,7 +129,7 @@ void EvolutionaryAlgorithm::crossover(int indv, arma::rowvec parent1, arma::rowv
 
 void EvolutionaryAlgorithm::elitism() {
     std::cout << "ELITISM\n";
-    arma::rowvec bestIndv = population.row(maxFitIndex);
+    arma::rowvec bestIndv = population.row(bestFitIndex);
     
     for (int i = 0; i < POPULATION_SIZE; i++) {
         // crossover
@@ -144,7 +153,7 @@ void EvolutionaryAlgorithm::tournament() {
     oldPopulation = population;
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        if (i == maxFitIndex)
+        if (i == bestFitIndex)
             continue;
         
         // chossing parents for new individual
@@ -152,7 +161,7 @@ void EvolutionaryAlgorithm::tournament() {
             int indexIndA = rand() % POPULATION_SIZE; // indv 1 that will "fight" to be parent
             int indexIndB = rand() % POPULATION_SIZE; // indv 2 that will "fight" to be parent
 
-            parentIndex[j] = ((this->*(evaluateType[EVAL_TYPE]))(fitness[indexIndA],fitness[indexIndB]) ? indexIndA : indexIndB);
+            parentIndex[j] = (fitness[indexIndA] < fitness[indexIndB] ? indexIndA : indexIndB);
         }
 
         // crossover
@@ -186,7 +195,7 @@ void EvolutionaryAlgorithm::roulette() {
     
     // Chosing new parents for each individual
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        if (i == maxFitIndex) // preserves best individual
+        if (i == bestFitIndex) // preserves best individual
             continue;
         
         for (int k = 0; k < 2; k++) { // chosing 2 parents
@@ -237,9 +246,9 @@ void EvolutionaryAlgorithm::selectionAndMutation() { // tournament, elitism, rou
     // population.transform( [](double x) { return ((x < 0 || x > MAX_PARAM_VALUE) ? abs(MAX_PARAM_VALUE-abs(x)) : x); } );
     
     // Mutating only one parameter from each individual
-    for(int i = 0; i < maxFitIndex; i++) mutate(i);
+    for(int i = 0; i < bestFitIndex; i++) mutate(i);
     // (don't mutate best one)
-    for(int i = maxFitIndex+1; i < POPULATION_SIZE; i++) mutate(i);
+    for(int i = bestFitIndex+1; i < POPULATION_SIZE; i++) mutate(i);
 
     return;
 }
@@ -290,7 +299,7 @@ void EvolutionaryAlgorithm::saveGenerationData(int generation) {
     for (int i = 0; i < POPULATION_SIZE; i++) {
         csvFileWriter << formatParamsString(i) << "," << fitness[i] << ",";
     }
-    csvFileWriter << formatParamsString(maxFitIndex) << "," << maxFitness << "\n";
+    csvFileWriter << formatParamsString(bestFitIndex) << "," << bestFitness << "\n";
 }
 
 void EvolutionaryAlgorithm::increaseMutation() {
@@ -312,7 +321,7 @@ void EvolutionaryAlgorithm::predationOfOne() {
     arma::rowvec newInd(NB_PARAMETERS, arma::fill::randu); // creating totally new individual
     newInd = newInd * MAX_PARAM_VALUE;
     
-    population.row(minFitIndex) = newInd;
+    population.row(worstFitIndex) = newInd;
 
     return;
 }
@@ -328,7 +337,7 @@ void EvolutionaryAlgorithm::partIncrease(){
 void EvolutionaryAlgorithm::oneRemainingPopReset() {
     std::cout << "APPLYING POPULATION RESET\n";
 
-    arma::rowvec best = population.row(maxFitIndex);
+    arma::rowvec best = population.row(bestFitIndex);
 
     initializePop(INITIALS);
     population.row(0) = best;
@@ -338,12 +347,11 @@ void EvolutionaryAlgorithm::oneRemainingPopReset() {
 }
 
 
-// Function that kills all individuals and creates a new population
 // Ends the batch of generations from current EA
-void EvolutionaryAlgorithm::fullPopReset() {
-    std::cout << "HARD POPULATION RESET";
+void EvolutionaryAlgorithm::endEABatch() {
+    std::cout << "END EA BATCH";
 
-    continueEA = false;
+    continueBatch = false;
 
     return;
 }
@@ -361,7 +369,7 @@ void EvolutionaryAlgorithm::checkEvents() {
     if(nbNoImprovementGens == 0) 
         return;
     
-    for(int i = 1; i < 6; i++){
+    for(int i = 5; i > 0; i++){
         if(eventHappens(i)) {
             (this->*(eventTypes[i-1]))(); // calls one of these functions: increaseMutation, predationOfOne, partIncrease, oneRemainingPopReset, fullPopReset
             return;
@@ -377,12 +385,12 @@ void EvolutionaryAlgorithm::startEventTriggerList(){
 void EvolutionaryAlgorithm::evoAlg(std::string csvStr){
     nbNoImprovementGens = 0;
     createCSV(csvStr);
-    
+    continueBatch = true;
     partPos = 0; // defines selection method of current batch of generations
 
-    continueEA = true;
+    
     generationIndex = 0;
-    while (continueEA) {
+    while (continueBatch) {
         std::cout << "\n==== Generation " << generationIndex << " ====\n";
         // population.print("Current population:");
         evaluatePop();
@@ -400,22 +408,20 @@ void EvolutionaryAlgorithm::evoAlg(std::string csvStr){
     return;
 }
 
-void EvolutionaryAlgorithm::replaceByBests(int tournmentType){
-    for(int i = 0; i < TOURNMENT_RATE; i++) 
-        population.row(i) = semiFinalsAndFinals[tournmentType].row(i);
+void EvolutionaryAlgorithm::fillInitialsWithBests(int tournmentType){
+    for(int i = 0; i < TOURNMENT_RATE; i++)
+        population.row(i) = bestTournmentIndv[tournmentType].row(i);
 }
 
 void EvolutionaryAlgorithm::semiFinalsTournment(int semiFinalPos){
     for(int i = 0; i < TOURNMENT_RATE; i++){
         initializePop(INITIALS);
         evoAlg("SF-" + std::to_string(semiFinalPos) + "_EA-" + std::to_string(i));
-        semiFinalsAndFinals[SEMI_FINALS].row(i) = population.row(maxFitIndex); // saves the best individual from current EA
+        bestTournmentIndv[SEMI_FINALS].row(i) = population.row(bestFitIndex); // saves the best individual from current EA
     }
-
     initializePop(SEMI_FINALS);
-    replaceByBests(SEMI_FINALS);
     evoAlg("SF-" + std::to_string(semiFinalPos)); // this EA will use the best individuals from each previous EA
-    semiFinalsAndFinals[FINALS].row(semiFinalPos) = population.row(maxFitIndex); // saves the best individual from current EA 
+    bestTournmentIndv[FINALS].row(semiFinalPos) = population.row(bestFitIndex); // saves the best individual from current EA 
     return;
 }
 
@@ -424,10 +430,9 @@ void EvolutionaryAlgorithm::finalTournment(){
         semiFinalsTournment(i);
     
     initializePop(FINALS);
-    replaceByBests(FINALS); 
     evoAlg("Main"); // this EA will use the best individuals from each semifinal
     
-    bestIndividual = population.row(maxFitIndex);
+    bestIndividual = population.row(bestFitIndex);
     std::cout << "EVOLUTIONARY ALGORITHM FINISHED!" << std::endl;
     //eaFinished = true;
     return;
@@ -454,13 +459,11 @@ void *runScript(void *scriptFuncObject) {
     return NULL;
 }
 
-void EvolutionaryAlgorithm::setIndvFitness(std::vector<std::pair<int,int>> fitnessResults){
-    indvFitness = 0;
+void EvolutionaryAlgorithm::setFitness(int pos,std::vector<std::pair<int,int>> fitnessResults){
+    fitness[pos] = 0;
     for(auto fitnessPair : fitnessResults){
-        indvFitness += std::abs(fitnessPair.first - fitnessPair.second)/fitnessPair.first; 
+        fitness[pos] += std::abs(fitnessPair.first - fitnessPair.second)/fitnessPair.first; 
     }
-    pthread_mutex_unlock(&mutex);
-    continueEA = true;
-    pthread_mutex_lock(&mutex);
+    remainingFitnessToCalc -= 1;
     return;
 }

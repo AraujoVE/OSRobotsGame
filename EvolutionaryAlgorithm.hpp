@@ -9,6 +9,7 @@ class EvolutionaryAlgorithm{
     public:
         EvolutionaryAlgorithm();
         ~EvolutionaryAlgorithm();
+        void saveBestIndvParamsCSV();
         void initializePop(int);
         void normalizeFitness(double*);
         void evaluatePop();
@@ -25,22 +26,23 @@ class EvolutionaryAlgorithm{
         void predationOfOne();
         void partIncrease();
         void oneRemainingPopReset();
-        void fullPopReset();
+        void endEABatch();
         bool eventHappens(int);
         void checkEvents();
         void startEventTriggerList();
         void evoAlg(std::string);
-        void replaceByBests(int);
+        void fillInitialsWithBests(int);
         void semiFinalsTournment(int);
         void finalTournment();
-        bool greater(double,double);
-        bool less(double,double);
         void scriptLoop();
-        void setIndvFitness(std::vector<std::pair<int,int>>);
+        void setFitness(std::vector<std::pair<int,int>>);
     private:
+
+        EAGameControler &m_eaGameControler;
 
         pthread_t scriptThread;
         pthread_mutex_t mutex;
+        pthread_mutex_t mutex2;
 
         arma::rowvec bestIndividual;
 
@@ -78,7 +80,7 @@ class EvolutionaryAlgorithm{
         bool continueEA;
         bool eaFinished;
         const double MIN_MULT = 0.5;
-        const double MAX_MULT = 0.5;
+        const double MAX_MULT = 1.5;
         const double MUTATE_POSITIVE_MULT = 1.0;
         const double MUTATE_NEGATIVE_MULT = -1.0;
 
@@ -98,7 +100,7 @@ class EvolutionaryAlgorithm{
         const long MAX_PARAM_VALUE = 1; // max value a parameter can reach
         enum tournments{ SEMI_FINALS, FINALS, INITIALS};
 
-        arma::mat::fixed<TOURNMENT_RATE, NB_PARAMETERS> semiFinalsAndFinals[2] = {
+        arma::mat::fixed<TOURNMENT_RATE, NB_PARAMETERS> bestTournmentIndv[2] = {
             arma::mat::fixed<TOURNMENT_RATE, NB_PARAMETERS>(),
             arma::mat::fixed<TOURNMENT_RATE, NB_PARAMETERS>()
         };
@@ -119,8 +121,8 @@ class EvolutionaryAlgorithm{
 
         // Each LINE (ROW) is the individual's parameters
         double fitness[POPULATION_SIZE];
-        double maxFitness = 0, minFitness = 2000000000;
-        int maxFitIndex = -1, minFitIndex = -1;
+        double bestFitness = 0, worstFitness = 2000000000;
+        int bestFitIndex = -1, worstFitIndex = -1;
         double mutationRate = INITIAL_MUTATION;
         int nbNoImprovementGens = 0; // number of generations in a row without any improvement (best indiviNdual remains the same)
         int generationIndex = 0;
@@ -129,12 +131,8 @@ class EvolutionaryAlgorithm{
         // Choose if population evaluation will be according to max fitness value or min fitness
         enum evalTypes{ BY_MIN, BY_MAX };
         evalTypes EVAL_TYPE = BY_MIN;
-        
-        bool (EvolutionaryAlgorithm::*evaluateType[2])(double,double) = {
-            &EvolutionaryAlgorithm::less,
-            &EvolutionaryAlgorithm::greater
-        };
 
+        bool continueBatch;        
         void (EvolutionaryAlgorithm::*selectionType[3])() = {
             &EvolutionaryAlgorithm::tournament, 
             &EvolutionaryAlgorithm::elitism, 
@@ -146,9 +144,9 @@ class EvolutionaryAlgorithm{
             &EvolutionaryAlgorithm::predationOfOne,
             &EvolutionaryAlgorithm::partIncrease,
             &EvolutionaryAlgorithm::oneRemainingPopReset,
-            &EvolutionaryAlgorithm::fullPopReset 
+            &EvolutionaryAlgorithm::endEABatch 
         };
-
+    int remainingFitnessToCalc;
 
 
 };
