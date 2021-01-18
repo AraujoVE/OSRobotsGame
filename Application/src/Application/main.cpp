@@ -7,6 +7,11 @@
 
 #include "EAAlgorithm/ConvertScripts.hpp"
 
+#include "Application/header/RobotsManagement.hpp"
+#include "Application/header/VillageStats.hpp"
+#include "Application/header/ConstsMap.hpp"
+#include "Application/header/RobotFunctions.hpp"
+
 #ifndef BOOST_VERSION
 #error "Boost needs to be installed on the system (tested with version 1.75)"
 #endif //!BOOST_VERSION
@@ -63,6 +68,39 @@ namespace Application
 
                 return false;
             }));
+
+///////////////// REMOVE DEBUG
+
+            // GameRunner gr1, gr2;
+            // gr1.Start();
+            // gr2.Start();
+
+
+            // GameConsts *gc = new GameConsts();
+            // gc->LoadValuesFromFile("Application/config/constValues.cfg");
+
+            // RobotsManagement *rm1 = new RobotsManagement(*gc);
+            // RobotsManagement *rm2 = new RobotsManagement(*gc);
+
+            // VillageStats *vs1 = new VillageStats(*gc);
+            // VillageStats *vs2 = new VillageStats(*gc);
+        
+            // vs1->startStatsDecayment();
+            // vs2->startStatsDecayment();
+
+            // while (true) {
+            //     DE_DEBUG("vs1 pop: {0}", vs1->getPopulation());
+            //     DE_DEBUG("vs2 pop: {0}\n", vs2->getPopulation());
+            //     usleep(1000);
+            // }
+
+            // rm1->setVillageStats(vs1);
+            // rm2->setVillageStats(vs2);
+
+            // rm1->createTask(RobotFunction::PROTECTION);
+            // rm2->createTask(RobotFunction::PROTECTION);
+
+            
         }
 
         virtual void OnUpdate() override

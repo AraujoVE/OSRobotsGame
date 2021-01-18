@@ -1,5 +1,4 @@
-#ifndef EA_SCRIPT
-#define EA_SCRIPT
+#pragma once
 
 #include "Application/Events/EventHandler/DefaultHandlers.fwd.hpp"
 #include "Application/header/RobotFunctions.hpp"
@@ -61,5 +60,3 @@ namespace EAAlgorithm
         }
     };
 } // namespace EAAlgorithm
-
-#endif

@@ -1,5 +1,5 @@
-#ifndef CONSTS_MAP
-#define CONSTS_MAP
+#pragma once
+
 #include <unordered_map>
 #include <string>
 #include <functional>
@@ -119,5 +119,3 @@ namespace Application
     };
 
 } // namespace Application
-
-#endif

@@ -11,7 +11,7 @@ namespace Application
 
     GameSave::GameSave(): m_GameConsts(new GameConsts()) {}
 
-    GameSave::GameSave(const std::string &gameConstsPath) : GameSave()
+    GameSave::GameSave(const std::string &gameConstsPath) : m_GameConsts(new GameConsts())
     {
         m_GameConsts->LoadValuesFromFile(gameConstsPath);
         Reset();

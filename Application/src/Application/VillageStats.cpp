@@ -169,6 +169,7 @@ namespace Application
 
     void VillageStats::startStatsDecayment()
     {
+        DE_ASSERT(!m_MarkedForDeletion);
         pthread_create(&decayThread, NULL, runDecay, this);
     }
 
@@ -222,6 +223,7 @@ namespace Application
                 usleep(m_GameConstsCache.DECAY_DELAY_MICRO);
             } while (m_DecaymentPaused);
         }
+        DE_TRACE("decayStats thread stopped!");
     }
 
     void VillageStats::decayResources(int, int, float &)
@@ -246,9 +248,9 @@ namespace Application
     {
         m_MarkedForDeletion = true;
 
-        DE_DEBUG("Danger: joining decayThread... @VillageStats::~VillageStats");
-        pthread_join(decayThread, NULL);
-        DE_DEBUG("Success: decayThread ended @VillageStats::~VillageStats");
+        // DE_DEBUG("Danger: joining decayThread... @VillageStats::~VillageStats");
+        // pthread_join(decayThread, NULL);
+        // DE_DEBUG("Success: decayThread ended @VillageStats::~VillageStats");
 
         for (int i = 0; i < BASE_STATS_NO + 1; i++)
         {

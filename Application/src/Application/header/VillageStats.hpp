@@ -1,5 +1,4 @@
-#ifndef VILLAGE_STATS
-#define VILLAGE_STATS
+#pragma once
 
 #include "RobotFunctions.hpp"
 #include "Avenue.hpp"
@@ -17,6 +16,7 @@ namespace Application
         EventListener m_EventListener;
         GameConstsCache m_GameConstsCache;
         bool m_MarkedForDeletion = false;
+        
         bool m_DecaymentPaused = false;
 
     public:
@@ -54,6 +54,8 @@ namespace Application
 
     public:
         VillageStats(GameConsts& gameConsts);
+        VillageStats(const VillageStats&) = delete;
+        VillageStats(VillageStats&&) = delete;
         ~VillageStats();
 
         float calcReduction(float,float);
@@ -93,4 +95,3 @@ namespace Application
 
     void *runDecay (void *decayFuncObject);
 } // namespace Application
-#endif

@@ -8,6 +8,8 @@
 
 #include "mypch.hpp"
 
+#include "DampEngine/Threads/Mutex.hpp"
+
 namespace Application
 {
 
@@ -17,59 +19,67 @@ namespace Application
     std::unordered_map<std::string, float> GameConsts::constsMap = {};
     void GameConsts::LoadValuesFromFile(const std::string &srcFile)
     {
-        constsMap.clear();
-        std::fstream myFile;
-        int tokenPos;
-        float val;
-        myFile.open(srcFile, std::ios::in);
+        //Static to force all instances to wait for this instance to end
+        static DampEngine::Mutex fileMutex;
 
-        DE_ASSERT(!myFile.fail(), "(GameConsts) FAILED TO OPEN FILE  '" + srcFile + "'");
-
-        std::string line, name;
-        while (std::getline(myFile, line))
+        fileMutex.Lock();
         {
-            if (line[0] < 'A' || line[0] > 'z')
-                continue;
-            tokenPos = line.find("=");
-            name = line.substr(0, tokenPos - 1);
-            val = stof(line.substr(tokenPos + 2, line.length() - tokenPos - 1));
-            SetValue(name, val);
+            constsMap.clear();
+            std::fstream myFile;
+            int tokenPos;
+            float val;
+            myFile.open(srcFile, std::ios::in);
+
+            DE_ASSERT(!myFile.fail(), "(GameConsts) FAILED TO OPEN FILE  '" + srcFile + "'");
+
+            std::string line, name;
+            while (std::getline(myFile, line))
+            {
+                if (line[0] < 'A' || line[0] > 'z')
+                    continue;
+                tokenPos = line.find("=");
+                name = line.substr(0, tokenPos - 1);
+                val = stof(line.substr(tokenPos + 2, line.length() - tokenPos - 1));
+                SetValue(name, val);
+            }
+
+            myFile.close();
         }
-        return;
+        fileMutex.Unlock();
     }
 
-    void GameConsts::LoadFromCromossome(const std::vector<double>& cromossome)
+    void GameConsts::LoadFromCromossome(const std::vector<double> &cromossome)
     {
         int i = 0;
-        SetValue("ON_ATTACK_MULTIPLIER", (float) cromossome.at(i++));
-        SetValue("POP_INCREASE_TAX", (float) cromossome.at(i++));
-        SetValue("POP_PER_CONSTRUCTION", (float) cromossome.at(i++));
-        SetValue("INIT_POP_VALUE", (float) cromossome.at(i++));
-        SetValue("INIT_STAT_VALUE", (float) cromossome.at(i++));
-        SetValue("ON_ATTACK_DECAY_TAX", (float) cromossome.at(i++));
-        SetValue("NORMAL_DECAY_TAX", (float) cromossome.at(i++));
-        SetValue("ATTACK_FREQUENCY", (float) cromossome.at(i++));
-        SetValue("INIT_RESOURCES_VALUE", (float) cromossome.at(i++));
-        SetValue("TAX_REDUCT", (float) cromossome.at(i++));
-        SetValue("DECAY_DELAY_MICRO", (float) cromossome.at(i++));
-        SetValue("MIN_LOSS_0", (float) cromossome.at(i++));
-        SetValue("MIN_LOSS_1", (float) cromossome.at(i++));
-        SetValue("MIN_LOSS_2", (float) cromossome.at(i++));
-        SetValue("MIN_LOSS_3", (float) cromossome.at(i++));
-        SetValue("MAX_LOSS_0", (float) cromossome.at(i++));
-        SetValue("MAX_LOSS_1", (float) cromossome.at(i++));
-        SetValue("MAX_LOSS_2", (float) cromossome.at(i++));
-        SetValue("MAX_LOSS_3", (float) cromossome.at(i++));
-        SetValue("TOT_ROBOTS_INI", (float) cromossome.at(i++));
-        SetValue("FREE_ROBOTS_INI", (float) cromossome.at(i++));
-        SetValue("PROD_COST_INI", (float) cromossome.at(i++));
-        SetValue("PROD_COST_INCREASE_TAX", (float) cromossome.at(i++));
-        SetValue("TIME_STEP", (float) cromossome.at(i++));
-        SetValue("INIT_TIME_STEP", (float) cromossome.at(i++));
-        SetValue("MAX_TIME_STEPS", (float) cromossome.at(i++));
-        SetValue("MIN_REWARD", (float) cromossome.at(i++));
-        SetValue("REWARD_RANGE", (float) cromossome.at(i++));
-        SetValue("FAILURE_TAX", (float) cromossome.at(i++));
+        SetValue("ON_ATTACK_MULTIPLIER", (float)cromossome.at(i++));
+        SetValue("POP_INCREASE_TAX", (float)cromossome.at(i++));
+        SetValue("POP_PER_CONSTRUCTION", (float)cromossome.at(i++));
+        SetValue("INIT_POP_VALUE", (float)cromossome.at(i++));
+        SetValue("INIT_STAT_VALUE", (float)cromossome.at(i++));
+        SetValue("ON_ATTACK_DECAY_TAX", (float)cromossome.at(i++));
+        SetValue("NORMAL_DECAY_TAX", (float)cromossome.at(i++));
+        SetValue("ATTACK_FREQUENCY", (float)cromossome.at(i++));
+        SetValue("INIT_RESOURCES_VALUE", (float)cromossome.at(i++));
+        SetValue("TAX_REDUCT", (float)cromossome.at(i++));
+        // SetValue("DECAY_DELAY_MICRO", (float) cromossome.at(i++));
+        SetValue("MIN_LOSS_0", (float)cromossome.at(i++));
+        SetValue("MIN_LOSS_1", (float)cromossome.at(i++));
+        SetValue("MIN_LOSS_2", (float)cromossome.at(i++));
+        SetValue("MIN_LOSS_3", (float)cromossome.at(i++));
+        SetValue("MAX_LOSS_0", (float)cromossome.at(i++));
+        SetValue("MAX_LOSS_1", (float)cromossome.at(i++));
+        SetValue("MAX_LOSS_2", (float)cromossome.at(i++));
+        SetValue("MAX_LOSS_3", (float)cromossome.at(i++));
+        SetValue("TOT_ROBOTS_INI", (float)cromossome.at(i++));
+        SetValue("FREE_ROBOTS_INI", (float)cromossome.at(i++));
+        SetValue("PROD_COST_INI", (float)cromossome.at(i++));
+        SetValue("PROD_COST_INCREASE_TAX", (float)cromossome.at(i++));
+        SetValue("TIME_STEP", (float)cromossome.at(i++));
+        SetValue("INIT_TIME_STEP", (float)cromossome.at(i++));
+        SetValue("MAX_TIME_STEPS", (float)cromossome.at(i++));
+        SetValue("MIN_REWARD", (float)cromossome.at(i++));
+        SetValue("REWARD_RANGE", (float)cromossome.at(i++));
+        SetValue("FAILURE_TAX", (float)cromossome.at(i++));
     }
 
     float GameConsts::GetValue(const std::string &key) const
@@ -78,6 +88,7 @@ namespace Application
         return constsMap[key];
     }
 
+    //TODO: avoid invalid params ((e.g. division per zero))
     float GameConsts::SetValue(const std::string &key, float newValue)
     {
         constsMap[key] = newValue;

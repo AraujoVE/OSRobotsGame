@@ -63,7 +63,7 @@ namespace EAAlgorithm
             "ATTACK_FREQUENCY",
             "INIT_RESOURCES_VALUE",
             "TAX_REDUCT",
-            "DECAY_DELAY_MICRO",
+            //DECAY_DELAY_MICRO -- not configurable (changed on the UI)
             "MIN_LOSS_0",
             "MIN_LOSS_1",
             "MIN_LOSS_2",
@@ -75,12 +75,14 @@ namespace EAAlgorithm
             "TOT_ROBOTS_INI",
             "FREE_ROBOTS_INI",
             "PROD_COST_INI",
+            "PROD_COST_INCREASE_TAX",
             "TIME_STEP",
             "INIT_TIME_STEP",
             "MAX_TIME_STEPS",
             "MIN_REWARD",
             "REWARD_RANGE",
-            "FAILURE_TAX"};
+            "FAILURE_TAX"
+        };
         bool eaFinished;
         const double MIN_MULT = 0.5;
         const double MAX_MULT = 1.5;

@@ -10,6 +10,8 @@
 
 #include "EvolutionaryAlgorithm.hpp"
 
+#include "mypch.hpp"
+
 #include "EAController.hpp"
 
 // NOT USED??
@@ -94,16 +96,15 @@ namespace EAAlgorithm
         std::cout << "EVALUATING POPULATION\n";
 
         nbNoImprovementGens++; // we begin considering there was no improvement in the generation
-        pthread_mutex_lock(&mutex);
-        remainingFitnessToCalc = POPULATION_SIZE;
-        pthread_mutex_unlock(&mutex);
 
         std::vector<std::vector<double>> populationVec2(population.n_rows);
         for (size_t i = 0; i < population.n_rows; ++i)
             populationVec2[i] = (arma::conv_to<std::vector<double>>::from(population.row(i)));
 
+        DE_TRACE("Sending population to EAController to execute it");
         auto gameplayResults = m_EAController.RunPopulationInGame(populationVec2);
 
+        DE_TRACE("Calculating fitness of population after gameplay results received");
         calcFitness(gameplayResults);
 
         for (int i = 0; i < POPULATION_SIZE; i++)

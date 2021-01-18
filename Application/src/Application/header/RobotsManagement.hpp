@@ -1,5 +1,4 @@
-#ifndef ROBOTS_MANAGEMENT
-#define ROBOTS_MANAGEMENT
+#pragma once
 
 #include "RobotFunctions.hpp"
 #include "Task.hpp"
@@ -91,4 +90,3 @@ namespace Application
         inline bool onTaskEnded(Task& task) { m_EventListener.On<Event>(task); taskEndedRoutine(task); return false; }
     };
 } // namespace Application
-#endif

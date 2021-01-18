@@ -1,5 +1,4 @@
-#ifndef TASK
-#define TASK
+#pragma once
 
 #include "cpphack.hpp"
 
@@ -43,7 +42,7 @@ namespace Application
     private:
         std::unique_ptr<EventListener> m_EventListener;
 
-        ThreadLoop m_ThreadLoop;
+        ThreadLoop *m_ThreadLoop;
         bool m_Running;
 
         const int id;
@@ -75,4 +74,3 @@ namespace Application
         friend class RobotsManagement;
     };
 } // namespace Application
-#endif

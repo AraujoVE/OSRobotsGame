@@ -42,25 +42,43 @@ namespace EAAlgorithm
 
     std::vector<EAController::GameplayResult> EAController::RunPopulationInGame(const std::vector<Individual> &population)
     {
+        DE_DEBUG("EAController::RunPopulationInGame()");
         m_GameplayResults.clear();
 
         std::vector<EAScript *> scripts;
+        std::vector<GameRunner*> gameRunners;
 
+        //TODO: DELAY MCRO from UI
+        //Used only to get DELAY_MICRO
+        GameConsts *fileGC = new GameConsts();
+        fileGC->LoadValuesFromFile(getEAScriptSrcFilePath());
+
+        int debug_ind_ind = 0;
         for (const Individual &individual : population)
         {
-            GameRunner indvGameRunner;
-            indvGameRunner.GetGameConsts().LoadFromCromossome(individual);
-            EAScript *script = new EAScript(indvGameRunner, getEAScriptSrcFilePath());
+            //Feeds indvGameRunner with base consts from file, before overwriting with genes
+            GameRunner *indvGameRunner = new GameRunner();
+
+            DE_DEBUG("(RunPopulationInGame) Loading game runner with cromossome...");
+            indvGameRunner->GetGameConsts().LoadFromCromossome(individual);
+            DE_DEBUG("(RunPopulationInGame) Done.");
+            EAScript *script = new EAScript(*indvGameRunner, getEAScriptSrcFilePath());
+
+            DE_DEBUG("(RunPopulationInGame) Executing (async) gameScript.cfg on individual {0}...", ++debug_ind_ind);
             script->startScript();
 
             scripts.push_back(script);
+            gameRunners.push_back(indvGameRunner);
         }
 
+        debug_ind_ind = 0;
         for (auto *script : scripts)
         {
+            DE_DEBUG("(RunPopulationInGame) Waiting for script to end (script of individual {0})...", ++debug_ind_ind);
             m_GameplayResults.push_back(*script->joinScriptThread());
         }
 
+        DE_DEBUG("(RunPopulationInGame) All individuals have been tested! returning results");
         return m_GameplayResults;
     }
 

@@ -13,7 +13,6 @@ namespace Application
     //Inicialização e destruição de classe
     Task::Task(RobotFunction funct, GameConstsCache& gameConsts, Task::TaskID id)
         : m_GameConstsCache(gameConsts),
-          m_ThreadLoop(std::bind(&Task::UpdateTask, this), std::bind([](Task *self) { return !self->IsTaskCompleted(); }, this)),
           id(id),
           function(funct)
     {
@@ -33,8 +32,13 @@ namespace Application
 
         m_EventListener.reset(new EventListener());
 
-        m_ThreadLoop.m_EventListener->Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
-        m_ThreadLoop.m_EventListener->Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
+
+        auto tlTickFn = std::bind(&Task::UpdateTask, this);
+        auto tlStopFn = [=]() { return !this->IsTaskCompleted(); };
+        m_ThreadLoop = new ThreadLoop(tlTickFn, tlStopFn);
+
+        m_ThreadLoop->m_EventListener->Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
+        m_ThreadLoop->m_EventListener->Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
 
     }
 
@@ -75,21 +79,21 @@ namespace Application
     void Task::Start()
     {
         DE_TRACE("Starting Task #{0} (Function:{1})", id, getRobotFunctionString(function));
-        m_ThreadLoop.Start();
+        m_ThreadLoop->Start();
     }
 
     void Task::Cancel()
     {
         DE_TRACE("Stopping Task #{0} (Function:{1})", id, getRobotFunctionString(function));
         
-        m_ThreadLoop.Stop();
+        m_ThreadLoop->Stop();
     }
 
     void Task::MarkAsIgnored()
     {
         DE_TRACE("Detaching Task #{0} (Function:{1})", id, getRobotFunctionString(function));
-        m_ThreadLoop.m_EventListener->Clear();
-        m_ThreadLoop.Stop();
+        m_ThreadLoop->m_EventListener->Clear();
+        m_ThreadLoop->Stop();
     }
 
     bool Task::OnThreadLoopStarted()
