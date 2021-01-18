@@ -59,9 +59,9 @@ void Avenue::startConsumer() {
 void Avenue::stopConsumer() {
     m_ConsumerRunning = false;
     producer(1);
-    DE_DEBUG("IN: join @Avenue::stopConsumer");
+    // DE_DEBUG("IN: join @Avenue::stopConsumer");
     pthread_join(consumer_thread, NULL);
-    DE_DEBUG("OUT: join @Avenue::stopConsumer");
+    // DE_DEBUG("OUT: join @Avenue::stopConsumer");
 }
 
 

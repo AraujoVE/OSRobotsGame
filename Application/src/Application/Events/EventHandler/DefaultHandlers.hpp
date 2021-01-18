@@ -1,14 +1,15 @@
 #pragma once
 
+#include "DefaultHandlers.fwd.hpp"
+
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 
 #include "Application/Game/GameRunner.hpp"
 #include "Application/header/Task.hpp"
+#include <string>
 
 namespace Application
 {
-    struct EAGameSettings;
-
     /*  ROBOTS MANAGEMENT EVENT HANDLERS  */
     DA_EVENT(EH_TaskCreated, bool, (Task&));
     DA_EVENT(EH_TaskStarted, bool, (Task&));
@@ -33,7 +34,8 @@ namespace Application
     /* EAGAME GUI LAYER EVENTS */
     DA_EVENT(EH_EAGameSettingsChanged, bool, (EAGameSettings));
 
+    /* GAME CONSTS EVENTS */
+    DA_EVENT(EH_GCValueChanged, bool, (const std::string& /* changed value key */, float /* changed value */));
+
     
 } // namespace Application
-
-#undef DA_EVENT

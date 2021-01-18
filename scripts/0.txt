@@ -1,7 +1,11 @@
 task++(med)
-task--(pro,4)
-move++(con,3)
-move--(med,19)
+move++(med,0)
+move++(med,0)
+move++(med,0)
+move--(med,0)
+move--(med,0)
+task--(med,0)
+robots++
 robots++
 robots--
 wait(3)

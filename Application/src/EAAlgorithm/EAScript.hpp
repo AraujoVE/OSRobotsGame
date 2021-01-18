@@ -21,11 +21,13 @@ namespace EAAlgorithm
         pthread_t scriptThread;
         std::vector<std::vector<std::vector<std::string>>> gameScript;
         const static int DIRECTIONS_SIZE = 7;
-        const static int WAIT_UNIT = 500000;
+        const static int HUMAN_WAIT_UNIT = 500000;
 
     public:
         EAScript(GameRunner &, std::string);
         ~EAScript();
+
+        void startScript();
 
         void scriptFunct0(const std::vector<std::string> &params);
         void scriptFunct1(const std::vector<std::string> &params);

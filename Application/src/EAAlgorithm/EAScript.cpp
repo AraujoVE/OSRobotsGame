@@ -2,14 +2,13 @@
 #include "Application/ImGui/GameWindows/FunctionWindow.hpp"
 #include "Application/ImGui/GameWindows/TaskWindow.hpp"
 
-
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Game/GameSave.hpp"
 
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
 #include "Application/header/RobotsManagement.hpp"
-
+#include "DampEngine/Threads/Mutex.hpp"
 
 #include "mypch.hpp"
 
@@ -18,129 +17,192 @@ using namespace Application;
 #define EAS_SRM (m_GameRunner.GetSave().GetRobotsManagement())
 #define EAS_SVS (m_GameRunner.GetSave().GetVillageStats())
 
-namespace EAAlgorithm {
-    EAScript::EAScript(GameRunner& gameRunner, std::string filePath): 
-        m_GameRunner(gameRunner),
-        srcFile(filePath)
+namespace EAAlgorithm
+{
+    EAScript::EAScript(GameRunner &gameRunner, std::string filePath) : m_GameRunner(gameRunner),
+                                                                       srcFile(filePath)
     {
         initScriptDirections();
+    }
+
+    void EAScript::startScript()
+    {
         pthread_create(&scriptThread, NULL, runScript, this);
     }
 
-    EAScript::~EAScript(){
+    EAScript::~EAScript()
+    {
         pthread_join(scriptThread, NULL);
     }
 
-    void EAScript::initScriptDirections(){
+    void EAScript::initScriptDirections()
+    {
         std::fstream myFile;
-        int tokenPos,curGameplay = -1,curOp;
+        int tokenPos, curGameplay = -1, curOp;
         myFile.open(srcFile, std::ios::in);
         std::string line;
+        float DELAY_MICRO = m_GameRunner.GetGameConsts().GetValue("DECAY_DELAY_MICRO");
+
         while (std::getline(myFile, line))
         {
-            if(line[0] == '#'){
+            if (line[0] == '#')
+            {
                 gameScript.push_back(std::vector<std::vector<std::string>>());
                 curGameplay++;
                 curOp = 0;
                 gameScript.at(curGameplay).push_back(std::vector<std::string>());
-                gameScript.at(curGameplay).at(curOp).push_back(line.substr(1,line.length() - 1));
+                gameScript.at(curGameplay).at(curOp).push_back(line.substr(1, line.length() - 1));
             }
-            else{
+            else
+            {
                 gameScript.at(curGameplay).push_back(std::vector<std::string>());
                 curOp++;
                 tokenPos = line.find(",");
-                while(tokenPos != -1){
-                    gameScript.at(curGameplay).at(curOp).push_back(line.substr(0,tokenPos));
-                    line = line.substr(tokenPos + 1,line.length() - (1 + tokenPos));
+                while (tokenPos != -1)
+                {
+                    gameScript.at(curGameplay).at(curOp).push_back(line.substr(0, tokenPos));
+                    line = line.substr(tokenPos + 1, line.length() - (1 + tokenPos));
                     tokenPos = line.find(",");
                 }
                 gameScript.at(curGameplay).at(curOp).push_back(line);
+
+                //If it is a wait operation, hijack another parameter with DELAY_MICRO
+                if (gameScript.at(curGameplay).at(curOp).at(0) == "6")
+                    gameScript.at(curGameplay).at(curOp).push_back(std::to_string(DELAY_MICRO));
             }
         }
     }
 
-
-    void EAScript::scriptFunct0(const std::vector<std::string>& params){
+    void EAScript::scriptFunct0(const std::vector<std::string> &params)
+    {
         EAS_SRM->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
     }
 
-    void EAScript::scriptFunct1(const std::vector<std::string>& params){
-        auto &curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction) stoi(params.at(1)));
-        EAS_SRM->cancelTask(curTask);
+    void EAScript::scriptFunct1(const std::vector<std::string> &params)
+    {
+        auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
+        DE_ASSERT(curTask.has_value(), "(EAScript::scriptFunct1) Invalid Task " + params.at(2));
+        EAS_SRM->cancelTask(*curTask.value());
     }
 
-    void EAScript::scriptFunct2(const std::vector<std::string>& params){
-        auto &curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction) stoi(params.at(1)));
-        EAS_SRM->moveRobot(curTask,1);
+    void EAScript::scriptFunct2(const std::vector<std::string> &params)
+    {
+        auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
+        DE_ASSERT(curTask.has_value(), "(EAScript::scriptFunct2) Invalid Task " + params.at(2));
+        EAS_SRM->moveRobot(*curTask.value(), 1);
     }
 
-    void EAScript::scriptFunct3(const std::vector<std::string>& params){
-        auto &curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction) stoi(params.at(1)));
-        EAS_SRM->moveRobot(curTask,-1);
+    void EAScript::scriptFunct3(const std::vector<std::string> &params)
+    {
+        auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
+        DE_ASSERT(curTask.has_value(), "(EAScript::scriptFunct3) Invalid Task " + params.at(2));
+        EAS_SRM->moveRobot(*curTask.value(), -1);
     }
 
-    void EAScript::scriptFunct4(const std::vector<std::string>& params){
+    void EAScript::scriptFunct4(const std::vector<std::string> &params)
+    {
         EAS_SRM->createRobots(1);
     }
 
-    void EAScript::scriptFunct5(const std::vector<std::string>& params){
-        EAS_SRM->destroyRobots(1);        
+    void EAScript::scriptFunct5(const std::vector<std::string> &params)
+    {
+        EAS_SRM->destroyRobots(1);
     }
 
-    void EAScript::scriptFunct6(const std::vector<std::string>& params){
-        int waitTime = (std::stoi(params.at(1)) > 1 ? std::stoi(params.at(1)) - 1 : 0);
-        usleep(waitTime*WAIT_UNIT);
+    void EAScript::scriptFunct6(const std::vector<std::string> &params)
+    {
+        double waitsPerSecond = 1e6 / HUMAN_WAIT_UNIT;
+
+        int waitTime = std::stoi(params.at(1));
+
+        int waitCount = waitTime * waitsPerSecond;
+        if (waitCount > 0)
+            waitCount--;
+
+        float DELAY_MICRO = std::stof(params.at(2));
+
+        usleep(waitCount * DELAY_MICRO);
     }
 
     //TODO: Jogo versão normal ou calibração
-    //TODO: Velocidade dos segundos do jogo -> slider 
+    //TODO: Velocidade dos segundos do jogo -> slider
 
-    void EAScript::scriptLoop(){
-        time_t initTime,endTime;
+    void EAScript::scriptLoop()
+    {
+        time_t initTime, endTime;
         int it = 0;
 
-        std::vector<std::pair<time_t,time_t>> gameplaysResults;
+        std::vector<std::pair<time_t, time_t>> gameplaysResults;
 
-        while(true){
-            for(auto gameplay : gameScript){
-                std::cout << "Gameplay " << ++it << std::endl;
+        float DELAY_MICRO = m_GameRunner.GetGameConsts().GetValue("DECAY_DELAY_MICRO");
 
-                m_GameRunner.SetOnGameStarted(new EH_GameStarted([&initTime](GameRunner& _) {
-                    initTime = time(0);
-                    return false;
-                }));
+        DampEngine::Mutex endMutex;
 
-                m_GameRunner.SetOnGameEnded(new EH_GameEnded([&endTime](GameRunner& _) {
-                    endTime = time(0);
-                    return false;
-                }));
+        auto &_gameScript = gameScript;
 
-                m_GameRunner.Start();
+        m_GameRunner.SetOnGameStarted(new EH_GameStarted([&initTime, this, &_gameScript, &it, DELAY_MICRO](GameRunner &_) {
+            DE_DEBUG("(EAScript) Game Started");
+            initTime = time(0);
 
-                for(int i=1;i < (int)gameplay.size();i++){
-                    std::cout << "\tAction " << i << std::endl;
-                    (this->*(scriptLoopFuncts[stoi(gameplay.at(i).at(0))]))(gameplay.at(i));
-                    usleep(WAIT_UNIT);
-                }
-                std::cout << "Acabou a primeira Gameplay";
-                //Callback para saber quando acaba o jogo
-                //quando isso acontece : endTime = time(0)
-                time_t targetDuration = stol(gameplay.at(0).at(0));
-                
-                gameplaysResults.push_back({endTime-initTime, targetDuration});
+            for (int i = 1; i < (int)_gameScript.at(it).size(); i++)
+            {
+                std::cout << "\tAction " << i << std::endl;
+                (this->*(scriptLoopFuncts[stoi(_gameScript.at(it).at(i).at(0))]))(_gameScript.at(it).at(i));
+                usleep(DELAY_MICRO);
             }
 
-            //TODO: chamar o guerra
-            // EAFunction(gameplayResults);
+            return false;
+        }));
+
+        auto &gameRunner = m_GameRunner;
+
+        m_GameRunner.SetOnGameEnded(new EH_GameEnded([&endTime, &endMutex, &_gameScript, &it, &initTime, &gameplaysResults, &gameRunner](GameRunner &_) {
+            DE_DEBUG("(EAScript) Game Ended");
+            endTime = time(0);
+
+            //Callback para saber quando acaba o jogo
+            //quando isso acontece : endTime = time(0)
+            time_t targetDurationAU = stol(_gameScript.at(it).at(0).at(0));
+            time_t realDurationS = endTime - initTime;
+
+            double AUperS = HUMAN_WAIT_UNIT / gameRunner.GetGameConsts().GetValue("DECAY_DELAY_MICRO");
+            time_t realDurationAU = realDurationS * AUperS;
+
+            gameplaysResults.push_back({targetDurationAU, realDurationAU});
+
+            DE_DEBUG("(EAScript) UNLOCK 1");
+            endMutex.Unlock();
+
+            return false;
+        }));
+
+        for (int m = 0; m < (int)gameScript.size(); m++)
+        {
+            std::cout << "Gameplay " << it << std::endl;
+
+            DE_DEBUG("(EAScript) Requesting game to start");
+            m_GameRunner.Start();
+
+            DE_DEBUG("(EAScript) LOCK 1");
+            endMutex.Lock();
+            DE_DEBUG("(EAScript) LOCK 2");
+            endMutex.Lock();
+            DE_DEBUG("(EAScript) UNLOCK 2");
+            endMutex.Unlock();
+            it++;
         }
+
+        //TODO: chamar o guerra
+        // EAFunction(gameplayResults);
     }
 
-    void *runScript(void *scriptFuncObject) {
-        EAScript *script = (EAScript*) scriptFuncObject;
+    void *runScript(void *scriptFuncObject)
+    {
+        EAScript *script = (EAScript *)scriptFuncObject;
         script->scriptLoop();
         return NULL;
     }
-}
+} // namespace EAAlgorithm
 
 /*
 task++(par1) //Cria uma nova Task
@@ -174,12 +236,6 @@ wait(par1) // Espera um certo tempo até a próxima ação
     //par1 : tempo de espera em WAIT_UNITS
 */
 
-
-
-
-
-
-
 /*
 //task++(med)
 0,2
@@ -203,9 +259,6 @@ wait(par1) // Espera um certo tempo até a próxima ação
 6,3
 */
 
-
-
-
 /*
 task++(med)
 task--(pro,5)
@@ -216,7 +269,6 @@ robots--
 wait(3)
 end(182)
 */
-
 
 /*
 task++(med)

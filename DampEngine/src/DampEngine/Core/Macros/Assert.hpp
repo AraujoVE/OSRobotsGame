@@ -14,7 +14,7 @@
 //TODO: not working DE_INTERNAL_STRIP_PARENTHESIS
 #define DE_ASSERT_3(type, check, message, ...) { if (!(check)) { CAT(CAT(DE, _), CRITICAL) (message, DE_INTERNAL_STRIP_PARENTHESIS __VA_ARGS__); DE_BREAK_CODE(); } }
 #define DE_ASSERT_2(type, check, message) { if (!(check))  CAT(CAT(DE, _), ERROR)(message); }
-#define DE_ASSERT_1(type, check) DE_ASSERT_3(type, check, "Assertion failed: '{0}'", (#check) )
+#define DE_ASSERT_1(type, check) DE_ASSERT_3(type, check, "Assertion failed: '{0}' \n\tAt {1}:{2} -----> {3}", (#check, __FILE__, __LINE__, __ASSERT_FUNCTION) )
 
 
 

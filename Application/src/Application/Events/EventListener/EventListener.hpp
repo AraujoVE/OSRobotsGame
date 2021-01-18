@@ -34,7 +34,7 @@ namespace Application
             const HandlerQueue &queue = handlerQueueMap[eventType];
             if (queue.empty())
             {
-                DE_WARN("Ignoring unimplemented Event: {0}", eventType);
+                // DE_WARN("Ignoring unimplemented Event: {0}", eventType);
                 break;
             }
 

@@ -1,6 +1,8 @@
 #include <DampEngine.hpp>
 #include <DampEngine/Core/Macros/Log.hpp>
 
+#include "cpphack.hpp"
+
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -20,5 +22,7 @@
 #include <csignal>
 #include <filesystem>
 #include <unistd.h>
+#include <optional>
+
 
 #include <boost/algorithm/string.hpp>

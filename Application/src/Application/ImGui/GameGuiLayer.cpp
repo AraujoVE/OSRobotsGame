@@ -30,12 +30,11 @@ namespace Application
             m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
             return false;
         }));
-
-        m_GameRunner.Start();
     }
 
     void GameGuiLayer::ImGuiDescription()
     {
+        //TODO: do not show if it's EA
         if (m_GameRunner.IsGameLost()) {
             LostScreenDescription();
             return;

@@ -10,30 +10,23 @@
 
 namespace Application
 {
-    Task::TaskID Task::s_NextID = 0;
-
     //Inicialização e destruição de classe
-    Task::Task(RobotFunction funct)
-        : TIME_STEP(ConstsMap::getValue("TIME_STEP")),
-          INIT_TIME_STEP(ConstsMap::getValue("INIT_TIME_STEP")),
-          MAX_TIME_STEPS(ConstsMap::getValue("MAX_TIME_STEPS")),
-          MIN_REWARD(ConstsMap::getValue("MIN_REWARD")),
-          REWARD_RANGE(ConstsMap::getValue("REWARD_RANGE")),
-          FAILURE_TAX(ConstsMap::getValue("FAILURE_TAX")),
+    Task::Task(RobotFunction funct, GameConstsCache& gameConsts, Task::TaskID id)
+        : m_GameConstsCache(gameConsts),
           m_ThreadLoop(std::bind(&Task::UpdateTask, this), std::bind([](Task *self) { return !self->IsTaskCompleted(); }, this)),
-          id(s_NextID++),
+          id(id),
           function(funct)
     {
         // use current time as seed for random generator
         std::srand(std::time(nullptr));
 
         robotsNo = 0;
-        progressLength = TIME_STEP * (INIT_TIME_STEP + (std::rand() % MAX_TIME_STEPS));
+        progressLength = m_GameConstsCache.TIME_STEP * (m_GameConstsCache.INIT_TIME_STEP + (std::rand() % m_GameConstsCache.MAX_TIME_STEPS));
         curProgress = 0;
         lastUpdateTime = time(0);
         remainingTime = -1;
         gainedGoods = 0;
-        rewardMultiplier = MIN_REWARD + (std::rand() % REWARD_RANGE);
+        rewardMultiplier = m_GameConstsCache.MIN_REWARD + (std::rand() % m_GameConstsCache.REWARD_RANGE);
         predictedTime = 0;
 
         m_Running = false;
@@ -42,6 +35,7 @@ namespace Application
 
         m_ThreadLoop.m_EventListener->Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
         m_ThreadLoop.m_EventListener->Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
+
     }
 
     Task::~Task()
@@ -51,7 +45,7 @@ namespace Application
 
     int Task::CalcLostRobots()
     {
-        int progress = (int)(FAILURE_TAX * 100 * ((float)curProgress / (float)progressLength));
+        int progress = (int)(m_GameConstsCache.FAILURE_TAX * 100 * ((float)curProgress / (float)progressLength));
         int randomLost = 1 + std::rand() % 100;
         float lostRobots = 0;
 

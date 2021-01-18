@@ -10,6 +10,8 @@
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
+#include <optional>
+
 #include <unordered_map>
 
 namespace Application
@@ -23,13 +25,13 @@ namespace Application
         static constexpr int MAX_TASKS_PER_FUNCTION = 5;
 
     private:
+        int m_NextTaskID = 0;
+
         int totRobots;
         int freeRobots;
         int prodCost; //TODO: Implementation to change this value
-        const float PROD_COST_INCREASE_TAX;
-        const int TOT_ROBOTS_INI;
-        const int FREE_ROBOTS_INI;
-        const int PROD_COST_INI;
+
+        GameConstsCache m_GameConstsCache;
 
         VillageStats *villageStats;
         std::unordered_map<Task::TaskID, Task*> tasks[FUNCTION_QTY];
@@ -43,7 +45,7 @@ namespace Application
 
     public:
         
-        RobotsManagement();
+        RobotsManagement(GameConsts& gameConsts);
         void initializeStats();
         ~RobotsManagement();
 
@@ -73,7 +75,8 @@ namespace Application
         bool moveRobot(Task &, int);
 
         const std::unordered_map<Task::TaskID, Task*> &getTasks(RobotFunction function) const;
-        Task &findTask(Task::TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;
+        std::optional<Task*> findTask(Task::TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;
+
         
         bool createTask(RobotFunction);
         void cancelTask(Task &);

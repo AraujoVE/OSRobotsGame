@@ -7,11 +7,8 @@
 namespace Application
 {
 
-    RobotsManagement::RobotsManagement():
-        PROD_COST_INCREASE_TAX(ConstsMap::getValue("PROD_COST_INCREASE_TAX")),
-        TOT_ROBOTS_INI(ConstsMap::getValue("TOT_ROBOTS_INI")),
-        FREE_ROBOTS_INI(ConstsMap::getValue("FREE_ROBOTS_INI")),
-        PROD_COST_INI(ConstsMap::getValue("PROD_COST_INI"))
+    RobotsManagement::RobotsManagement(GameConsts& gameConsts)
+        : m_GameConstsCache(gameConsts)
     {
         initializeStats();
         initializeAvenues();
@@ -34,9 +31,9 @@ namespace Application
     void RobotsManagement::initializeStats()
     {
         //TODO: mudar de volta (para 1, tot e free)
-        totRobots = TOT_ROBOTS_INI;
-        freeRobots = FREE_ROBOTS_INI;
-        prodCost = PROD_COST_INI;
+        totRobots =  m_GameConstsCache.TOT_ROBOTS_INI;
+        freeRobots =  m_GameConstsCache.FREE_ROBOTS_INI;
+        prodCost = m_GameConstsCache. PROD_COST_INI;
         villageStats = NULL;
     }
 
@@ -109,7 +106,7 @@ namespace Application
         return tasks[(int)function];
     }
 
-    Task &RobotsManagement::findTask(Task::TaskID taskID, RobotFunction functionHint) const {
+    std::optional<Task*> RobotsManagement::findTask(Task::TaskID taskID, RobotFunction functionHint) const {
         DE_ASSERT(FUNCTION_QTY > 0);
 
         tasksDown();
@@ -119,13 +116,13 @@ namespace Application
             auto searchRes = tasks[i%FUNCTION_QTY].find(taskID);
             if (searchRes != tasks[i%FUNCTION_QTY].end()) {
                 tasksUp();
-                return *(Task*)searchRes->second;
+                return std::optional<Task*>{(Task*)searchRes->second};
             }
         }
 
         tasksUp();
 
-        throw std::logic_error("Task not found");
+        return std::nullopt;
     }
     
 
@@ -219,7 +216,7 @@ namespace Application
         }
 
         //Cria nova task com o id Incrementado
-        Task *newTask = new Task(funct);
+        Task *newTask = new Task(funct, m_GameConstsCache, m_NextTaskID++);
 
         newTask->m_EventListener->Register(new EH_TaskFinished(std::bind(&RobotsManagement::onTaskEnded<EH_TaskFinished>, this, std::placeholders::_1)));
         newTask->m_EventListener->Register(new EH_TaskCancelled(std::bind(&RobotsManagement::onTaskEnded<EH_TaskCancelled>, this, std::placeholders::_1)));
@@ -252,7 +249,7 @@ namespace Application
 
         if(endedTask.GetRobotFunction() == RobotFunction::RESOURCE_GATHERING){
             robotsAvenues[PROD_COST]->down();
-            float increase = 1.0 + PROD_COST_INCREASE_TAX*(endedTask.GetGainedGoods()/(float)endedTask.GetAvgReward()) ;
+            float increase = 1.0 + m_GameConstsCache.PROD_COST_INCREASE_TAX*(endedTask.GetGainedGoods()/(float)endedTask.GetAvgReward()) ;
             prodCost = (int)((float)prodCost * increase);
             robotsAvenues[PROD_COST]->up();
         }

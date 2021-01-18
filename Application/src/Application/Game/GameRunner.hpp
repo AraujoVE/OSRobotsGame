@@ -5,6 +5,16 @@
 
 namespace Application
 {
+
+    struct GameStatus {
+        bool
+            GameStarted = false,
+            GamePaused = false,
+            GameLost = false;
+
+        std::string GameLostReason = "Unexpected State! this is an error!";
+    };
+
     class EH_GameStarted;
     class EH_GameEnded;
     class EventListener;
@@ -27,19 +37,23 @@ namespace Application
         void Unpause();
 
         void OnGameLost(const std::string& reason);
-        inline bool IsGameLost() const { return m_GameLost; };
-        inline bool IsGamePaused() const { return !m_GameRunning && !m_GameLost; };
-        inline const std::string& GetGameLostReason() const { return m_GameLostReason; };
+
+        inline bool IsGameLost() const { return m_GameStatus.GameLost; };
+        
+        inline bool IsGamePaused() const { return m_GameStatus.GamePaused && m_GameStatus.GameStarted; };
+
+        inline const std::string& GetGameLostReason() const { return m_GameStatus.GameLostReason; };
 
         inline GameSave &GetSave() { return *m_GameSave.get(); } 
+        inline GameConsts &GetGameConsts() { return m_GameSave->GetGameConsts(); }
 
     private:
         void SetupGameOverConditions();
     private:
         std::shared_ptr<GameSave> m_GameSave;
         EventListener *m_EventListener;
-        bool m_GameRunning;
-        bool m_GameLost;
-        std::string m_GameLostReason;
+
+
+        GameStatus m_GameStatus;
     };
 } // namespace Application

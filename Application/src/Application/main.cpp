@@ -33,21 +33,23 @@ namespace Application
         virtual void OnStart() override
         {
             DE_INFO("OSRobotsGame starting");
-            char path[1024];
-            getcwd(path, 1024);
-            std::string cwd(path);
-            ConstsMap::initMapFromFile(cwd + "/Application/config/constValues.cfg");
 
+            char cwd[1024];
+            getcwd(cwd, 1024);
+            DE_TRACE("Converting all scripts in {0}/scripts", std::string(cwd));
             EAAlgorithm::ConvertScripts convertScripts(cwd);
         }
 
         virtual void InitLayers() override
         {
             m_GameGuiLayer = new GameGuiLayer(*m_GameRunner);
-            m_EAGameGuiLayer = new EAGameGuiLayer();
+            m_EAGameGuiLayer = new EAGameGuiLayer(*m_GameRunner);
 
+            // m_LayerStack.PushOverlay(m_GameGuiLayer);
+            // m_GameRunner->Start();
+            
             m_LayerStack.PushOverlay(m_EAGameGuiLayer);
-
+            
             auto *l_LayerStack = &m_LayerStack;
             auto *l_GameGuiLayer = m_GameGuiLayer;
             auto *l_GameRunner = m_GameRunner;

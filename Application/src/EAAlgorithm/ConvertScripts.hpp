@@ -1,5 +1,4 @@
-#ifndef EA_SCRIPT
-#define EA_SCRIPT
+#pragma once
 
 //#include <pthread.h>
 #include <string>
@@ -47,5 +46,3 @@ namespace EAAlgorithm
             &ConvertScripts::commandFunct7};
     };
 } // namespace EAAlgorithm
-
-#endif

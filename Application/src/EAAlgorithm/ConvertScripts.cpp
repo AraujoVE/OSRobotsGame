@@ -100,13 +100,13 @@ namespace EAAlgorithm
                 myFile << std::endl;
         }
         myFile.close();
+        gameplay.clear();
     }
 
     ConvertScripts::ConvertScripts(std::string mainPath) : filePath(mainPath)
     {
         int i = 0;
         std::fstream myFile, secondFile;
-        int tokenPos, curGameplay = -1, curOp;
         std::string line;
 
         myFile.open(filePath + "/gameScript.cfg", std::ios::out);

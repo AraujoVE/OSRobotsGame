@@ -1,8 +1,11 @@
 #ifndef TASK
 #define TASK
 
+#include "cpphack.hpp"
+
 #include "Application/header/RobotFunctions.hpp"
 #include "Application/Threads/ThreadLoop.hpp"
+#include "Application/header/ConstsMap.hpp"
 
 #include <memory>
 
@@ -13,11 +16,16 @@ namespace Application
     class Task final
     {
     public:
-        Task(RobotFunction funct);
+        using TaskID = unsigned long int;
+
+    private:
+        const GameConstsCache &m_GameConstsCache;
+
+        Task(RobotFunction funct, GameConstsCache &gameConsts, Task::TaskID id);
+
+    public:
         ~Task();
         Task(Task &&) = default;
-
-        using TaskID = unsigned long int;
 
         inline TaskID GetID() const { return id; }
         inline RobotFunction GetRobotFunction() const { return function; }
@@ -29,20 +37,11 @@ namespace Application
         inline time_t GetRemainingTime() const { return remainingTime; }
         inline float GetGainedGoods() const { return gainedGoods; }
 
-        inline int GetAvgReward() const { return AVG_REWARD; }
+        inline int GetAvgReward() const { return m_GameConstsCache.AVG_REWARD; }
         inline time_t GetLastUpdate() const { return lastUpdateTime; }
+
     private:
         std::unique_ptr<EventListener> m_EventListener;
-
-        int TIME_STEP;
-        const int INIT_TIME_STEP;
-        const int MAX_TIME_STEPS;
-        const int MIN_REWARD;
-        const int REWARD_RANGE;
-        const float FAILURE_TAX;
-        const int AVG_REWARD = (int)(((float)TIME_STEP) * ((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0) / 2.0) * ((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0) / 2.0));
-
-        static TaskID s_NextID;
 
         ThreadLoop m_ThreadLoop;
         bool m_Running;
@@ -60,7 +59,6 @@ namespace Application
         float gainedGoods;
 
     private:
-
         void setRobotsNo(int newRobotsNo);
         void UpdateTask();
         inline bool IsTaskCompleted() { return remainingTime == 0; }
@@ -71,10 +69,8 @@ namespace Application
         void Cancel();
         void MarkAsIgnored();
 
-
         bool OnThreadLoopStarted();
         bool OnThreadLoopEnded(ThreadEndedReason::ThreadEndedReason_t reason);
-
 
         friend class RobotsManagement;
     };

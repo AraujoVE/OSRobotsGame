@@ -8,15 +8,13 @@
 namespace Application
 {
     //PUBLIC:
-    GameRunner::GameRunner() : GameRunner(std::make_shared<GameSave>())
+    GameRunner::GameRunner() : GameRunner(std::make_shared<GameSave>(GameConsts::GetDefaultPath()))
     {
     }
 
     GameRunner::GameRunner(const std::shared_ptr<GameSave> &gameSave)
     {
         m_GameSave = gameSave;
-        m_GameRunning = false;
-        m_GameLost = false;
         m_EventListener = new EventListener();
     }
 
@@ -30,15 +28,16 @@ namespace Application
 
     void GameRunner::Start()
     {
-        DE_ASSERT(!m_GameRunning, "Trying to start the game 2 times in the same runner");
+        DE_ASSERT(!m_GameStatus.GameStarted, "Trying to start the game 2 times in the same runner");
 
-        if (m_GameLost)
+        if (m_GameStatus.GameLost)
         {
             ResetSave();
-            m_GameLost = false;
+            m_GameStatus.GameLost = false;
         }
 
-        m_GameRunning = true;
+        m_GameStatus.GameStarted = true;
+        m_GameStatus.GamePaused = false;
 
         m_GameSave->GetVillageStats()->startStatsDecayment();
 
@@ -48,29 +47,29 @@ namespace Application
 
     void GameRunner::Stop()
     {
-        DE_ASSERT(m_GameRunning, "Trying to stop a game that is not running");
+        DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running");
 
         m_EventListener->On<EH_GameEnded>(*this);
-        m_GameRunning = false;
+        m_GameStatus.GameStarted = false;
 
         //TODO: stop village stats decayment
     }
 
     void GameRunner::Pause()
     {
-        m_GameRunning = false;
+        m_GameStatus.GamePaused = true;
         m_GameSave->GetVillageStats()->setStatsDecaymentPaused(true);
     }
     void GameRunner::Unpause()
     {
-        m_GameRunning = true;
+        m_GameStatus.GamePaused = false;
         m_GameSave->GetVillageStats()->setStatsDecaymentPaused(false);
     }
 
     void GameRunner::OnGameLost(const std::string &reason)
     {
-        m_GameLost = true;
-        m_GameLostReason = reason;
+        m_GameStatus.GameLost = true;
+        m_GameStatus.GameLostReason = reason;
         Stop();
     }
 

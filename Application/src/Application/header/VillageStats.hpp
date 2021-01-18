@@ -7,6 +7,7 @@
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
+#include "Application/header/ConstsMap.hpp"
 
 namespace Application
 {
@@ -14,30 +15,18 @@ namespace Application
     {
     private:
         EventListener m_EventListener;
+        GameConstsCache m_GameConstsCache;
         bool m_MarkedForDeletion = false;
         bool m_DecaymentPaused = false;
 
     public:
         const static int BASE_STATS_NO = FUNCTION_QTY;
         const static int POPULATION_INDEX = BASE_STATS_NO;
-        const int ON_ATTACK_MULTIPLIER;
-        const float POP_INCREASE_TAX;
-        const int POP_PER_CONSTRUCTION;
-        const int INIT_POP_VALUE;
-        const int INIT_STAT_VALUE;
-        const float ON_ATTACK_DECAY_TAX;
-        const float NORMAL_DECAY_TAX;
-        const int ATTACK_FREQUENCY;
-        const int INIT_RESOURCES_VALUE;
-        const float TAX_REDUCT;
-        const unsigned long DECAY_DELAY_MICRO;
     private:
         bool onAttack;
         float statTax;
         int maxPop;
 
-        const float MIN_LOSS[BASE_STATS_NO - 1];
-        const float MAX_LOSS[BASE_STATS_NO - 1];
         int baseStats[BASE_STATS_NO];/*
             defenses;
             food;
@@ -61,9 +50,10 @@ namespace Application
         int population; // if population reaches zero, the game is over -> pop calculated based on other village stats
 
         void initializeVSAvenues();
+        bool updateGameConsts();
 
     public:
-        VillageStats();
+        VillageStats(GameConsts& gameConsts);
         ~VillageStats();
 
         float calcReduction(float,float);

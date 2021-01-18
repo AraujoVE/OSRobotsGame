@@ -106,7 +106,7 @@ namespace Application::GameWindows
 
     void FunctionWindow::OnTaskEnded(int id)
     {
-        DE_DEBUG("(FunctionWindow) onTaskEnded()");
+        // DE_DEBUG("(FunctionWindow) onTaskEnded()");
 
         auto windowIt = m_TaskWindowMap.find(id);
 
