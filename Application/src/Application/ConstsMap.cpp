@@ -90,7 +90,17 @@ namespace Application
 
     //TODO: avoid invalid params ((e.g. division per zero))
     float GameConsts::SetValue(const std::string &key, float newValue)
-    {
+    {   
+        //TODO: clamp values in another place
+        if ( 
+            ( 
+                key == "MAX_TIME_STEPS" ||
+                key == "REWARD_RANGE" 
+            )       
+            && newValue < 1.0f
+        ) 
+        newValue = 1.0f; 
+
         constsMap[key] = newValue;
         m_EventListener->On<EH_GCValueChanged>({key, newValue});
         return newValue;

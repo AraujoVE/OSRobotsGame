@@ -87,13 +87,23 @@ namespace EAAlgorithm
     void EAScript::scriptFunct1(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
-        DE_ASSERT(curTask.has_value(), "(EAScript::scriptFunct1) Invalid Task " + params.at(2));
+        if (!curTask.has_value())
+        {
+            DE_WARN("Ignoring invalid cancelTask #{0}", params.at(2));
+            return;
+        }
+        DE_ASSERT(curTask.has_value(), "(EAScript:: scriptFunct1) Invalid Task " + params.at(2));
         EAS_SRM->cancelTask(*curTask.value());
     }
 
     void EAScript::scriptFunct2(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
+        if (!curTask.has_value())
+        {
+            DE_WARN("Ignoring invalid moveRobot++ @Task #{0}", params.at(2));
+            return;
+        }
         DE_ASSERT(curTask.has_value(), "(EAScript::scriptFunct2) Invalid Task " + params.at(2));
         EAS_SRM->moveRobot(*curTask.value(), 1);
     }
@@ -101,6 +111,11 @@ namespace EAAlgorithm
     void EAScript::scriptFunct3(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
+        if (!curTask.has_value())
+        {
+            DE_WARN("Ignoring invalid moveRobot-- @Task #{0}", params.at(2));
+            return;
+        }
         DE_ASSERT(curTask.has_value(), "(EAScript::scriptFunct3) Invalid Task " + params.at(2));
         EAS_SRM->moveRobot(*curTask.value(), -1);
     }
