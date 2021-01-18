@@ -30,7 +30,9 @@ project "Application"
 		"DampEngine",
 		"GLFW",
 		"Glad",
-		"ImGui"
+		"ImGui",
+		"armadillo",
+		-- "lmpack"
 	}
 
 	filter "system:linux"

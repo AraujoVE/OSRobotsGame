@@ -35,5 +35,10 @@ namespace Application
     /* GAME CONSTS EVENTS */
     DA_EVENT_FWD(EH_GCValueChanged, bool, (const std::string& /* changed value key */, float /* changed value */));
 
+
+    //TODO: remove
+    /* EA HANDLERS */
+    DA_EVENT_FWD(EH_EAScriptEnded, bool, (int /* individualIndex */,  std::vector<std::pair<double, double>> /* gameplayResults */));
+
     
 } // namespace Application

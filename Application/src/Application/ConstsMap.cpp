@@ -38,6 +38,40 @@ namespace Application
         return;
     }
 
+    void GameConsts::LoadFromCromossome(const std::vector<double>& cromossome)
+    {
+        int i = 0;
+        SetValue("ON_ATTACK_MULTIPLIER", (float) cromossome.at(i++));
+        SetValue("POP_INCREASE_TAX", (float) cromossome.at(i++));
+        SetValue("POP_PER_CONSTRUCTION", (float) cromossome.at(i++));
+        SetValue("INIT_POP_VALUE", (float) cromossome.at(i++));
+        SetValue("INIT_STAT_VALUE", (float) cromossome.at(i++));
+        SetValue("ON_ATTACK_DECAY_TAX", (float) cromossome.at(i++));
+        SetValue("NORMAL_DECAY_TAX", (float) cromossome.at(i++));
+        SetValue("ATTACK_FREQUENCY", (float) cromossome.at(i++));
+        SetValue("INIT_RESOURCES_VALUE", (float) cromossome.at(i++));
+        SetValue("TAX_REDUCT", (float) cromossome.at(i++));
+        SetValue("DECAY_DELAY_MICRO", (float) cromossome.at(i++));
+        SetValue("MIN_LOSS_0", (float) cromossome.at(i++));
+        SetValue("MIN_LOSS_1", (float) cromossome.at(i++));
+        SetValue("MIN_LOSS_2", (float) cromossome.at(i++));
+        SetValue("MIN_LOSS_3", (float) cromossome.at(i++));
+        SetValue("MAX_LOSS_0", (float) cromossome.at(i++));
+        SetValue("MAX_LOSS_1", (float) cromossome.at(i++));
+        SetValue("MAX_LOSS_2", (float) cromossome.at(i++));
+        SetValue("MAX_LOSS_3", (float) cromossome.at(i++));
+        SetValue("TOT_ROBOTS_INI", (float) cromossome.at(i++));
+        SetValue("FREE_ROBOTS_INI", (float) cromossome.at(i++));
+        SetValue("PROD_COST_INI", (float) cromossome.at(i++));
+        SetValue("PROD_COST_INCREASE_TAX", (float) cromossome.at(i++));
+        SetValue("TIME_STEP", (float) cromossome.at(i++));
+        SetValue("INIT_TIME_STEP", (float) cromossome.at(i++));
+        SetValue("MAX_TIME_STEPS", (float) cromossome.at(i++));
+        SetValue("MIN_REWARD", (float) cromossome.at(i++));
+        SetValue("REWARD_RANGE", (float) cromossome.at(i++));
+        SetValue("FAILURE_TAX", (float) cromossome.at(i++));
+    }
+
     float GameConsts::GetValue(const std::string &key) const
     {
         DE_ASSERT(constsMap.find(key) != constsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
@@ -65,24 +99,17 @@ namespace Application
         m_EventListener->Register(eHandler);
     }
 
-
-
-
-
-
-
-
     GameConstsCache::GameConstsCache(GameConsts &gameConsts)
-            : m_GameConsts(gameConsts)
-        {
-            std::function<void()> handler(std::bind(&GameConstsCache::UpdateAll, this));
+        : m_GameConsts(gameConsts)
+    {
+        std::function<void()> handler(std::bind(&GameConstsCache::UpdateAll, this));
 
-            gameConsts.SetOnValueChanged(new EH_GCValueChanged([handler](const std::string &_, float __) {
-                handler();
-                return false;
-            }));
+        gameConsts.SetOnValueChanged(new EH_GCValueChanged([handler](const std::string &_, float __) {
+            handler();
+            return false;
+        }));
 
-            UpdateAll();
-        }
+        UpdateAll();
+    }
 
 } // namespace Application

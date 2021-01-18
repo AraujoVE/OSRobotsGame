@@ -34,10 +34,6 @@ namespace Application
         {
             DE_INFO("OSRobotsGame starting");
 
-            char cwd[1024];
-            getcwd(cwd, 1024);
-            DE_TRACE("Converting all scripts in {0}/scripts", std::string(cwd));
-            EAAlgorithm::ConvertScripts convertScripts(cwd);
         }
 
         virtual void InitLayers() override

@@ -5,7 +5,7 @@
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
-#include "EAAlgorithm/EAScript.hpp"
+#include "EAAlgorithm/EAController.hpp"
 
 #include <memory>
 
@@ -47,7 +47,7 @@ namespace Application
         const static int SCRIPT_FUNCT_SIZE = 7;
 
         GameRunner &m_GameRunner;
-        EAAlgorithm::EAScript *m_EAScript;
+        EAAlgorithm::EAController m_EAController;
         EventListener m_EventListener;
 
 

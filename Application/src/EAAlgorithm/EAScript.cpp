@@ -8,7 +8,7 @@
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
 #include "Application/header/RobotsManagement.hpp"
-#include "DampEngine/Threads/Mutex.hpp"
+#include "Application/Threads/Semaphore.hpp"
 
 #include "mypch.hpp"
 
@@ -16,9 +16,15 @@ using namespace Application;
 
 #define EAS_SRM (m_GameRunner.GetSave().GetRobotsManagement())
 #define EAS_SVS (m_GameRunner.GetSave().GetVillageStats())
-
 namespace EAAlgorithm
 {
+
+    static void *runScript(void *scriptFuncObject)
+    {
+        EAScript *script = (EAScript *)scriptFuncObject;
+        return script->scriptLoop();
+    }
+
     EAScript::EAScript(GameRunner &gameRunner, std::string filePath) : m_GameRunner(gameRunner),
                                                                        srcFile(filePath)
     {
@@ -127,16 +133,16 @@ namespace EAAlgorithm
     //TODO: Jogo versão normal ou calibração
     //TODO: Velocidade dos segundos do jogo -> slider
 
-    void EAScript::scriptLoop()
+    std::vector<std::pair<double, double>> *EAScript::scriptLoop()
     {
         time_t initTime, endTime;
         int it = 0;
 
-        std::vector<std::pair<time_t, time_t>> gameplaysResults;
+        auto *gameplaysResults = new std::vector<std::pair<double, double>>();
 
         float DELAY_MICRO = m_GameRunner.GetGameConsts().GetValue("DECAY_DELAY_MICRO");
 
-        DampEngine::Mutex endMutex;
+        Application::Semaphore endSem;
 
         auto &_gameScript = gameScript;
 
@@ -156,7 +162,7 @@ namespace EAAlgorithm
 
         auto &gameRunner = m_GameRunner;
 
-        m_GameRunner.SetOnGameEnded(new EH_GameEnded([&endTime, &endMutex, &_gameScript, &it, &initTime, &gameplaysResults, &gameRunner](GameRunner &_) {
+        m_GameRunner.SetOnGameEnded(new EH_GameEnded([&endTime, &endSem, &_gameScript, &it, &initTime, gameplaysResults, &gameRunner](GameRunner &_) {
             DE_DEBUG("(EAScript) Game Ended");
             endTime = time(0);
 
@@ -168,10 +174,10 @@ namespace EAAlgorithm
             double AUperS = HUMAN_WAIT_UNIT / gameRunner.GetGameConsts().GetValue("DECAY_DELAY_MICRO");
             time_t realDurationAU = realDurationS * AUperS;
 
-            gameplaysResults.push_back({targetDurationAU, realDurationAU});
+            gameplaysResults->push_back({targetDurationAU, realDurationAU});
 
             DE_DEBUG("(EAScript) UNLOCK 1");
-            endMutex.Unlock();
+            endSem.Post();
 
             return false;
         }));
@@ -184,24 +190,17 @@ namespace EAAlgorithm
             m_GameRunner.Start();
 
             DE_DEBUG("(EAScript) LOCK 1");
-            endMutex.Lock();
+            endSem.Wait();
             DE_DEBUG("(EAScript) LOCK 2");
-            endMutex.Lock();
+            endSem.Wait();
             DE_DEBUG("(EAScript) UNLOCK 2");
-            endMutex.Unlock();
+            endSem.Post();
             it++;
         }
 
-        //TODO: chamar o guerra
-        // EAFunction(gameplayResults);
+        return gameplaysResults;
     }
 
-    void *runScript(void *scriptFuncObject)
-    {
-        EAScript *script = (EAScript *)scriptFuncObject;
-        script->scriptLoop();
-        return NULL;
-    }
 } // namespace EAAlgorithm
 
 /*

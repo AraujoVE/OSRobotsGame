@@ -10,19 +10,13 @@
 
 using namespace EAAlgorithm;
 
-static std::string getEAScriptSrcFilePath()
-{
-    char path[1024];
-    getcwd(path, 1024);
-    std::string cwd(path);
-    return cwd + "/gameScript.cfg";
-}
+
 
 namespace Application
 {
 
     EAGameGuiLayer::EAGameGuiLayer(GameRunner &gameRunner)
-        : m_GameRunner(gameRunner), m_EAScript(new EAScript(m_GameRunner, getEAScriptSrcFilePath()))
+        : m_GameRunner(gameRunner), m_EAController(gameRunner)
     {
     }
 
@@ -56,7 +50,7 @@ namespace Application
 
         if (startPressed && !m_EAState.Started) {
             m_EAState.Started = true;
-            m_EAScript->startScript();
+            m_EAController.StartEA();
         }
 
         

@@ -24,6 +24,8 @@ namespace Application
         
 
         void LoadValuesFromFile(const std::string &path);
+        void LoadFromCromossome(const std::vector<double>& cromossome);
+
         float GetValue(const std::string &key) const;
         float SetValue(const std::string &key, float newValue);
 

@@ -1,7 +1,10 @@
 #ifndef EA_SCRIPT
 #define EA_SCRIPT
 
+#include "Application/Events/EventHandler/DefaultHandlers.fwd.hpp"
 #include "Application/header/RobotFunctions.hpp"
+#include "DampEngine/Core/Macros/Log.hpp"
+#include "DampEngine/Core/Macros/Assert.hpp"
 #include <vector>
 #include <pthread.h>
 
@@ -36,7 +39,7 @@ namespace EAAlgorithm
         void scriptFunct4(const std::vector<std::string> &params);
         void scriptFunct5(const std::vector<std::string> &params);
         void scriptFunct6(const std::vector<std::string> &params);
-        void scriptLoop();
+        std::vector<std::pair<double, double>> *scriptLoop();
 
         void (EAScript::*scriptLoopFuncts[DIRECTIONS_SIZE])(const std::vector<std::string> &) = {
             &EAScript::scriptFunct0,
@@ -48,8 +51,15 @@ namespace EAAlgorithm
             &EAScript::scriptFunct6};
 
         void initScriptDirections();
+
+        std::vector<std::pair<double,double>> *joinScriptThread() 
+        { 
+            void *ret;
+            pthread_join(scriptThread, &ret); 
+            DE_ASSERT(ret != nullptr, "Wrong thread return (null)");
+            return (std::vector<std::pair<double,double>>*) ret;
+        }
     };
-    void *runScript(void *);
 } // namespace EAAlgorithm
 
 #endif
