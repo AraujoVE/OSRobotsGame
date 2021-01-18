@@ -25,8 +25,10 @@ namespace EAAlgorithm
         return script->scriptLoop();
     }
 
-    EAScript::EAScript(GameRunner &gameRunner, std::string filePath) : m_GameRunner(gameRunner),
-                                                                       srcFile(filePath)
+    EAScript::EAScript(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName) 
+        : m_GameRunner(gameRunner),
+          srcFile(filePath),
+          m_DebugName(debugName)
     {
         initScriptDirections();
     }
@@ -162,12 +164,11 @@ namespace EAAlgorithm
         auto &_gameScript = gameScript;
 
         m_GameRunner.SetOnGameStarted(new EH_GameStarted([&initTime, this, &_gameScript, &it, DELAY_MICRO](GameRunner &_) {
-            DE_DEBUG("(EAScript) Game Started");
+            DE_DEBUG("(EAScript -- {0}) OnGameStarted", m_DebugName);
             initTime = time(0);
 
             for (int i = 1; i < (int)_gameScript.at(it).size(); i++)
             {
-                std::cout << "\tAction " << i << std::endl;
                 (this->*(scriptLoopFuncts[stoi(_gameScript.at(it).at(i).at(0))]))(_gameScript.at(it).at(i));
                 usleep(DELAY_MICRO);
             }
@@ -177,8 +178,8 @@ namespace EAAlgorithm
 
         auto &gameRunner = m_GameRunner;
 
-        m_GameRunner.SetOnGameEnded(new EH_GameEnded([&endTime, &endSem, &_gameScript, &it, &initTime, gameplaysResults, &gameRunner](GameRunner &_) {
-            DE_DEBUG("(EAScript) Game Ended");
+        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &endTime, &endSem, &_gameScript, &it, &initTime, gameplaysResults, &gameRunner](GameRunner &_) {
+            DE_DEBUG("(EAScriptyyy -- {0}) OnGameEnded", m_DebugName);
             endTime = time(0);
 
             //Callback para saber quando acaba o jogo
@@ -191,7 +192,8 @@ namespace EAAlgorithm
 
             gameplaysResults->push_back({targetDurationAU, realDurationAU});
 
-            DE_DEBUG("(EAScript) UNLOCK 1");
+            usleep(5e6);
+
             endSem.Post();
 
             return false;
@@ -199,18 +201,18 @@ namespace EAAlgorithm
 
         for (int m = 0; m < (int)gameScript.size(); m++)
         {
-            std::cout << "Gameplay " << it << std::endl;
-
-            DE_DEBUG("(EAScript) Requesting game to start");
+            DE_INFO("(EAScript -- {0}) Starting gameplay #{1}", m_DebugName, m);
             m_GameRunner.Start();
 
-            DE_DEBUG("(EAScript) LOCK 1");
+
+            DE_DEBUG("(EAScript -- {0}) Waiting for gameplay #{1} to end...", m_DebugName, m);
             endSem.Wait();
-            DE_DEBUG("(EAScript) LOCK 2");
-            endSem.Wait();
-            DE_DEBUG("(EAScript) UNLOCK 2");
-            endSem.Post();
+            DE_INFO("(EAScript -- {0}) Gameplay #{1} ended normally", m_DebugName, m);
             it++;
+
+            DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but it's not lost!!! **");
+
+            DE_TRACE("(EAScript -- {0}) Changing gameplay ", m_DebugName);
         }
 
         return gameplaysResults;

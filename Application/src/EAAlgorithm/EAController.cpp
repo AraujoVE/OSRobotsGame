@@ -46,8 +46,9 @@ namespace EAAlgorithm
         m_GameplayResults.clear();
 
         std::vector<EAScript *> scripts;
-        std::vector<GameRunner*> gameRunners;
+        std::vector<GameRunner *> gameRunners;
 
+        //TODO: fix ml
         //TODO: DELAY MCRO from UI
         //Used only to get DELAY_MICRO
         GameConsts *fileGC = new GameConsts();
@@ -62,13 +63,14 @@ namespace EAAlgorithm
             DE_DEBUG("(RunPopulationInGame) Loading game runner with cromossome...");
             indvGameRunner->GetGameConsts().LoadFromCromossome(individual);
             DE_DEBUG("(RunPopulationInGame) Done.");
-            EAScript *script = new EAScript(*indvGameRunner, getEAScriptSrcFilePath());
+            EAScript *script = new EAScript(*indvGameRunner, getEAScriptSrcFilePath(), std::to_string(debug_ind_ind));
 
             DE_DEBUG("(RunPopulationInGame) Executing (async) gameScript.cfg on individual {0}...", ++debug_ind_ind);
             script->startScript();
 
             scripts.push_back(script);
             gameRunners.push_back(indvGameRunner);
+
         }
 
         debug_ind_ind = 0;

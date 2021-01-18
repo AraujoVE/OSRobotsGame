@@ -16,6 +16,11 @@
 #error "Boost needs to be installed on the system (tested with version 1.75)"
 #endif //!BOOST_VERSION
 
+
+
+//TODO: TICK_DELAY for Task and VilageStats:;decay
+//TODO: OnGameEnded -> sends VilageStats::decay threadloop tickCount to callback as "gameDurationInTicks"
+
 namespace Application
 {
     class MyApplication final : public DampEngine::Application

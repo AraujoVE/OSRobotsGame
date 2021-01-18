@@ -19,14 +19,15 @@ namespace EAAlgorithm
     {
     private:
         GameRunner &m_GameRunner;
-        std::string srcFile;
+        std::string srcFile, m_DebugName;
         pthread_t scriptThread;
         std::vector<std::vector<std::vector<std::string>>> gameScript;
         const static int DIRECTIONS_SIZE = 7;
         const static int HUMAN_WAIT_UNIT = 500000;
 
     public:
-        EAScript(GameRunner &, std::string);
+        EAScript(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName);
+
         ~EAScript();
 
         void startScript();

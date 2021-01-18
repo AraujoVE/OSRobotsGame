@@ -9,7 +9,6 @@ namespace Application
 
     class Semaphore final
     {
-        DampEngine::Mutex mutex;
         sem_t sem;
 
     public:
@@ -24,15 +23,11 @@ namespace Application
 
         inline void Wait()
         {
-            mutex.Lock();
             sem_wait(&sem);
-            mutex.Unlock();
         }
         inline void Post()
         {
-            mutex.Lock();
             sem_post(&sem);
-            mutex.Unlock();
         }
     };
 

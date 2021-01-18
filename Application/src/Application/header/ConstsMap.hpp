@@ -14,8 +14,12 @@ namespace Application
     class GameConsts final
     {
     private:
-        static std::unordered_map<std::string, float> constsMap;
+        std::unordered_map<std::string, float> m_ConstsMap;
         EventListener *m_EventListener;
+
+        //Static to force all instances to open file synchronously
+        static DampEngine::Mutex s_FileMutex;
+        DampEngine::Mutex m_MapMutex;
 
     public:
 
@@ -26,7 +30,7 @@ namespace Application
         void LoadValuesFromFile(const std::string &path);
         void LoadFromCromossome(const std::vector<double>& cromossome);
 
-        float GetValue(const std::string &key) const;
+        float GetValue(const std::string &key);
         float SetValue(const std::string &key, float newValue);
 
         void SetOnValueChanged(EH_GCValueChanged *eHandler, const std::vector<std::string> &filterKeyVec);
@@ -69,7 +73,7 @@ namespace Application
         int AVG_REWARD;
 
     private:
-        const GameConsts &m_GameConsts;
+        GameConsts &m_GameConsts;
         std::vector<std::function<void()>> m_AditionalUpdates;
         void UpdateAll()
         {

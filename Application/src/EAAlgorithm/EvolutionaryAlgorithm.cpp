@@ -107,11 +107,15 @@ namespace EAAlgorithm
         DE_TRACE("Calculating fitness of population after gameplay results received");
         calcFitness(gameplayResults);
 
-        for (int i = 0; i < POPULATION_SIZE; i++)
+        worstFitness = bestFitness = fitness[0];
+        worstFitIndex = bestFitIndex = 0;
+
+        for (int i = 1; i < POPULATION_SIZE; i++)
         {
             // example of fitness calculation -> CHANGE!!!!
             // fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado
 
+            DE_ASSERT(fitness[i] >= 0);
             if (fitness[i] < bestFitness)
             { // searching for the  max fitnnes from new generation
                 bestFitness = fitness[i];
@@ -200,6 +204,9 @@ namespace EAAlgorithm
         double standardizedFitness[POPULATION_SIZE];
         int parentIndex[2], rNb;
         double probSum = 0.0, partialSum = 0.0;
+
+        (void) standardizedFitness[0];
+
 
         // copying last population (new one will be different)
         // for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -412,11 +419,11 @@ namespace EAAlgorithm
         if (nbNoImprovementGens == 0)
             return;
 
-        for (int i = 5; i > 0; i++)
+        for (int i = 4; i >= 0; i--)
         {
-            if (eventHappens(i))
+            if (eventHappens(i + 1))
             {
-                (this->*(eventTypes[i - 1]))(); // calls one of these functions: increaseMutation, predationOfOne, partIncrease, oneRemainingPopReset, fullPopReset
+                (this->*(eventTypes[i]))(); // calls one of these functions: increaseMutation, predationOfOne, partIncrease, oneRemainingPopReset, fullPopReset
                 return;
             }
         }
@@ -449,7 +456,6 @@ namespace EAAlgorithm
             // if fullPopReset() is called, continueEA = false
 
             generationIndex++;
-            scanf("%*c");
         }
 
         return;
@@ -519,11 +525,13 @@ namespace EAAlgorithm
         int pos = 0;
         for (auto &indivResults : gameplayResultsPop)
         {
+            fitness[pos] = 0;
             for (auto &fitnessPair : indivResults)
             {
                 //first: expected, second: real
-                fitness[pos++] += std::abs(fitnessPair.first - fitnessPair.second) / fitnessPair.first;
+                fitness[pos] += std::abs(fitnessPair.first - fitnessPair.second) / fitnessPair.first;
             }
+            pos++;
         }
         return;
     }

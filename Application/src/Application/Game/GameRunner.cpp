@@ -38,11 +38,11 @@ namespace Application
 
         m_GameStatus.GameStarted = true;
         m_GameStatus.GamePaused = false;
-
-        m_GameSave->GetVillageStats()->startStatsDecayment();
-
-        SetupGameOverConditions();
+        
         m_EventListener->On<EH_GameStarted>(*this);
+        
+        SetupGameOverConditions();
+        m_GameSave->GetVillageStats()->startStatsDecayment();
     }
 
     void GameRunner::Stop()

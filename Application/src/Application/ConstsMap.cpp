@@ -13,18 +13,24 @@
 namespace Application
 {
 
-    GameConsts::GameConsts() : m_EventListener(new EventListener()) {}
+    GameConsts::GameConsts()
+        : m_ConstsMap({}),
+          m_EventListener(new EventListener()),
+          m_MapMutex()
+    {
+    }
     GameConsts::~GameConsts() { delete m_EventListener; }
 
-    std::unordered_map<std::string, float> GameConsts::constsMap = {};
+    DampEngine::Mutex GameConsts::s_FileMutex;
     void GameConsts::LoadValuesFromFile(const std::string &srcFile)
     {
-        //Static to force all instances to wait for this instance to end
-        static DampEngine::Mutex fileMutex;
 
-        fileMutex.Lock();
+        s_FileMutex.Lock();
         {
-            constsMap.clear();
+            m_MapMutex.Lock();
+            m_ConstsMap.clear();
+            m_MapMutex.Unlock();
+
             std::fstream myFile;
             int tokenPos;
             float val;
@@ -45,7 +51,7 @@ namespace Application
 
             myFile.close();
         }
-        fileMutex.Unlock();
+        s_FileMutex.Unlock();
     }
 
     void GameConsts::LoadFromCromossome(const std::vector<double> &cromossome)
@@ -82,26 +88,30 @@ namespace Application
         SetValue("FAILURE_TAX", (float)cromossome.at(i++));
     }
 
-    float GameConsts::GetValue(const std::string &key) const
+    float GameConsts::GetValue(const std::string &key)
     {
-        DE_ASSERT(constsMap.find(key) != constsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
-        return constsMap[key];
+        m_MapMutex.Lock();
+        auto findIt = m_ConstsMap.find(key);
+        DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
+        float val = findIt->second;
+        m_MapMutex.Unlock();
+        return val;
     }
 
-    //TODO: avoid invalid params ((e.g. division per zero))
     float GameConsts::SetValue(const std::string &key, float newValue)
-    {   
+    {
         //TODO: clamp values in another place
-        if ( 
-            ( 
+        if (
+            (
                 key == "MAX_TIME_STEPS" ||
-                key == "REWARD_RANGE" 
-            )       
-            && newValue < 1.0f
-        ) 
-        newValue = 1.0f; 
+                key == "REWARD_RANGE") &&
+            newValue < 1.0f)
+            newValue = 1.0f;
 
-        constsMap[key] = newValue;
+        m_MapMutex.Lock();
+        m_ConstsMap[key] = newValue;
+        m_MapMutex.Unlock();
+
         m_EventListener->On<EH_GCValueChanged>({key, newValue});
         return newValue;
     }

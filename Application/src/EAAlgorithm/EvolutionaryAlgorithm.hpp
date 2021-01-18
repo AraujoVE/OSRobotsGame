@@ -133,7 +133,7 @@ namespace EAAlgorithm
 
         // Each LINE (ROW) is the individual's parameters
         double fitness[POPULATION_SIZE];
-        double bestFitness = 0, worstFitness = 2000000000;
+        double bestFitness = 2000000000, worstFitness = -1;
         int bestFitIndex = -1, worstFitIndex = -1;
         double mutationRate = INITIAL_MUTATION;
         int nbNoImprovementGens = 0; // number of generations in a row without any improvement (best indiviNdual remains the same)

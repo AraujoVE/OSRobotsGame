@@ -32,7 +32,7 @@ namespace Application
 
         m_EventListener.reset(new EventListener());
 
-
+        //TODO: fix memory leak
         auto tlTickFn = std::bind(&Task::UpdateTask, this);
         auto tlStopFn = [=]() { return !this->IsTaskCompleted(); };
         m_ThreadLoop = new ThreadLoop(tlTickFn, tlStopFn);
@@ -74,6 +74,8 @@ namespace Application
         remainingTime = robotsNo == 0 ? -1 : (progressLength - curProgress) / robotsNo;
         gainedGoods = (pow((float)curProgress, 2) / (float)progressLength) * (float)rewardMultiplier;
         lastUpdateTime = curTime;
+
+        
     }
 
     void Task::Start()
