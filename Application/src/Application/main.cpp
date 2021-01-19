@@ -43,7 +43,6 @@ namespace Application
         virtual void OnStart() override
         {
             DE_INFO("OSRobotsGame starting");
-
         }
 
         virtual void InitLayers() override

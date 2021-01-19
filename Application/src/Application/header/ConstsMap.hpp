@@ -10,31 +10,75 @@
 
 namespace Application
 {
+    class GameConsts;
+
+    using ParameterApplier = std::function<float(GameConsts *, float receivedValue, std::vector<std::string>)>;
+
+    struct PredefinedAppliers
+    {
+        const static ParameterApplier defaultApplier;
+
+        // ParameterApplier powerParameters = [](GameConsts*, std::vector<std::string>) {
+
+        // };
+    };
+
+    struct ParameterData
+    {
+
+    private:
+        ParameterApplier valueApplierFn;
+        std::vector<std::string> applierParameters;
+
+    public:
+        float CapturedValue, AppliedValue;
+
+        ParameterData(ParameterApplier valueApplierFn, std::vector<std::string> applierParameters)
+            : valueApplierFn(valueApplierFn), applierParameters(applierParameters)
+        {
+            CapturedValue = AppliedValue = 0;
+        }
+
+        ParameterData() : ParameterData(PredefinedAppliers::defaultApplier, {})
+        {
+        }
+
+        void Capture(float capturedValue)
+        {
+            CapturedValue = capturedValue;
+        }
+
+        void Apply(GameConsts *gameConsts)
+        {
+            AppliedValue = valueApplierFn(gameConsts, CapturedValue, applierParameters);
+        }
+    };
+
+#define DA_DECL_PARAM_BASIC(name) { #name, ParameterData() }
+#define DA_DECL_PARAM_APPLY(name, func, ...) { #name, ParameterData(func, {#__VA_ARGS__}) }
 
     class GameConsts final
     {
     private:
-        std::unordered_map<std::string, float> m_ConstsMap;
+        std::unordered_map<std::string, ParameterData> m_ConstsMap;
         EventListener *m_EventListener;
 
         //Static to force all instances to open file synchronously
         static DampEngine::Mutex s_FileMutex;
         DampEngine::Mutex m_MapMutex;
 
-    public:
+        void SetValue(const std::string &key, float newValue);
 
+    public:
         GameConsts();
         ~GameConsts();
-        
 
         void LoadValuesFromFile(const std::string &path);
-        void LoadFromCromossome(const std::vector<double>& cromossome);
+        void LoadFromCromossome(const std::vector<double> &cromossome);
 
         float GetValue(const std::string &key);
-        float SetValue(const std::string &key, float newValue);
 
-        void SetOnValueChanged(EH_GCValueChanged *eHandler, const std::vector<std::string> &filterKeyVec);
-        void SetOnValueChanged(EH_GCValueChanged *eHandler);
+        void SetOnValueChanged(EH_GameConstsChanged *eHandler);
 
         static std::string GetDefaultPath()
         {
@@ -108,7 +152,6 @@ namespace Application
             FAILURE_TAX = m_GameConsts.GetValue("FAILURE_TAX");
 
             AVG_REWARD = (int)(((float)TIME_STEP) * ((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0) / 2.0) * ((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0) / 2.0));
-            
 
             for (auto updateFn : m_AditionalUpdates)
                 updateFn();
@@ -117,7 +160,8 @@ namespace Application
     public:
         GameConstsCache(GameConsts &gameConsts);
 
-        void AddAditionalUpdateFn(const std::function<void()>& function) {
+        void AddAditionalUpdateFn(const std::function<void()> &function)
+        {
             m_AditionalUpdates.push_back(function);
         }
     };

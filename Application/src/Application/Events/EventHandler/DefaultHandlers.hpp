@@ -35,7 +35,7 @@ namespace Application
     DA_EVENT(EH_EAGameSettingsChanged, bool, (EAGameSettings));
 
     /* GAME CONSTS EVENTS */
-    DA_EVENT(EH_GCValueChanged, bool, (const std::string& /* changed value key */, float /* changed value */));
+    DA_EVENT(EH_GameConstsChanged, bool, (void));
 
     /* EA HANDLERS */
     DA_EVENT(EH_EAScriptEnded, bool, (int /* individualIndex */,  std::vector<std::pair<double, double>> /* gameplayResults */));

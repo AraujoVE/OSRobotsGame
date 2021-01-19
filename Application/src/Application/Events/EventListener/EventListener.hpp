@@ -75,8 +75,8 @@ namespace Application
         action.Invoke(argTuple);
     }
 
-    template <typename R, typename... Args>
-    void EventListener::Register(EventHandler<R, Args...> *eventHandler)
+    template <class EventHandlerType>
+    void EventListener::Register(EventHandlerType *eventHandler)
     {
         std::string eventType = eventHandler->GetType();
         pthread_mutex_lock(&mapMutex);

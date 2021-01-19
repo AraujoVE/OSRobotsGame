@@ -45,8 +45,9 @@ namespace Application
         template <class EventHandlerType>
         void OnAsync(typename EventHandlerType::ArgumentsTuple argTuple);
         
-        template <typename R, typename... Args>
-        void Register(EventHandler<R, Args...> *eventHandler);
+        template <class EventHandlerType>
+        void Register(EventHandlerType *eventHandler);
+        
 
         void Clear()
         {

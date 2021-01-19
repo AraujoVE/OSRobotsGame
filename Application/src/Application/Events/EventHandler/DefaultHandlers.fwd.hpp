@@ -33,8 +33,7 @@ namespace Application
     DA_EVENT_FWD(EH_EAGameSettingsChanged, bool, (EAGameSettings));
 
     /* GAME CONSTS EVENTS */
-    DA_EVENT_FWD(EH_GCValueChanged, bool, (const std::string& /* changed value key */, float /* changed value */));
-
+    DA_EVENT_FWD(EH_GameConstsChanged, bool, ());
 
     //TODO: remove
     /* EA HANDLERS */
