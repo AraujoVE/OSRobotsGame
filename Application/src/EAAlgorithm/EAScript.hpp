@@ -23,7 +23,10 @@ namespace EAAlgorithm
         pthread_t scriptThread;
         std::vector<std::vector<std::vector<std::string>>> gameScript;
         const static int DIRECTIONS_SIZE = 7;
-        const static int HUMAN_WAIT_UNIT = 500000;
+        const static int HUMAN_OP_DELAY = 500000;
+        const static int HUMAN_GP_TICK_DELAY = 1000;
+        static constexpr double AU_PER_TICK = HUMAN_GP_TICK_DELAY/1e6;
+
 
     public:
         EAScript(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName);

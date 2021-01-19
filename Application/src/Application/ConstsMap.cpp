@@ -1,5 +1,3 @@
-#include <magic.h>
-
 #include <vector>
 #include <unordered_map>
 #include "Application/header/ConstsMap.hpp"

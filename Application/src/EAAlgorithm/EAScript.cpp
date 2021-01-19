@@ -134,7 +134,7 @@ namespace EAAlgorithm
 
     void EAScript::scriptFunct6(const std::vector<std::string> &params)
     {
-        double waitsPerSecond = 1e6 / HUMAN_WAIT_UNIT;
+        double waitsPerSecond = 1e6 / HUMAN_OP_DELAY;
 
         int waitTime = std::stoi(params.at(1));
 
@@ -152,7 +152,7 @@ namespace EAAlgorithm
 
     std::vector<std::pair<double, double>> *EAScript::scriptLoop()
     {
-        time_t initTime, endTime;
+        int gameDurationInTicks = -1;
         int it = 0;
 
         auto *gameplaysResults = new std::vector<std::pair<double, double>>();
@@ -163,9 +163,8 @@ namespace EAAlgorithm
 
         auto &_gameScript = gameScript;
 
-        m_GameRunner.SetOnGameStarted(new EH_GameStarted([&initTime, this, &_gameScript, &it, DELAY_MICRO](GameRunner &_) {
+        m_GameRunner.SetOnGameStarted(new EH_GameStarted([this, &_gameScript, &it, DELAY_MICRO](GameRunner &_) {
             DE_DEBUG("(EAScript -- {0}) OnGameStarted", m_DebugName);
-            initTime = time(0);
 
             for (int i = 1; i < (int)_gameScript.at(it).size(); i++)
             {
@@ -178,22 +177,11 @@ namespace EAAlgorithm
 
         auto &gameRunner = m_GameRunner;
 
-        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &endTime, &endSem, &_gameScript, &it, &initTime, gameplaysResults, &gameRunner](GameRunner &_) {
+        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &gameDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults, &gameRunner](GameRunner &_,int elapsedTimeTicks) {
             DE_DEBUG("(EAScriptyyy -- {0}) OnGameEnded", m_DebugName);
-            endTime = time(0);
 
-            //Callback para saber quando acaba o jogo
-            //quando isso acontece : endTime = time(0)
-            time_t targetDurationAU = stol(_gameScript.at(it).at(0).at(0));
-            time_t realDurationS = endTime - initTime;
 
-            double AUperS = HUMAN_WAIT_UNIT / gameRunner.GetGameConsts().GetValue("DECAY_DELAY_MICRO");
-            time_t realDurationAU = realDurationS * AUperS;
-
-            gameplaysResults->push_back({targetDurationAU, realDurationAU});
-
-            usleep(5e6);
-
+            gameDurationInTicks = elapsedTimeTicks;
             endSem.Post();
 
             return false;
@@ -208,8 +196,15 @@ namespace EAAlgorithm
             DE_DEBUG("(EAScript -- {0}) Waiting for gameplay #{1} to end...", m_DebugName, m);
             endSem.Wait();
             DE_INFO("(EAScript -- {0}) Gameplay #{1} ended normally", m_DebugName, m);
+
+            //Callback para saber quando acaba o jogo
+            //quando isso acontece : endTime = time(0)
+            double targetDurationAU = stol(_gameScript.at(it).at(0).at(0));
+            double gameDurationAU = gameDurationInTicks * AU_PER_TICK;//Time calculated in VillageStats::decayStats with sleep(DECAY_DELAY_MICRO)
+            gameplaysResults->push_back({targetDurationAU, gameDurationAU});
             it++;
 
+            DE_ASSERT(gameDurationInTicks >= 0, "Game duration not calculated correctly");
             DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but it's not lost!!! **");
 
             DE_TRACE("(EAScript -- {0}) Changing gameplay ", m_DebugName);

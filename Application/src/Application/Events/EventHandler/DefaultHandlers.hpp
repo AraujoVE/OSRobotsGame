@@ -24,7 +24,7 @@ namespace Application
 
     /* GAME RUNNER EVENT HANDLERS */
     DA_EVENT(EH_GameStarted, bool, (GameRunner&));
-    DA_EVENT(EH_GameEnded, bool, (GameRunner&));
+    DA_EVENT(EH_GameEnded, bool, (GameRunner&,int));
     
 
     /* THREADLOOP EVENTS */

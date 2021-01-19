@@ -36,7 +36,7 @@ namespace EAAlgorithm
         bool eventHappens(int);
         void checkEvents();
         void startEventTriggerList();
-        void evoAlg(std::string);
+        void evoAlg(int,std::string);
         void fillInitialsWithBests(int);
         void semiFinalsTournment(int);
         void finalTournment();
@@ -102,7 +102,7 @@ namespace EAAlgorithm
 
         const long APPLY_PREDATION_INTERVAL = 10; // interval (in generations) to apply predation
 
-        const long MAX_PARAM_VALUE = 1; // max value a parameter can reach
+        const long MAX_PARAM_VALUE = 1000; // max value a parameter can reach
         enum tournments
         {
             SEMI_FINALS,
@@ -115,6 +115,38 @@ namespace EAAlgorithm
             arma::mat::fixed<TOURNMENT_RATE, NB_PARAMETERS>()};
 
         int eventTriggerModule[6] = {1, 10, 5, 10, 2, 10};
+
+        #define EA_CB(NAME,MIN,MAX) {MIN,MAX}
+        std::vector<std::pair<double,double>> attributesValuesBounds = {
+            EA_CB("ON_ATTACK_MULTIPLIER",,),
+            EA_CB("POP_INCREASE_TAX",,),
+            EA_CB("POP_PER_CONSTRUCTION",,),
+            EA_CB("INIT_POP_VALUE",,),
+            EA_CB("INIT_STAT_VALUE",,),
+            EA_CB("ON_ATTACK_DECAY_TAX",,),
+            EA_CB("NORMAL_DECAY_TAX",,),
+            EA_CB("ATTACK_FREQUENCY",,),
+            EA_CB("INIT_RESOURCES_VALUE",,),
+            EA_CB("TAX_REDUCT",,),
+            EA_CB("MIN_LOSS_0",,),
+            EA_CB("MIN_LOSS_1",,),
+            EA_CB("MIN_LOSS_2",,),
+            EA_CB("MIN_LOSS_3",,),
+            EA_CB("MAX_LOSS_0",,),
+            EA_CB("MAX_LOSS_1",,),
+            EA_CB("MAX_LOSS_2",,),
+            EA_CB("MAX_LOSS_3",,),
+            EA_CB("TOT_ROBOTS_INI",,),
+            EA_CB("FREE_ROBOTS_INI",,),
+            EA_CB("PROD_COST_INI",,),
+            EA_CB("PROD_COST_INCREASE_TAX",,),
+            EA_CB("TIME_STEP",,),
+            EA_CB("INIT_TIME_STEP",,),
+            EA_CB("MAX_TIME_STEPS",,),
+            EA_CB("MIN_REWARD",,),
+            EA_CB("REWARD_RANGE",,),
+            EA_CB("FAILURE_TAX",,),
+        }
 
         enum selectionMethods
         {

@@ -32,6 +32,7 @@ namespace Application
     VillageStats::VillageStats(GameConsts &gameConsts)
         : m_GameConstsCache(gameConsts)
     {
+        elapsedTimeTicks = 0;
         std::srand(std::time(nullptr)); // use current time as seed for random generator
         initializeStats();
         initializeVSAvenues();
@@ -218,18 +219,14 @@ namespace Application
             else
                 it = (it + 1 + m_GameConstsCache.ATTACK_FREQUENCY) % m_GameConstsCache.ATTACK_FREQUENCY;
 
+
+            elapsedTimeTicks += 1;
             do
             {
                 usleep(m_GameConstsCache.DECAY_DELAY_MICRO);
             } while (m_DecaymentPaused);
         }
         DE_TRACE("decayStats thread stopped!");
-    }
-
-    void VillageStats::decayResources(int, int, float &)
-    {
-        //TODO: AraujoVE ver oq é isso
-        DE_WARN("VillageStats::decayResources not implemented. Ignoring call!!!");
     }
 
     Avenue *VillageStats::getAvenue(int type)
@@ -257,6 +254,10 @@ namespace Application
             avenueVS[i]->stopConsumer();
             delete avenueVS[i];
         }
+    }
+
+    int VillageStats::getElapsedTimeTicks(){
+        return elapsedTimeTicks;
     }
 
 } // namespace Application

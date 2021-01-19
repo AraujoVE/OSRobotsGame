@@ -22,7 +22,7 @@ namespace Application
 
     /* GAME RUNNER EVENT HANDLERS */
     DA_EVENT_FWD(EH_GameStarted, bool, (GameRunner&));
-    DA_EVENT_FWD(EH_GameEnded, bool, (GameRunner&));
+    DA_EVENT_FWD(EH_GameEnded, bool, (GameRunner&,int));
     
 
     /* THREADLOOP EVENTS */

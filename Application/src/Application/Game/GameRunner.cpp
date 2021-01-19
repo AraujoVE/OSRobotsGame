@@ -49,7 +49,7 @@ namespace Application
     {
         DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running");
 
-        m_EventListener->On<EH_GameEnded>(*this);
+        m_EventListener->On<EH_GameEnded>({*this,m_GameSave->GetVillageStats()->getElapsedTimeTicks()});
         m_GameStatus.GameStarted = false;
 
         //TODO: stop village stats decayment

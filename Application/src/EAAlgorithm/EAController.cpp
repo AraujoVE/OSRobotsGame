@@ -40,6 +40,7 @@ namespace EAAlgorithm
         m_Algorithm.startAlgorithm();
     }
 
+    //TODO: Sync or Async UI
     std::vector<EAController::GameplayResult> EAController::RunPopulationInGame(const std::vector<Individual> &population)
     {
         DE_DEBUG("EAController::RunPopulationInGame()");
@@ -53,6 +54,7 @@ namespace EAAlgorithm
         //Used only to get DELAY_MICRO
         GameConsts *fileGC = new GameConsts();
         fileGC->LoadValuesFromFile(getEAScriptSrcFilePath());
+
 
         int debug_ind_ind = 0;
         for (const Individual &individual : population)
@@ -70,7 +72,7 @@ namespace EAAlgorithm
 
             scripts.push_back(script);
             gameRunners.push_back(indvGameRunner);
-
+            break;
         }
 
         debug_ind_ind = 0;

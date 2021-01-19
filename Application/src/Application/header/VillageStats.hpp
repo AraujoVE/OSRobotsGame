@@ -23,6 +23,7 @@ namespace Application
         const static int BASE_STATS_NO = FUNCTION_QTY;
         const static int POPULATION_INDEX = BASE_STATS_NO;
     private:
+        int elapsedTimeTicks;
         bool onAttack;
         float statTax;
         int maxPop;
@@ -38,12 +39,11 @@ namespace Application
         Avenue *avenueVS[BASE_STATS_NO+1];
         pthread_t decayThread;
 
-        void (VillageStats::*decayStatsFuncts[BASE_STATS_NO])(int,int,float&) = {
+        void (VillageStats::*decayStatsFuncts[BASE_STATS_NO - 1])(int,int,float&) = {
             &VillageStats::decayFood,
             &VillageStats::decayHealth,
             &VillageStats::decayStructures,
             &VillageStats::decayDefenses,
-            &VillageStats::decayResources
         };
 
 
@@ -91,6 +91,8 @@ namespace Application
 
         void initializeStats();
         void addTaskResources(RobotFunction, time_t, int);
+
+        int getElapsedTimeTicks();
     };
 
     void *runDecay (void *decayFuncObject);

@@ -32,7 +32,7 @@ namespace Application::GameWindows
 
             ImGui::Begin("GameStatus", NULL, m_WindowFlags);
             {
-                ImGui::Text(statusTitle);
+                ImGui::Text("%s",statusTitle);
                 
                 ImGui::Text("Population: %d", population);
                 ImGui::SameLine();

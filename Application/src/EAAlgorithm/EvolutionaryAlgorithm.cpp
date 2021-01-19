@@ -435,8 +435,9 @@ namespace EAAlgorithm
             eventTriggerModule[i] *= eventTriggerModule[i - 1];
     }
 
-    void EvolutionaryAlgorithm::evoAlg(std::string csvStr)
+    void EvolutionaryAlgorithm::evoAlg(int createPopType,std::string csvStr)
     {
+        initializePop(createPopType);
         nbNoImprovementGens = 0;
         createCSV(csvStr);
         continueBatch = true;
@@ -471,12 +472,10 @@ namespace EAAlgorithm
     {
         for (int i = 0; i < TOURNMENT_RATE; i++)
         {
-            initializePop(INITIALS);
-            evoAlg("SF-" + std::to_string(semiFinalPos) + "_EA-" + std::to_string(i));
+            evoAlg(INITIALS,"SF-" + std::to_string(semiFinalPos) + "_EA-" + std::to_string(i));
             bestTournmentIndv[SEMI_FINALS].row(i) = population.row(bestFitIndex); // saves the best individual from current EA
         }
-        initializePop(SEMI_FINALS);
-        evoAlg("SF-" + std::to_string(semiFinalPos));                               // this EA will use the best individuals from each previous EA
+        evoAlg(SEMI_FINALS,"SF-" + std::to_string(semiFinalPos));                               // this EA will use the best individuals from each previous EA
         bestTournmentIndv[FINALS].row(semiFinalPos) = population.row(bestFitIndex); // saves the best individual from current EA
         return;
     }
@@ -486,8 +485,7 @@ namespace EAAlgorithm
         for (int i = 0; i < TOURNMENT_RATE; i++)
             semiFinalsTournment(i);
 
-        initializePop(FINALS);
-        evoAlg("Main"); // this EA will use the best individuals from each semifinal
+        evoAlg(FINALS,"Main"); // this EA will use the best individuals from each semifinal
 
         bestIndividual = population.row(bestFitIndex);
         std::cout << "EVOLUTIONARY ALGORITHM FINISHED!" << std::endl;
