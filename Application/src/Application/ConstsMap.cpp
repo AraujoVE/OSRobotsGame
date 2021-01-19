@@ -14,12 +14,17 @@ namespace Application
     const ParameterApplier PredefinedAppliers::defaultApplier = [](GameConsts *, float receivedValue, std::vector<std::string>) {
         return receivedValue;
     };
+    const ParameterApplier PredefinedAppliers::divParameters = [](GameConsts* gameConsts, float receivedValue,std::vector<std::string> paramsList) {
+        return gameConsts->GetValue(paramsList.at(0)) / receivedValue;
+    };
+
 
     GameConsts::GameConsts()
         : m_ConstsMap({}),
           m_EventListener(new EventListener()),
           m_MapMutex()
     {
+
         m_ConstsMap.insert({
             DA_DECL_PARAM_BASIC(ON_ATTACK_MULTIPLIER),
             DA_DECL_PARAM_BASIC(POP_INCREASE_TAX),
@@ -27,15 +32,15 @@ namespace Application
             DA_DECL_PARAM_BASIC(INIT_POP_VALUE),
             DA_DECL_PARAM_BASIC(INIT_STAT_VALUE),
             DA_DECL_PARAM_BASIC(ON_ATTACK_DECAY_TAX),
-            DA_DECL_PARAM_BASIC(NORMAL_DECAY_TAX),
+            DA_DECL_PARAM_APPLY(NORMAL_DECAY_TAX,PredefinedAppliers::divParameters,ON_ATTACK_DECAY_TAX),
             DA_DECL_PARAM_BASIC(ATTACK_FREQUENCY),
             DA_DECL_PARAM_BASIC(INIT_RESOURCES_VALUE),
             DA_DECL_PARAM_BASIC(TAX_REDUCT),
             DA_DECL_PARAM_BASIC(DECAY_DELAY_MICRO),
-            DA_DECL_PARAM_BASIC(MIN_LOSS_0),
-            DA_DECL_PARAM_BASIC(MIN_LOSS_1),
-            DA_DECL_PARAM_BASIC(MIN_LOSS_2),
-            DA_DECL_PARAM_BASIC(MIN_LOSS_3),
+            DA_DECL_PARAM_APPLY(MIN_LOSS_0,PredefinedAppliers::divParameters,MAX_LOSS_0),
+            DA_DECL_PARAM_APPLY(MIN_LOSS_1,PredefinedAppliers::divParameters,MAX_LOSS_1),
+            DA_DECL_PARAM_APPLY(MIN_LOSS_2,PredefinedAppliers::divParameters,MAX_LOSS_2),
+            DA_DECL_PARAM_APPLY(MIN_LOSS_3,PredefinedAppliers::divParameters,MAX_LOSS_3),
             DA_DECL_PARAM_BASIC(MAX_LOSS_0),
             DA_DECL_PARAM_BASIC(MAX_LOSS_1),
             DA_DECL_PARAM_BASIC(MAX_LOSS_2),
@@ -118,7 +123,6 @@ namespace Application
             SetValue("MAX_LOSS_2", (float)cromossome.at(i++));
             SetValue("MAX_LOSS_3", (float)cromossome.at(i++));
             SetValue("TOT_ROBOTS_INI", (float)cromossome.at(i++));
-            SetValue("FREE_ROBOTS_INI", (float)cromossome.at(i++));
             SetValue("PROD_COST_INI", (float)cromossome.at(i++));
             SetValue("PROD_COST_INCREASE_TAX", (float)cromossome.at(i++));
             SetValue("TIME_STEP", (float)cromossome.at(i++));

@@ -52,44 +52,13 @@ namespace EAAlgorithm
         EAController &m_EAController;
 
         double indvFitness;
-        const std::string parametersList[28] = {
-            "ON_ATTACK_MULTIPLIER",
-            "POP_INCREASE_TAX",
-            "POP_PER_CONSTRUCTION",
-            "INIT_POP_VALUE",
-            "INIT_STAT_VALUE",
-            "ON_ATTACK_DECAY_TAX",
-            "NORMAL_DECAY_TAX",
-            "ATTACK_FREQUENCY",
-            "INIT_RESOURCES_VALUE",
-            "TAX_REDUCT",
-            //DECAY_DELAY_MICRO -- not configurable (changed on the UI)
-            "MIN_LOSS_0",
-            "MIN_LOSS_1",
-            "MIN_LOSS_2",
-            "MIN_LOSS_3",
-            "MAX_LOSS_0",
-            "MAX_LOSS_1",
-            "MAX_LOSS_2",
-            "MAX_LOSS_3",
-            "TOT_ROBOTS_INI",
-            "FREE_ROBOTS_INI",
-            "PROD_COST_INI",
-            "PROD_COST_INCREASE_TAX",
-            "TIME_STEP",
-            "INIT_TIME_STEP",
-            "MAX_TIME_STEPS",
-            "MIN_REWARD",
-            "REWARD_RANGE",
-            "FAILURE_TAX"
-        };
         bool eaFinished;
-        const double MIN_MULT = 0.5;
-        const double MAX_MULT = 1.5;
+        const double MIN_MULT = 1.0;
+        const double MAX_MULT = 1.0;
         const double MUTATE_POSITIVE_MULT = 1.0;
         const double MUTATE_NEGATIVE_MULT = -1.0;
 
-#define NB_PARAMETERS 28 // number of parameters that will be adjusted
+#define NB_PARAMETERS 27 // number of parameters that will be adjusted
 #define POPULATION_SIZE 20
 #define TOURNMENT_RATE 10
 
@@ -102,7 +71,6 @@ namespace EAAlgorithm
 
         const long APPLY_PREDATION_INTERVAL = 10; // interval (in generations) to apply predation
 
-        const long MAX_PARAM_VALUE = 1000; // max value a parameter can reach
         enum tournments
         {
             SEMI_FINALS,
@@ -116,36 +84,47 @@ namespace EAAlgorithm
 
         int eventTriggerModule[6] = {1, 10, 5, 10, 2, 10};
 
-        #define EA_CB(NAME,MIN,MAX) {MIN,MAX}
-        std::vector<std::pair<double,double>> attributesValuesBounds = {
-            EA_CB("ON_ATTACK_MULTIPLIER",0,1),
-            EA_CB("POP_INCREASE_TAX",0,1),
-            EA_CB("POP_PER_CONSTRUCTION",0,1),
-            EA_CB("INIT_POP_VALUE",0,1),
-            EA_CB("INIT_STAT_VALUE",0,1),
-            EA_CB("ON_ATTACK_DECAY_TAX",0,1),
-            EA_CB("NORMAL_DECAY_TAX",0,1),
-            EA_CB("ATTACK_FREQUENCY",0,1),
-            EA_CB("INIT_RESOURCES_VALUE",0,1),
-            EA_CB("TAX_REDUCT",0,1),
-            EA_CB("MIN_LOSS_0",0,1),
-            EA_CB("MIN_LOSS_1",0,1),
-            EA_CB("MIN_LOSS_2",0,1),
-            EA_CB("MIN_LOSS_3",0,1),
-            EA_CB("MAX_LOSS_0",0,1),
-            EA_CB("MAX_LOSS_1",0,1),
-            EA_CB("MAX_LOSS_2",0,1),
-            EA_CB("MAX_LOSS_3",0,1),
-            EA_CB("TOT_ROBOTS_INI",1,40),
-            EA_CB("FREE_ROBOTS_INI",0,1),
-            EA_CB("PROD_COST_INI",0,1),
-            EA_CB("PROD_COST_INCREASE_TAX",0,1),
-            EA_CB("TIME_STEP",15,60),
-            EA_CB("INIT_TIME_STEP",1,10),
-            EA_CB("MAX_TIME_STEPS",1,10),
-            EA_CB("MIN_REWARD",0,1),
-            EA_CB("REWARD_RANGE",0,1),
-            EA_CB("FAILURE_TAX",0,1),
+       
+        struct GeneValueBound {
+            std::string name;
+            double min = 0,max = 1;
+        };
+        #define EA_CB_3(NAME,MIN,MAX) {NAME,MIN,MAX}
+        #define EA_CB_2(NAME,MIN) {NAME,MIN,15*MIN}
+        #define EA_CB_1(NAME) {NAME,0,1}
+        #define EA_GET_MACRO_NAME_3(arg1, arg2, arg3, macro, ...) macro
+        #define EA_CB(...) EA_GET_MACRO_NAME_3(__VA_ARGS__,EA_CB_3,EA_CB_2,EA_CB_1)(__VA_ARGS__)
+
+
+
+        std::vector<GeneValueBound> attributesValues = {
+            EA_CB("ON_ATTACK_MULTIPLIER",1), //DEFAULT
+            EA_CB("POP_INCREASE_TAX",1), //DEFAULT
+            EA_CB("POP_PER_CONSTRUCTION",1), //DEFAULT
+            EA_CB("INIT_POP_VALUE",100), //DEFAULT
+            EA_CB("INIT_STAT_VALUE",50), //DEFAULT
+            EA_CB("ON_ATTACK_DECAY_TAX"), //DEFAULT
+            EA_CB("NORMAL_DECAY_TAX",1), // NORMAL_DECAY_TAX = ON_ATTACK_DECAY_TAX/NORMAL_DECAY_TAX
+            EA_CB("ATTACK_FREQUENCY",5), //DEFAULT
+            EA_CB("INIT_RESOURCES_VALUE",25), //DEFAULT
+            EA_CB("TAX_REDUCT"), //DEFAULT
+            EA_CB("MIN_LOSS_0",1), // MIN_LOSS_0 = MAX_LOSS_0/MIN_LOSS_0 
+            EA_CB("MIN_LOSS_1",1), // MIN_LOSS_1 = MAX_LOSS_1/MIN_LOSS_1 
+            EA_CB("MIN_LOSS_2",1), // MIN_LOSS_2 = MAX_LOSS_2/MIN_LOSS_2 
+            EA_CB("MIN_LOSS_3",1), // MIN_LOSS_3 = MAX_LOSS_3/MIN_LOSS_3 
+            EA_CB("MAX_LOSS_0"), //DEFAULT
+            EA_CB("MAX_LOSS_1"), //DEFAULT
+            EA_CB("MAX_LOSS_2"), //DEFAULT
+            EA_CB("MAX_LOSS_3"), //DEFAULT
+            EA_CB("TOT_ROBOTS_INI",1,25), //DEFAULT
+            EA_CB("PROD_COST_INI",5), //DEFAULT
+            EA_CB("PROD_COST_INCREASE_TAX"), //DEFAULT
+            EA_CB("TIME_STEP",15,60), //DEFAULT
+            EA_CB("INIT_TIME_STEP",1), //DEFAULT
+            EA_CB("MAX_TIME_STEPS",1), //DEFAULT
+            EA_CB("MIN_REWARD",1), //DEFAULT
+            EA_CB("REWARD_RANGE",1), //DEFAULT
+            EA_CB("FAILURE_TAX") //DEFAULT
         };
 
         enum selectionMethods

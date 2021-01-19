@@ -32,7 +32,7 @@ namespace Application
     {
         //TODO: mudar de volta (para 1, tot e free)
         totRobots =  m_GameConstsCache.TOT_ROBOTS_INI;
-        freeRobots =  m_GameConstsCache.FREE_ROBOTS_INI;
+        freeRobots =  m_GameConstsCache.TOT_ROBOTS_INI;
         prodCost = m_GameConstsCache. PROD_COST_INI;
         villageStats = NULL;
     }

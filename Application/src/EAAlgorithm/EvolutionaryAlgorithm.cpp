@@ -33,10 +33,10 @@ namespace EAAlgorithm
         std::fstream myFile;
         myFile.open("constValues.cfg", std::ios_base::app);
 
-        myFile << parametersList[0] << " = " << population(bestFitIndex, 0);
+        myFile << attributesValues[0].name << " = " << population(bestFitIndex, 0);
         for (size_t i = 1; i < NB_PARAMETERS; i++)
             myFile << std::endl
-                   << parametersList[i] << " = " << population(bestFitIndex, i);
+                   << attributesValues[i].name << " = " << population(bestFitIndex, i);
         //printf("k%sk\n", parametersList[i]);
         myFile.close();
     }
@@ -53,7 +53,8 @@ namespace EAAlgorithm
         // }
         population.randu(); // initialize with values between 0 and 1
         if (tournmentType == INITIALS)
-            population *= MAX_PARAM_VALUE; // if a normal EA is taking place, just multiply the population by a givern value
+            for(int j = 0; j < NB_PARAMETERS; j++)
+                population.col(j) = attributesValues[j].min + population.col(j)*(attributesValues[j].max - attributesValues[j].min); // if a normal EA is taking place, just multiply the population by a givern value
         else
         {
             int middle = TOURNMENT_RATE + (POPULATION_SIZE - TOURNMENT_RATE) / 2;
@@ -70,7 +71,8 @@ namespace EAAlgorithm
                 }
             }
             for (int i = middle; i < POPULATION_SIZE; i++)
-                population.row(i) *= MAX_PARAM_VALUE;
+                for (int j = 0; j< NB_PARAMETERS; i++)
+                    population(i,j) = attributesValues[j].min + population(i,j)*(attributesValues[j].max - attributesValues[j].min);
         }
 
         population.print("Population matrix initialized:");
@@ -93,6 +95,11 @@ namespace EAAlgorithm
     // 2nd step: evaluate population (calculate fitness)
     void EvolutionaryAlgorithm::evaluatePop()
     {
+        //Limit the values in each col
+        for(int j = 0; j < NB_PARAMETERS; j++){
+            population.col(j) = arma::clamp(population.col(j),attributesValues[j].min,attributesValues[j].max);
+        }
+
         std::cout << "EVALUATING POPULATION\n";
 
         nbNoImprovementGens++; // we begin considering there was no improvement in the generation
@@ -367,7 +374,9 @@ namespace EAAlgorithm
     void EvolutionaryAlgorithm::predationOfOne()
     {
         arma::rowvec newInd(NB_PARAMETERS, arma::fill::randu); // creating totally new individual
-        newInd = newInd * MAX_PARAM_VALUE;
+        for(int j = 0; j < NB_PARAMETERS; j++){
+            newInd = attributesValues[j].min + newInd(j)*(attributesValues[j].max - attributesValues[j].min);
+        }
 
         population.row(worstFitIndex) = newInd;
 

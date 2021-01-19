@@ -18,9 +18,7 @@ namespace Application
     {
         const static ParameterApplier defaultApplier;
 
-        // ParameterApplier powerParameters = [](GameConsts*, std::vector<std::string>) {
-
-        // };
+        const static ParameterApplier divParameters;
     };
 
     struct ParameterData
@@ -60,6 +58,7 @@ namespace Application
     class GameConsts final
     {
     private:
+
         std::unordered_map<std::string, ParameterData> m_ConstsMap;
         EventListener *m_EventListener;
 
@@ -105,7 +104,6 @@ namespace Application
         float MIN_LOSS[4];
         float MAX_LOSS[4];
         float TOT_ROBOTS_INI;
-        float FREE_ROBOTS_INI;
         float PROD_COST_INI;
         float PROD_COST_INCREASE_TAX;
         int TIME_STEP;
@@ -141,7 +139,6 @@ namespace Application
             MAX_LOSS[2] = m_GameConsts.GetValue("MAX_LOSS_2");
             MAX_LOSS[3] = m_GameConsts.GetValue("MAX_LOSS_3");
             TOT_ROBOTS_INI = m_GameConsts.GetValue("TOT_ROBOTS_INI");
-            FREE_ROBOTS_INI = m_GameConsts.GetValue("FREE_ROBOTS_INI");
             PROD_COST_INI = m_GameConsts.GetValue("PROD_COST_INI");
             PROD_COST_INCREASE_TAX = m_GameConsts.GetValue("PROD_COST_INCREASE_TAX");
             TIME_STEP = m_GameConsts.GetValue("TIME_STEP");
