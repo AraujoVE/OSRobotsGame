@@ -52,6 +52,7 @@ namespace EAAlgorithm
         //TODO: fix ml
         //TODO: DELAY MCRO from UI
         //Used only to get DELAY_MICRO
+        //TODO: EAs are getting the value 0 instead of pop
         GameConsts *fileGC = new GameConsts();
         fileGC->LoadValuesFromFile(getEAScriptSrcFilePath());
 

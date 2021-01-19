@@ -89,7 +89,7 @@ namespace Application
             myFile.close();
         }
 
-        for (auto pairIt : m_ConstsMap)
+        for (auto& pairIt : m_ConstsMap)
             pairIt.second.Apply(this);
 
         m_MapMutex.Unlock();
@@ -132,7 +132,7 @@ namespace Application
             SetValue("REWARD_RANGE", (float)cromossome.at(i++));
             SetValue("FAILURE_TAX", (float)cromossome.at(i++));
 
-            for (auto pairIt : m_ConstsMap)
+            for (auto& pairIt : m_ConstsMap)
                 pairIt.second.Apply(this);
 
         }

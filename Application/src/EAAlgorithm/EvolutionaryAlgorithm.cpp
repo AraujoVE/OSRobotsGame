@@ -53,6 +53,7 @@ namespace EAAlgorithm
         // }
         population.randu(); // initialize with values between 0 and 1
         if (tournmentType == INITIALS)
+            // TODO: convert to each_col
             for(int j = 0; j < NB_PARAMETERS; j++)
                 population.col(j) = attributesValues[j].min + population.col(j)*(attributesValues[j].max - attributesValues[j].min); // if a normal EA is taking place, just multiply the population by a givern value
         else
