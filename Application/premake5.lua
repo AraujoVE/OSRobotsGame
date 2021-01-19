@@ -44,6 +44,10 @@ project "Application"
 			"dl",
 			"pthread"
 		}
+		
+		buildoptions {
+			"-Wl,--stack,16777216"
+        }
 
 
 	filter "system:windows"

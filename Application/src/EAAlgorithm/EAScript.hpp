@@ -24,7 +24,7 @@ namespace EAAlgorithm
         std::vector<std::vector<std::vector<std::string>>> gameScript;
         const static int DIRECTIONS_SIZE = 7;
         const static int HUMAN_OP_DELAY = 500000;
-        const static int HUMAN_GP_TICK_DELAY = 1000;
+        const static int HUMAN_GP_TICK_DELAY = 500000;
         static constexpr double AU_PER_TICK = HUMAN_GP_TICK_DELAY/1e6;
 
 
