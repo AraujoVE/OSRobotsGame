@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdio.h>  /* defines FILENAME_MAX */
+#include <stdio.h> /* defines FILENAME_MAX */
 #include <string>
 
 #if defined(DE_SYSTEM_WINDOWS)
@@ -13,34 +13,15 @@
 #error "unsupported system"
 #endif
 
-namespace Util::Path {
-    const std::string& getCWD()
+namespace Util::Path
+{
+    enum class ResourceType : uint8_t
     {
-        static std::string cwd = "PPWPP";
-        
-        if (cwd == "PPWPP")
-        {
-            char path[FILENAME_MAX];
-            GetCurrentDir(path, FILENAME_MAX);
-            cwd = std::string(path);
-        }
-
-        return cwd;
-    }
-
-    enum class ResourceType : uint8_t {
         GAME_CONSTS = 0,
         GAME_SCRIPT_MACHINE,
         GAME_SCRIPT_HUMAN_FOLDER
     };
 
-    const std::string& getDefaultPath(ResourceType resourceType) {
-        static std::string defaultPaths[] = {
-            getCWD() + "/Application/config/constValues.cfg",
-            getCWD() + "/gameScript.cfg",
-            getCWD() + "/scripts/"
-        };
-
-        return defaultPaths[(int)resourceType];
-    }
-}
+    const std::string &getDefaultPath(ResourceType resourceType);
+    const std::string &getCWD();
+} // namespace Util::Path
