@@ -32,6 +32,7 @@ namespace Application
     public:
         MyApplication() : DampEngine::Application({"OSRobotGame"})
         {
+            DE_INFO("Initializing Application...");
             m_GameRunner = new GameRunner();
         }
 
@@ -42,11 +43,13 @@ namespace Application
 
         virtual void OnStart() override
         {
-            DE_INFO("OSRobotsGame starting");
+            DE_INFO("MyApplication::OnStart()");
         }
 
         virtual void InitLayers() override
         {
+            DE_INFO("MyApplication::InitLayers()");
+
             m_GameGuiLayer = new GameGuiLayer(*m_GameRunner);
             m_EAGameGuiLayer = new EAGameGuiLayer(*m_GameRunner);
 
@@ -113,7 +116,8 @@ namespace Application
 
         virtual void OnStop() override
         {
-            DE_INFO("OSRobotsGame stopping");
+            DE_INFO("MyApplication::OnStop()");
+
         }
 
     private:

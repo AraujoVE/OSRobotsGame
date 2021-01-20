@@ -15,7 +15,7 @@ namespace Application
         return receivedValue;
     };
     const ParameterApplier PredefinedAppliers::divParameters = [](GameConsts* gameConsts, float receivedValue,std::vector<std::string> paramsList) {
-        return gameConsts->GetValue(paramsList.at(0)) / receivedValue;
+        return gameConsts->GetRawValue(paramsList.at(0)) / receivedValue;
     };
 
 
@@ -63,6 +63,8 @@ namespace Application
     DampEngine::Mutex GameConsts::s_FileMutex;
     void GameConsts::LoadValuesFromFile(const std::string &srcFile)
     {
+        DE_DEBUG("GameConsts::LoadValuesFromFile START");
+
         s_FileMutex.Lock();
         m_MapMutex.Lock();
         {
@@ -86,21 +88,23 @@ namespace Application
 
             myFile.close();
         }
-
+        m_MapMutex.Unlock();
+        s_FileMutex.Unlock();
+        
         for (auto& pairIt : m_ConstsMap)
             pairIt.second.Apply(this);
 
-        m_MapMutex.Unlock();
-        s_FileMutex.Unlock();
+        DE_DEBUG("GameConsts::LoadValuesFromFile SUCCESS");
+
 
         m_EventListener->On<EH_GameConstsChanged>();
     }
 
     void GameConsts::LoadFromCromossome(const std::vector<double> &cromossome)
     {
-        int i = 0;
         m_MapMutex.Lock();
         {
+            int i = 0;
             SetValue("ON_ATTACK_MULTIPLIER", (float)cromossome.at(i++));
             SetValue("POP_INCREASE_TAX", (float)cromossome.at(i++));
             SetValue("POP_PER_CONSTRUCTION", (float)cromossome.at(i++));
@@ -130,12 +134,24 @@ namespace Application
             SetValue("REWARD_RANGE", (float)cromossome.at(i++));
             SetValue("FAILURE_TAX", (float)cromossome.at(i++));
 
-            for (auto& pairIt : m_ConstsMap)
-                pairIt.second.Apply(this);
 
         }
         m_MapMutex.Unlock();
+
+        for (auto& pairIt : m_ConstsMap)
+            pairIt.second.Apply(this);
+
         m_EventListener->On<EH_GameConstsChanged>();
+    }
+
+    float GameConsts::GetRawValue(const std::string &key)
+    {
+        m_MapMutex.Lock();
+        auto findIt = m_ConstsMap.find(key);
+        DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
+        float val = findIt->second.CapturedValue;
+        m_MapMutex.Unlock();
+        return val;
     }
 
     float GameConsts::GetValue(const std::string &key)
@@ -145,6 +161,7 @@ namespace Application
         DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
         float val = findIt->second.AppliedValue;
         m_MapMutex.Unlock();
+        
         return val;
     }
 

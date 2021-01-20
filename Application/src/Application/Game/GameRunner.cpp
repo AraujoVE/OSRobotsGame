@@ -84,11 +84,14 @@ namespace Application
         auto *robotsManagement = m_GameSave->GetRobotsManagement().get();
         auto *villageStats = m_GameSave->GetVillageStats().get();
 
+
+        const static std::string noRobotsReason = "No more robots available!";
+        const static std::string popuDeadReason = "Your population reached 0";
+
         robotsManagement->setOnRobotsDestroyed(new EH_RobotsDestroyed([=](int _) {
             if (robotsManagement->getTotRobots() <= 0 && villageStats->getResources() <= 0 && !IsGameLost())
             {
-                this->OnGameLost("No more robots available!");
-                return true;
+                this->OnGameLost(noRobotsReason);
             }
 
             return false;
@@ -97,8 +100,7 @@ namespace Application
         villageStats->setOnStatusDecayed(new EH_StatsDecayed([=]() {
             if (villageStats->getPopulation() <= 0 && !IsGameLost())
             {
-                this->OnGameLost("Your population reached 0!");
-                return true;
+                this->OnGameLost(popuDeadReason);
             }
 
             return false;

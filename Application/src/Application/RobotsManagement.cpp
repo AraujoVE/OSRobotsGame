@@ -262,7 +262,7 @@ namespace Application
 
         map.erase(id); 
     }
-
+    
     bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)
     {   
         if (robotsNo == 0)
@@ -287,8 +287,12 @@ namespace Application
             
         robotsAvenues[FREE_ROBOTS]->up(); 
 
-        if (returnValue == true)
+        if (returnValue == true) {
+            DE_TRACE("Moving {0} robots to task #{1}", robotsNo, choosenTask.GetID());
             m_EventListener.On<EH_RobotsMoved>({choosenTask, robotsNo});
+        } else {
+            DE_WARN("Ignoring invalid attempt to move {0} robots to task #{1}", robotsNo, choosenTask.GetID());
+        }
 
 
         return returnValue;
