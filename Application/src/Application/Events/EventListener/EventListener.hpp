@@ -28,12 +28,14 @@ namespace Application
         const std::string eventType = EventHandlerType::GetTypeStatic();
         bool eventConsumed = false;
 
-        pthread_mutex_lock(&mapMutex);
+        m_MapMutex.Lock();
+
         do
         {
             const HandlerQueue &queue = handlerQueueMap[eventType];
             if (queue.empty())
             {
+                
                 // DE_WARN("Ignoring unimplemented Event: {0}", eventType);
                 break;
             }
@@ -48,7 +50,7 @@ namespace Application
             }
         } while (false);
 
-        pthread_mutex_unlock(&mapMutex);
+        m_MapMutex.Unlock();
     }
 
     template <class EventHandlerType>
@@ -79,8 +81,8 @@ namespace Application
     void EventListener::Register(EventHandlerType *eventHandler)
     {
         std::string eventType = eventHandler->GetType();
-        pthread_mutex_lock(&mapMutex);
+        m_MapMutex.Lock();
         handlerQueueMap[eventType].push_back(std::make_unique<void *>((void *)eventHandler));
-        pthread_mutex_unlock(&mapMutex);
+        m_MapMutex.Unlock();
     }
 } // namespace Application

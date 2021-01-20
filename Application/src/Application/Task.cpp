@@ -33,6 +33,7 @@ namespace Application
         m_EventListener.reset(new EventListener());
 
         //TODO: fix memory leak
+        //TODO: release those functions from threadloop when this object is dead
         auto tlTickFn = std::bind(&Task::UpdateTask, this);
         auto tlStopFn = [=]() { return !this->IsTaskCompleted(); };
         m_ThreadLoop = new ThreadLoop(tlTickFn, tlStopFn);
@@ -45,6 +46,7 @@ namespace Application
     Task::~Task()
     {
         m_Running = false;
+        m_ThreadLoop->Abandon();
     }
 
     int Task::CalcLostRobots()

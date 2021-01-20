@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DampEngine/Threads/Mutex.hpp"
+
 #include <functional>
 #include <memory>
 #include <pthread.h>
@@ -28,7 +30,9 @@ namespace Application
         void InnerLoop();
         friend void *threadRountine(void *threadLoopV);
         const static std::function<bool()> s_DefaultAliveCheckFunction;
+        const static std::function<bool()> s_StoppedAliveCheckFunction;
 
+        DampEngine::Mutex m_FunctsMutex;
     public:
         std::unique_ptr<EventListener> m_EventListener;
 
@@ -38,6 +42,7 @@ namespace Application
 
         void Start();
         void Stop();
+        void Abandon();
     };
 
 } // namespace Application

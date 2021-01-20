@@ -2,6 +2,8 @@
 
 #include "EventListener.fwd.hpp"
 
+#include "DampEngine/Threads/Mutex.hpp"
+
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 
 #include "Application/Game/GameRunner.hpp"
@@ -17,22 +19,12 @@ namespace Application
 {
     typedef std::unique_ptr<void *> GenericEventHandlerPtr;
     typedef std::vector<GenericEventHandlerPtr> HandlerQueue;
-    class EventListener
+    class EventListener final
     {
-        pthread_mutex_t mapMutex;
+        DampEngine::Mutex m_MapMutex;
         std::unordered_map<std::string, HandlerQueue> handlerQueueMap;
 
     public:
-        EventListener()
-        {
-            pthread_mutex_init(&mapMutex, NULL);
-        }
-
-        ~EventListener()
-        {
-            pthread_mutex_destroy(&mapMutex);
-        }
-
         template <class EventHandlerType>
         void On();
 
@@ -44,16 +36,15 @@ namespace Application
 
         template <class EventHandlerType>
         void OnAsync(typename EventHandlerType::ArgumentsTuple argTuple);
-        
+
         template <class EventHandlerType>
         void Register(EventHandlerType *eventHandler);
-        
 
         void Clear()
         {
-            pthread_mutex_lock(&mapMutex);
+            m_MapMutex.Lock();
             handlerQueueMap.clear();
-            pthread_mutex_unlock(&mapMutex);
+            m_MapMutex.Unlock();
         }
     };
 } // namespace Application

@@ -46,7 +46,7 @@ project "Application"
 		}
 		
 		buildoptions {
-			"-Wl,--stack,16777216"
+			"-Wl,--stack,524288000"
         }
 
 
