@@ -52,10 +52,12 @@ namespace EAAlgorithm
         //     }
         // }
         population.randu(); // initialize with values between 0 and 1
-        if (tournmentType == INITIALS)
-            // TODO: convert to each_col
-            for(int j = 0; j < NB_PARAMETERS; j++)
-                population.col(j) = attributesValues[j].min + population.col(j)*(attributesValues[j].max - attributesValues[j].min); // if a normal EA is taking place, just multiply the population by a givern value
+        if (tournmentType == INITIALS) {
+            int index = 0;
+            population.each_col([&attributesValues, &index](arma::vec& popCol) { popCol = attributesValues[index].min + popCol * (attributesValues[index].max - attributesValues[index].min); index++; } );
+            // for(int j = 0; j < NB_PARAMETERS; j++)
+            //     population.col(j) = attributesValues[j].min + population.col(j)*(attributesValues[j].max - attributesValues[j].min); // if a normal EA is taking place, just multiply the population by a givern value
+        }
         else
         {
             int middle = TOURNMENT_RATE + (POPULATION_SIZE - TOURNMENT_RATE) / 2;
@@ -97,9 +99,11 @@ namespace EAAlgorithm
     void EvolutionaryAlgorithm::evaluatePop()
     {
         //Limit the values in each col
-        for(int j = 0; j < NB_PARAMETERS; j++){
-            population.col(j) = arma::clamp(population.col(j),attributesValues[j].min,attributesValues[j].max);
-        }
+        // for(int j = 0; j < NB_PARAMETERS; j++){
+        //     population.col(j) = arma::clamp(population.col(j),attributesValues[j].min,attributesValues[j].max);
+        // }
+        int index = 0;
+        population.each_col([&attributesValues, &index](arma::vec& popCol) { popCol = arma::clamp(popCol, attributesValues[index].min, attributesValues[index].max); index++; } );
 
         std::cout << "EVALUATING POPULATION\n";
 
@@ -375,9 +379,11 @@ namespace EAAlgorithm
     void EvolutionaryAlgorithm::predationOfOne()
     {
         arma::rowvec newInd(NB_PARAMETERS, arma::fill::randu); // creating totally new individual
-        for(int j = 0; j < NB_PARAMETERS; j++){
-            newInd = attributesValues[j].min + newInd(j)*(attributesValues[j].max - attributesValues[j].min);
-        }
+        // for(int j = 0; j < NB_PARAMETERS; j++){
+        //     newInd(j) = attributesValues[j].min + newInd(j)*(attributesValues[j].max - attributesValues[j].min);
+        // }
+        int index = 0;
+        newInd.for_each([&attributesValues, &index](double paramNewInd) { paramNewInd = attributesValues[index].min + paramNewInd * (attributesValues[index].max - attributesValues[index].min); index++; } );
 
         population.row(worstFitIndex) = newInd;
 
