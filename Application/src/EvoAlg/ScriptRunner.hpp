@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Application/Events/EventHandler/DefaultHandlers.fwd.hpp"
-#include "Application/header/RobotFunctions.hpp"
+#include "Application/Game/Ingame/RobotFunctions.hpp"
 #include "DampEngine/Core/Macros/Log.hpp"
 #include "DampEngine/Core/Macros/Assert.hpp"
+
+#include "EvoAlg/Types.hpp"
+
 #include <vector>
 #include <pthread.h>
 
@@ -13,9 +16,9 @@ namespace Application{
 }
 using namespace Application;
 
-namespace EAAlgorithm
+namespace EvoAlg
 {
-    class EAScript
+    class ScriptRunner
     {
     private:
         GameRunner &m_GameRunner;
@@ -29,9 +32,9 @@ namespace EAAlgorithm
 
 
     public:
-        EAScript(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName);
+        ScriptRunner(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName);
 
-        ~EAScript();
+        ~ScriptRunner();
 
         void startScript();
 
@@ -42,25 +45,25 @@ namespace EAAlgorithm
         void scriptFunct4(const std::vector<std::string> &params);
         void scriptFunct5(const std::vector<std::string> &params);
         void scriptFunct6(const std::vector<std::string> &params);
-        std::vector<std::pair<double, double>> *scriptLoop();
+        std::vector<TimeResult> *scriptLoop();
 
-        void (EAScript::*scriptLoopFuncts[DIRECTIONS_SIZE])(const std::vector<std::string> &) = {
-            &EAScript::scriptFunct0,
-            &EAScript::scriptFunct1,
-            &EAScript::scriptFunct2,
-            &EAScript::scriptFunct3,
-            &EAScript::scriptFunct4,
-            &EAScript::scriptFunct5,
-            &EAScript::scriptFunct6};
+        void (ScriptRunner::*scriptLoopFuncts[DIRECTIONS_SIZE])(const std::vector<std::string> &) = {
+            &ScriptRunner::scriptFunct0,
+            &ScriptRunner::scriptFunct1,
+            &ScriptRunner::scriptFunct2,
+            &ScriptRunner::scriptFunct3,
+            &ScriptRunner::scriptFunct4,
+            &ScriptRunner::scriptFunct5,
+            &ScriptRunner::scriptFunct6};
 
         void initScriptDirections();
 
-        std::vector<std::pair<double,double>> *joinScriptThread() 
+        std::vector<TimeResult> *joinScriptThread() 
         { 
             void *ret;
             pthread_join(scriptThread, &ret); 
             DE_ASSERT(ret != nullptr, "Wrong thread return (null)");
-            return (std::vector<std::pair<double,double>>*) ret;
+            return (std::vector<TimeResult>*) ret;
         }
     };
-} // namespace EAAlgorithm
+} // namespace EvoAlg

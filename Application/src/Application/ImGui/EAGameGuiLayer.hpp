@@ -5,7 +5,7 @@
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
-#include "EAAlgorithm/EAController.hpp"
+#include "EvoAlg/EAController.hpp"
 
 #include <memory>
 
@@ -51,7 +51,7 @@ namespace Application
         GameRunner *m_MainGameRunner;
 
 
-        EAAlgorithm::EAController *m_EAController;
+        EvoAlg::EAController *m_EAController;
         EventListener m_EventListener;
 
 

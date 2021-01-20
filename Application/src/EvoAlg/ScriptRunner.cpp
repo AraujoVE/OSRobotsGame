@@ -1,4 +1,4 @@
-#include "EAScript.hpp"
+#include "ScriptRunner.hpp"
 #include "Application/ImGui/GameWindows/FunctionWindow.hpp"
 #include "Application/ImGui/GameWindows/TaskWindow.hpp"
 
@@ -7,7 +7,7 @@
 
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
-#include "Application/header/RobotsManagement.hpp"
+#include "Application/Game/Ingame/RobotsManagement.hpp"
 #include "Application/Threads/Semaphore.hpp"
 
 #include "mypch.hpp"
@@ -16,16 +16,16 @@ using namespace Application;
 
 #define EAS_SRM (m_GameRunner.GetSave().GetRobotsManagement())
 #define EAS_SVS (m_GameRunner.GetSave().GetVillageStats())
-namespace EAAlgorithm
+namespace EvoAlg
 {
 
     static void *runScript(void *scriptFuncObject)
     {
-        EAScript *script = (EAScript *)scriptFuncObject;
+        ScriptRunner *script = (ScriptRunner *)scriptFuncObject;
         return script->scriptLoop();
     }
 
-    EAScript::EAScript(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName) 
+    ScriptRunner::ScriptRunner(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName) 
         : m_GameRunner(gameRunner),
           srcFile(filePath),
           m_DebugName(debugName)
@@ -33,23 +33,22 @@ namespace EAAlgorithm
         initScriptDirections();
     }
 
-    void EAScript::startScript()
+    void ScriptRunner::startScript()
     {
         pthread_create(&scriptThread, NULL, runScript, this);
     }
 
-    EAScript::~EAScript()
+    ScriptRunner::~ScriptRunner()
     {
         pthread_join(scriptThread, NULL);
     }
 
-    void EAScript::initScriptDirections()
+    void ScriptRunner::initScriptDirections()
     {
         std::fstream myFile;
         int tokenPos, curGameplay = -1, curOp;
         myFile.open(srcFile, std::ios::in);
         std::string line;
-        float DELAY_MICRO = m_GameRunner.GetGameConsts().GetValue("DECAY_DELAY_MICRO");
 
         while (std::getline(myFile, line))
         {
@@ -81,12 +80,12 @@ namespace EAAlgorithm
         }
     }
 
-    void EAScript::scriptFunct0(const std::vector<std::string> &params)
+    void ScriptRunner::scriptFunct0(const std::vector<std::string> &params)
     {
         EAS_SRM->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
     }
 
-    void EAScript::scriptFunct1(const std::vector<std::string> &params)
+    void ScriptRunner::scriptFunct1(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -94,11 +93,11 @@ namespace EAAlgorithm
             DE_WARN("Ignoring invalid cancelTask #{0}", params.at(2));
             return;
         }
-        DE_ASSERT(curTask.has_value(), "(EAScript:: scriptFunct1) Invalid Task " + params.at(2));
+        DE_ASSERT(curTask.has_value(), "(ScriptRunner:: scriptFunct1) Invalid Task " + params.at(2));
         EAS_SRM->cancelTask(*curTask.value());
     }
 
-    void EAScript::scriptFunct2(const std::vector<std::string> &params)
+    void ScriptRunner::scriptFunct2(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -106,11 +105,11 @@ namespace EAAlgorithm
             DE_WARN("Ignoring invalid moveRobot++ @Task #{0}", params.at(2));
             return;
         }
-        DE_ASSERT(curTask.has_value(), "(EAScript::scriptFunct2) Invalid Task " + params.at(2));
+        DE_ASSERT(curTask.has_value(), "(ScriptRunner::scriptFunct2) Invalid Task " + params.at(2));
         EAS_SRM->moveRobot(*curTask.value(), 1);
     }
 
-    void EAScript::scriptFunct3(const std::vector<std::string> &params)
+    void ScriptRunner::scriptFunct3(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -118,21 +117,21 @@ namespace EAAlgorithm
             DE_WARN("Ignoring invalid moveRobot-- @Task #{0}", params.at(2));
             return;
         }
-        DE_ASSERT(curTask.has_value(), "(EAScript::scriptFunct3) Invalid Task " + params.at(2));
+        DE_ASSERT(curTask.has_value(), "(ScriptRunner::scriptFunct3) Invalid Task " + params.at(2));
         EAS_SRM->moveRobot(*curTask.value(), -1);
     }
 
-    void EAScript::scriptFunct4(const std::vector<std::string> &params)
+    void ScriptRunner::scriptFunct4(const std::vector<std::string> &params)
     {
         EAS_SRM->createRobots(1);
     }
 
-    void EAScript::scriptFunct5(const std::vector<std::string> &params)
+    void ScriptRunner::scriptFunct5(const std::vector<std::string> &params)
     {
         EAS_SRM->destroyRobots(1);
     }
 
-    void EAScript::scriptFunct6(const std::vector<std::string> &params)
+    void ScriptRunner::scriptFunct6(const std::vector<std::string> &params)
     {
         double waitsPerSecond = 1e6 / HUMAN_OP_DELAY;
 
@@ -150,21 +149,19 @@ namespace EAAlgorithm
     //TODO: Jogo versão normal ou calibração
     //TODO: Velocidade dos segundos do jogo -> slider
 
-    std::vector<std::pair<double, double>> *EAScript::scriptLoop()
+    std::vector<TimeResult> *ScriptRunner::scriptLoop()
     {
-        int gameDurationInTicks = -1;
+        int measuredDurationInTicks = -1;
         int it = 0;
 
-        auto *gameplaysResults = new std::vector<std::pair<double, double>>();
-
-        float DELAY_MICRO = m_GameRunner.GetGameConsts().GetValue("DECAY_DELAY_MICRO");
+        auto *gameplaysResults = new std::vector<TimeResult>();
 
         Application::Semaphore endSem;
 
         auto &_gameScript = gameScript;
 
-        m_GameRunner.SetOnGameStarted(new EH_GameStarted([this, &_gameScript, &it, DELAY_MICRO](GameRunner &_) {
-            DE_DEBUG("(EAScript -- {0}) OnGameStarted", m_DebugName);
+        m_GameRunner.SetOnGameStarted(new EH_GameStarted([this, &_gameScript, &it](GameRunner &_) {
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", m_DebugName);
 
             for (int i = 1; i < (int)_gameScript.at(it).size(); i++)
             {
@@ -177,11 +174,10 @@ namespace EAAlgorithm
 
         auto &gameRunner = m_GameRunner;
 
-        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &gameDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults, &gameRunner](GameRunner &_,int elapsedTimeTicks) {
-            DE_DEBUG("(EAScript -- {0}) OnGameEnded", m_DebugName);
+        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &measuredDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults, &gameRunner](GameRunner &_,int elapsedTimeInTicks) {
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_DebugName);
 
-
-            gameDurationInTicks = elapsedTimeTicks;
+            measuredDurationInTicks = elapsedTimeInTicks;
             endSem.Post();
 
             return false;
@@ -189,31 +185,31 @@ namespace EAAlgorithm
 
         for (int m = 0; m < (int)gameScript.size(); m++)
         {
-            DE_INFO("(EAScript -- {0}) Starting gameplay #{1}", m_DebugName, m);
+            DE_INFO("(ScriptRunner -- {0}) Starting gameplay #{1}", m_DebugName, m);
             m_GameRunner.Start();
 
 
-            DE_DEBUG("(EAScript -- {0}) Waiting for gameplay #{1} to end...", m_DebugName, m);
+            DE_DEBUG("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_DebugName, m);
             endSem.Wait();
-            DE_INFO("(EAScript -- {0}) Gameplay #{1} ended normally", m_DebugName, m);
+            DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_DebugName, m);
 
             //Callback para saber quando acaba o jogo
             //quando isso acontece : endTime = time(0)
             double targetDurationAU = stol(_gameScript.at(it).at(0).at(0));
-            double gameDurationAU = gameDurationInTicks * AU_PER_TICK;//Time calculated in VillageStats::decayStats with sleep(DECAY_DELAY_MICRO)
-            gameplaysResults->push_back({targetDurationAU, gameDurationAU});
+            double measuredDurationAU = measuredDurationInTicks * AU_PER_TICK;
+            gameplaysResults->push_back(TimeResult{targetDurationAU, measuredDurationAU});
             it++;
 
-            DE_ASSERT(gameDurationInTicks >= 0, "Game duration not calculated correctly");
+            DE_ASSERT(measuredDurationInTicks >= 0, "Game duration not calculated correctly");
             DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but it's not lost!!! **");
 
-            DE_TRACE("(EAScript -- {0}) Changing gameplay ", m_DebugName);
+            DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_DebugName);
         }
 
         return gameplaysResults;
     }
 
-} // namespace EAAlgorithm
+} // namespace EvoAlg
 
 /*
 task++(par1) //Cria uma nova Task

@@ -1,10 +1,13 @@
 #pragma once
 
+//Types such as GeneVec, Individual, GameplayResults, etc.
+#include "EvoAlg/Types.hpp"
+
 #include <string>
 #include <armadillo> // http://arma.sourceforge.net/docs.html v10.2.0
 #include <vector>
 #include <thread> /* std::this_thread::sleep_for */
-namespace EAAlgorithm
+namespace EvoAlg
 {
 
     class EAController;
@@ -41,7 +44,7 @@ namespace EAAlgorithm
         void semiFinalsTournment(int);
         void finalTournment();
         void scriptLoop();
-        void calcFitness(const std::vector<std::vector<std::pair<double, double>>> &);
+        void calcFitness(const std::vector<GameplayResult> &);
 
     private:
         pthread_t scriptThread;
@@ -173,4 +176,4 @@ namespace EAAlgorithm
         int remainingFitnessToCalc;
     };
 
-} // namespace EAAlgorithm
+} // namespace EvoAlg

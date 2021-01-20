@@ -1,6 +1,6 @@
 #include <vector>
 #include <unordered_map>
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/GameConsts.hpp"
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
@@ -36,7 +36,6 @@ namespace Application
             DA_DECL_PARAM_BASIC(ATTACK_FREQUENCY),
             DA_DECL_PARAM_BASIC(INIT_RESOURCES_VALUE),
             DA_DECL_PARAM_BASIC(TAX_REDUCT),
-            DA_DECL_PARAM_BASIC(DECAY_DELAY_MICRO),
             DA_DECL_PARAM_APPLY(MIN_LOSS_0,divParameters,MAX_LOSS_0),
             DA_DECL_PARAM_APPLY(MIN_LOSS_1,divParameters,MAX_LOSS_1),
             DA_DECL_PARAM_APPLY(MIN_LOSS_2,divParameters,MAX_LOSS_2),
@@ -115,7 +114,6 @@ namespace Application
             SetValue("ATTACK_FREQUENCY", (float)cromossome.at(i++));
             SetValue("INIT_RESOURCES_VALUE", (float)cromossome.at(i++));
             SetValue("TAX_REDUCT", (float)cromossome.at(i++));
-            // SetValue("DECAY_DELAY_MICRO", (float) cromossome.at(i++));
             SetValue("MIN_LOSS_0", (float)cromossome.at(i++));
             SetValue("MIN_LOSS_1", (float)cromossome.at(i++));
             SetValue("MIN_LOSS_2", (float)cromossome.at(i++));

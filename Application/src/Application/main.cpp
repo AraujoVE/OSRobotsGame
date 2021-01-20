@@ -3,19 +3,20 @@
 
 #include "Application/ImGui/GameGuiLayer.hpp"
 #include "Application/ImGui/EAGameGuiLayer.hpp"
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/GameConsts.hpp"
 
-#include "EAAlgorithm/ConvertScripts.hpp"
+#include "EvoAlg/ScriptConverter.hpp"
 
-#include "Application/header/RobotsManagement.hpp"
-#include "Application/header/VillageStats.hpp"
-#include "Application/header/ConstsMap.hpp"
-#include "Application/header/RobotFunctions.hpp"
+#include "Application/Game/Ingame/RobotsManagement.hpp"
+#include "Application/Game/Ingame/VillageStats.hpp"
+#include "Application/Game/GameConsts.hpp"
+#include "Application/Game/Ingame/RobotFunctions.hpp"
 
 #ifndef BOOST_VERSION
 #error "Boost needs to be installed on the system (tested with version 1.75)"
 #endif //!BOOST_VERSION
 
+//TODO: stop using optional to avoid cpphack.hpp
 
 
 //TODO: TICK_DELAY for Task and VilageStats:;decay

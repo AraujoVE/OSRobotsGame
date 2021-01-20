@@ -1,5 +1,17 @@
+#ifndef ALALALALALALA
+#define ALALALALALALA
+    //TEMPORARY
+    //TODO: REMOVE
+    const int DELAY_MICRO = 500;
+    //TEMPORARY ^
+#endif  //!ALALALALALALA
+
+
 #include <DampEngine.hpp>
 #include <DampEngine/Core/Macros/Log.hpp>
+
+
+
 
 #include "cpphack.hpp"
 

@@ -1,5 +1,5 @@
-#include "Application/header/VillageStats.hpp"
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/Ingame/VillageStats.hpp"
+#include "Application/Game/GameConsts.hpp"
 
 #include "mypch.hpp"
 
@@ -207,7 +207,6 @@ namespace Application
                 decayStat(it, i);
             }
 
-            // DE_DEBUG("decayStats() Population = {0}", population);
             decayPopulation();
 
             avenueVS[POPULATION_INDEX]->up();
@@ -222,8 +221,9 @@ namespace Application
 
             elapsedTimeTicks += 1;
             do
-            {
-                usleep(m_GameConstsCache.DECAY_DELAY_MICRO);
+            {   
+                //TODO: different struct
+                usleep(DELAY_MICRO);
             } while (m_DecaymentPaused);
         }
         DE_TRACE("decayStats thread stopped!");

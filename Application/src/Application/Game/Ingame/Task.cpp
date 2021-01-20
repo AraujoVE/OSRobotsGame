@@ -1,5 +1,5 @@
-#include "Application/header/Task.hpp"
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/Ingame/Task.hpp"
+#include "Application/Game/GameConsts.hpp"
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"

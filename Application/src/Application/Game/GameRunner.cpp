@@ -1,14 +1,18 @@
 #include "Application/Game/GameRunner.hpp"
-#include "Application/header/RobotsManagement.hpp"
-#include "Application/header/VillageStats.hpp"
+#include "Application/Game/Ingame/RobotsManagement.hpp"
+#include "Application/Game/Ingame/VillageStats.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 #include "Application/Events/EventListener/EventListener.hpp"
+#include "Application/Game/GameConsts.hpp"
+
+#include "Application/Util/path.hpp"
 
 #include "mypch.hpp"
 namespace Application
 {
     //PUBLIC:
-    GameRunner::GameRunner() : GameRunner(std::make_shared<GameSave>(GameConsts::GetDefaultPath()))
+    //TODO: fix ml on new GameConsts()
+    GameRunner::GameRunner() : GameRunner(std::make_shared<GameSave>(new GameConsts()))
     {
     }
 

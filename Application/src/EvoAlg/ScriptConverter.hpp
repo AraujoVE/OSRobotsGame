@@ -6,20 +6,27 @@
 #include <unordered_map>
 #include <filesystem>
 
-namespace EAAlgorithm
+namespace EvoAlg
 {
-    class ConvertScripts
+    class ScriptConverter
     {
     private:
         const static int COMMANDS_SIZE = 8;
+
+        //TODO: make const static
         std::string commands[8] = {"task++", "task--", "move++", "move--", "robots++", "robots--", "wait", "end"};
+
+        //TODO: make const static
         std::unordered_map<std::string, std::string> functToIntMap = {{"pro", "0"}, {"hun", "1"}, {"med", "2"}, {"con", "3"}, {"res", "4"}};
-        std::vector<std::string> gameplay;
-        std::string filePath;
+
+        //TODO: use class Script
+        std::vector<std::string> m_Gameplay;
+
+        std::fstream m_OutputFile;
 
     public:
-        ConvertScripts(std::string);
-        ~ConvertScripts();
+        ScriptConverter();
+        ~ScriptConverter();
 
         void removeSpaces(std::string &desiredStr);
         void removeParenthesis(std::string &desiredStr);
@@ -35,14 +42,14 @@ namespace EAAlgorithm
         void commandFunct6(std::string, int);
         void commandFunct7(std::string, int);
 
-        void (ConvertScripts::*commandFuncts[COMMANDS_SIZE])(std::string, int) = {
-            &ConvertScripts::commandFunct0,
-            &ConvertScripts::commandFunct1,
-            &ConvertScripts::commandFunct2,
-            &ConvertScripts::commandFunct3,
-            &ConvertScripts::commandFunct4,
-            &ConvertScripts::commandFunct5,
-            &ConvertScripts::commandFunct6,
-            &ConvertScripts::commandFunct7};
+        void (ScriptConverter::*commandFuncts[COMMANDS_SIZE])(std::string, int) = {
+            &ScriptConverter::commandFunct0,
+            &ScriptConverter::commandFunct1,
+            &ScriptConverter::commandFunct2,
+            &ScriptConverter::commandFunct3,
+            &ScriptConverter::commandFunct4,
+            &ScriptConverter::commandFunct5,
+            &ScriptConverter::commandFunct6,
+            &ScriptConverter::commandFunct7};
     };
-} // namespace EAAlgorithm
+} // namespace EvoAlg

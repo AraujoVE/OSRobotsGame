@@ -54,7 +54,7 @@ project "Application"
 		systemversion "latest"
 
 		defines {
-			OS_SYSTEM_WINDOWS
+			DE_SYSTEM_WINDOWS
 		}
 
 	-- filter "system:"

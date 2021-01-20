@@ -1,8 +1,12 @@
-#include "ConvertScripts.hpp"
+#include "ScriptConverter.hpp"
+
+#include "Application/Util/path.hpp"
+
 #include "mypch.hpp"
-namespace EAAlgorithm
+
+namespace EvoAlg
 {
-    void ConvertScripts::removeSpaces(std::string &desiredStr)
+    void ScriptConverter::removeSpaces(std::string &desiredStr)
     {
         std::string newStr = "";
         for (int i = 0; i < (int)desiredStr.length(); i++)
@@ -13,12 +17,12 @@ namespace EAAlgorithm
         desiredStr = newStr;
     }
 
-    void ConvertScripts::removeParenthesis(std::string &desiredStr)
+    void ScriptConverter::removeParenthesis(std::string &desiredStr)
     {
         desiredStr = desiredStr.substr(desiredStr.find("(") + 1, desiredStr.find(")") - desiredStr.find("(") - 1);
     }
 
-    std::vector<std::string> ConvertScripts::splitString(std::string desiredStr, std::string key)
+    std::vector<std::string> ScriptConverter::splitString(std::string desiredStr, std::string key)
     {
         std::vector<std::string> splittedStr;
         int tokenPos = desiredStr.find(key);
@@ -33,90 +37,89 @@ namespace EAAlgorithm
         return splittedStr;
     }
 
-    std::vector<std::string> ConvertScripts::splitText(std::string desiredStr)
+    std::vector<std::string> ScriptConverter::splitText(std::string desiredStr)
     {
         removeSpaces(desiredStr);
         removeParenthesis(desiredStr);
         return splitString(desiredStr, ",");
     }
 
-    void ConvertScripts::commandFunct0(std::string command, int pos)
+    void ScriptConverter::commandFunct0(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
         for (int i = 0; i < (int)splittedStr.size(); i++)
             std::cout << "$" << splittedStr[i] << std::endl;
-        gameplay.push_back("0," + functToIntMap[splittedStr[0]]);
+        m_Gameplay.push_back("0," + functToIntMap[splittedStr[0]]);
     }
-    void ConvertScripts::commandFunct1(std::string command, int pos)
+    void ScriptConverter::commandFunct1(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
         for (int i = 0; i < (int)splittedStr.size(); i++)
             std::cout << "$" << splittedStr[i] << std::endl;
-        gameplay.push_back("1," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
+        m_Gameplay.push_back("1," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
     }
 
-    void ConvertScripts::commandFunct2(std::string command, int pos)
+    void ScriptConverter::commandFunct2(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
         for (int i = 0; i < (int)splittedStr.size(); i++)
             std::cout << "$" << splittedStr[i] << std::endl;
-        gameplay.push_back("2," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
+        m_Gameplay.push_back("2," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
     }
-    void ConvertScripts::commandFunct3(std::string command, int pos)
+    void ScriptConverter::commandFunct3(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
         for (int i = 0; i < (int)splittedStr.size(); i++)
             std::cout << "$" << splittedStr[i] << std::endl;
-        gameplay.push_back("3," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
+        m_Gameplay.push_back("3," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
     }
 
-    void ConvertScripts::commandFunct4(std::string command, int pos)
+    void ScriptConverter::commandFunct4(std::string command, int pos)
     {
-        gameplay.push_back("4");
+        m_Gameplay.push_back("4");
     }
-    void ConvertScripts::commandFunct5(std::string command, int pos)
+    void ScriptConverter::commandFunct5(std::string command, int pos)
     {
-        gameplay.push_back("5");
+        m_Gameplay.push_back("5");
     }
 
-    void ConvertScripts::commandFunct6(std::string command, int pos)
+    void ScriptConverter::commandFunct6(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
         for (int i = 0; i < (int)splittedStr.size(); i++)
             std::cout << "$" << splittedStr[i] << std::endl;
-        gameplay.push_back("6," + splittedStr[0]);
+        m_Gameplay.push_back("6," + splittedStr[0]);
     }
-    void ConvertScripts::commandFunct7(std::string command, int pos)
+    void ScriptConverter::commandFunct7(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
         std::fstream myFile;
 
-        myFile.open(filePath + "/gameScript.cfg", std::ios_base::app);
-        myFile << (pos ? "\n#" : "#") << splittedStr[0] << std::endl;
-        for (int i = 0; i < (int)gameplay.size(); i++)
+        m_OutputFile << (pos ? "\n#" : "#") << splittedStr[0] << std::endl;
+        for (int i = 0; i < (int)m_Gameplay.size(); i++)
         {
-            myFile << gameplay[i];
-            if (i != (int)(gameplay.size() - 1))
-                myFile << std::endl;
+            m_OutputFile << m_Gameplay[i];
+            if (i != (int)(m_Gameplay.size() - 1))
+                m_OutputFile << std::endl;
         }
-        myFile.close();
-        gameplay.clear();
+        m_Gameplay.clear();
     }
 
-    ConvertScripts::ConvertScripts(std::string mainPath) : filePath(mainPath)
+    ScriptConverter::ScriptConverter()
     {
         int i = 0;
-        std::fstream myFile, secondFile;
+        std::fstream inputFile;
         std::string line;
 
-        myFile.open(filePath + "/gameScript.cfg", std::ios::out);
-        myFile.close();
+        const std::string& scriptFolder = Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER);
 
-        myFile.open(filePath + "/scripts/" + std::to_string(0) + ".txt", std::ios::in);
+        m_OutputFile.open(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_MACHINE), std::ios::out);
 
-        while (!myFile.fail())
+        inputFile.open(scriptFolder + std::to_string(0) + ".txt", std::ios::in);
+
+        while (!inputFile.fail())
         {
-            while (std::getline(myFile, line))
+            while (std::getline(inputFile, line))
             {
                 std::cout << line << std::endl;
                 for (int j = 0; j < 8; j++)
@@ -128,13 +131,19 @@ namespace EAAlgorithm
                     }
                 }
             }
-            myFile.close();
-            myFile.open(filePath + "/scripts/" + std::to_string(++i) + ".txt", std::ios::in);
+            inputFile.close();
+            inputFile.open(scriptFolder + "/scripts/" + std::to_string(++i) + ".txt", std::ios::in);
         }
+
+        inputFile.close();
+        m_OutputFile.close();
     }
 
-    ConvertScripts::~ConvertScripts() {}
-} // namespace EAAlgorithm
+    ScriptConverter::~ScriptConverter() {}
+} // namespace EvoAlg
+
+
+//TODO: @AraujoVE, delete this giant commented code if not necessary
   /*
             if(line[0] == '#'){
                 gameScript.push_back(std::vector<std::vector<std::string>>());
@@ -178,6 +187,18 @@ namespace EAAlgorithm
         }
     }
     */
+
+
+
+
+
+
+
+
+
+
+// ----- Script formatting tutorial: -----
+
 
 /*
 task++(par1) //Cria uma nova Task

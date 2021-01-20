@@ -3,7 +3,7 @@
 #include "RobotFunctions.hpp"
 #include "Task.hpp"
 #include "VillageStats.hpp"
-#include "Avenue.hpp"
+#include "Application/Threads/Avenue.hpp"
 #include <vector>
 #include "Application/ImGui/GameWindows/FunctionWindow.hpp"
 #include "Application/Events/EventListener/EventListener.hpp"

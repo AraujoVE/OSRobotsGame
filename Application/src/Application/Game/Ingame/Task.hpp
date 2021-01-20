@@ -2,9 +2,9 @@
 
 #include "cpphack.hpp"
 
-#include "Application/header/RobotFunctions.hpp"
+#include "Application/Game/Ingame/RobotFunctions.hpp"
 #include "Application/Threads/ThreadLoop.hpp"
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/GameConsts.hpp"
 
 #include <memory>
 

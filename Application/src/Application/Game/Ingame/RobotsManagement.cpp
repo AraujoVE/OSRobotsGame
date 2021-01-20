@@ -1,6 +1,6 @@
-#include "Application/header/RobotsManagement.hpp"
+#include "Application/Game/Ingame/RobotsManagement.hpp"
 
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/GameConsts.hpp"
 
 #include "mypch.hpp"
 //Inicialização e destruição da classe

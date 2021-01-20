@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Application/header/VillageStats.hpp"
+#include "Application/Game/Ingame/VillageStats.hpp"
 
 #include "Application/ImGui/IGWindow.hpp"
 namespace Application::GameWindows

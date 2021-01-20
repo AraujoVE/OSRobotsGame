@@ -2,16 +2,13 @@
 
 #include "Application/Game/GameSave.hpp"
 #include "Application/Game/GameRunner.hpp"
-#include "Application/header/VillageStats.hpp"
+#include "Application/Game/Ingame/VillageStats.hpp"
 
-#include "EAAlgorithm/EAScript.hpp"
+#include "EvoAlg/ScriptRunner.hpp"
 
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/GameConsts.hpp"
 
-using namespace EAAlgorithm;
-
-
-
+using namespace EvoAlg;
 namespace Application
 {
 

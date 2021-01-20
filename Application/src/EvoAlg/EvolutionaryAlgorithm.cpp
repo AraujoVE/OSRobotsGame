@@ -8,6 +8,7 @@
 #include <armadillo> // http://arma.sourceforge.net/docs.html
 #include <thread>    /* std::this_thread::sleep_for */
 
+
 #include "EvolutionaryAlgorithm.hpp"
 
 #include "mypch.hpp"
@@ -24,7 +25,7 @@
 //     EV_A_RATE,
 // };
 
-namespace EAAlgorithm
+namespace EvoAlg
 {
     //arma::rowvec semiFinalsAndFinals[SEMI_FINALS][TOURNMENT_RATE];
     //arma::rowvec indvFinals[TOURNMENT_RATE];
@@ -114,6 +115,7 @@ namespace EAAlgorithm
         std::cout << "EVALUATING POPULATION\n";
 
         nbNoImprovementGens++; // we begin considering there was no improvement in the generation
+
 
         std::vector<std::vector<double>> populationVec2(population.n_rows);
         for (size_t i = 0; i < population.n_rows; ++i)
@@ -542,20 +544,19 @@ namespace EAAlgorithm
 
     
 
-    void EvolutionaryAlgorithm::calcFitness(const std::vector<std::vector<std::pair<double, double>>> &gameplayResultsPop)
+    void EvolutionaryAlgorithm::calcFitness(const std::vector<GameplayResult> &gameplayResultsPop)
     {
         int pos = 0;
         for (auto &indivResults : gameplayResultsPop)
         {
             fitness[pos] = 0;
-            for (auto &fitnessPair : indivResults)
+            for (auto &timeResult : indivResults)
             {
-                //first: expected, second: real
-                fitness[pos] += std::abs(fitnessPair.first - fitnessPair.second) / fitnessPair.first;
+                fitness[pos] += std::abs(timeResult.TargetTime - timeResult.MeasuredTime) / timeResult.TargetTime;
             }
             pos++;
         }
         return;
     }
 
-} // namespace EAAlgorithm
+} // namespace EvoAlg

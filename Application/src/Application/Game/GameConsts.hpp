@@ -17,7 +17,6 @@ namespace Application
     struct PredefinedAppliers
     {
         const static ParameterApplier defaultApplier;
-
         const static ParameterApplier divParameters;
     };
 
@@ -85,13 +84,7 @@ namespace Application
 
         void SetOnValueChanged(EH_GameConstsChanged *eHandler);
 
-        static std::string GetDefaultPath()
-        {
-            char path[1024];
-            getcwd(path, 1024);
-            std::string cwd(path);
-            return cwd + "/Application/config/constValues.cfg";
-        }
+        
     };
 
     struct GameConstsCache
@@ -106,7 +99,6 @@ namespace Application
         int ATTACK_FREQUENCY;
         float INIT_RESOURCES_VALUE;
         float TAX_REDUCT;
-        useconds_t DECAY_DELAY_MICRO;
         float MIN_LOSS[4];
         float MAX_LOSS[4];
         float TOT_ROBOTS_INI;
@@ -135,7 +127,6 @@ namespace Application
             ATTACK_FREQUENCY = m_GameConsts.GetValue("ATTACK_FREQUENCY");
             INIT_RESOURCES_VALUE = m_GameConsts.GetValue("INIT_RESOURCES_VALUE");
             TAX_REDUCT = m_GameConsts.GetValue("TAX_REDUCT");
-            DECAY_DELAY_MICRO = m_GameConsts.GetValue("DECAY_DELAY_MICRO");
             MIN_LOSS[0] = m_GameConsts.GetValue("MIN_LOSS_0");
             MIN_LOSS[1] = m_GameConsts.GetValue("MIN_LOSS_1");
             MIN_LOSS[2] = m_GameConsts.GetValue("MIN_LOSS_2");

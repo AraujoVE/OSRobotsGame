@@ -1,12 +1,12 @@
 #pragma once
 
 #include "RobotFunctions.hpp"
-#include "Avenue.hpp"
+#include "Application/Threads/Avenue.hpp"
 #include <pthread.h>
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/GameConsts.hpp"
 
 namespace Application
 {
