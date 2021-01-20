@@ -66,8 +66,6 @@ namespace Application
         s_FileMutex.Lock();
         m_MapMutex.Lock();
         {
-            m_ConstsMap.clear();
-
             std::fstream myFile;
             int tokenPos;
             float val;
