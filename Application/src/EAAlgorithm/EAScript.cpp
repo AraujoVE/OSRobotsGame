@@ -178,7 +178,7 @@ namespace EAAlgorithm
         auto &gameRunner = m_GameRunner;
 
         m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &gameDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults, &gameRunner](GameRunner &_,int elapsedTimeTicks) {
-            DE_DEBUG("(EAScriptyyy -- {0}) OnGameEnded", m_DebugName);
+            DE_DEBUG("(EAScript -- {0}) OnGameEnded", m_DebugName);
 
 
             gameDurationInTicks = elapsedTimeTicks;

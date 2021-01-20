@@ -25,6 +25,7 @@ namespace Application
     {
 
     private:
+        DampEngine::Mutex m_ValuesMutex;
         ParameterApplier valueApplierFn;
         std::vector<std::string> applierParameters;
 
@@ -43,12 +44,16 @@ namespace Application
 
         void Capture(float capturedValue)
         {
+            m_ValuesMutex.Lock();
             CapturedValue = capturedValue;
+            m_ValuesMutex.Unlock();
         }
 
         void Apply(GameConsts *gameConsts)
         {
+            m_ValuesMutex.Lock();
             AppliedValue = valueApplierFn(gameConsts, CapturedValue, applierParameters);
+            m_ValuesMutex.Unlock();
         }
     };
 
@@ -75,6 +80,7 @@ namespace Application
         void LoadValuesFromFile(const std::string &path);
         void LoadFromCromossome(const std::vector<double> &cromossome);
 
+        float GetRawValue(const std::string &key);
         float GetValue(const std::string &key);
 
         void SetOnValueChanged(EH_GameConstsChanged *eHandler);

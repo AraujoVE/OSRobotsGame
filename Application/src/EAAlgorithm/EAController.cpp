@@ -73,7 +73,6 @@ namespace EAAlgorithm
 
             scripts.push_back(script);
             gameRunners.push_back(indvGameRunner);
-            break;
         }
 
         debug_ind_ind = 0;
