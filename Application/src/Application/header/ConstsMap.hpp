@@ -53,7 +53,7 @@ namespace Application
     };
 
 #define DA_DECL_PARAM_BASIC(name) { #name, ParameterData() }
-#define DA_DECL_PARAM_APPLY(name, func, ...) { #name, ParameterData(func, {#__VA_ARGS__}) }
+#define DA_DECL_PARAM_APPLY(name, func, ...) { #name, ParameterData(PredefinedAppliers::func, {#__VA_ARGS__}) }
 
     class GameConsts final
     {
