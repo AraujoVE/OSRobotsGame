@@ -20,16 +20,26 @@ namespace Application
     class GameGuiLayer final : public ImGuiLayer
     {
     public:
-        GameGuiLayer(GameRunner&);
+        GameGuiLayer();
+        void SetGameRunner(GameRunner*);
+        
+    private:
+        void InitializeGameWindows();
+        void DeinitializeGameWindows();
 
     private:
         virtual void ImGuiDescription() override;
 
+        void NoGameAttachedGuiDescription();
+        void MainGameGuiDescription();
+        void GameLostGuiDescription();
+
     private:
-        void LostScreenDescription();
+        
         const static int SCRIPT_FUNCT_SIZEE = 7;
 
-        GameRunner &m_GameRunner;
+        //Not this class responsibility to free game runner
+        GameRunner *m_GameRunner;
 
         GameWindows::StatusWindow *m_StatusWindow;
         GameWindows::FunctionWindow *m_FunctionWindows[FUNCTION_QTY];

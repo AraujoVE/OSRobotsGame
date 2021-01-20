@@ -9,20 +9,32 @@
 using namespace Application::GameWindows;
 namespace Application
 {
-    GameGuiLayer::GameGuiLayer(GameRunner& gameRunner)
-        : m_GameRunner(gameRunner)
+    GameGuiLayer::GameGuiLayer() : m_GameRunner(nullptr)
     {
-        m_StatusWindow = new StatusWindow(m_GameRunner.GetSave().GetVillageStats());
+    }
 
-        m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::HUNT);
-        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::MEDICINE);
-        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::CONSTRUCTION);
-        m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::PROTECTION);
-        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(m_GameRunner.GetSave().GetRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
+    void GameGuiLayer::SetGameRunner(GameRunner *newRunner)
+    {
+        if (m_GameRunner != nullptr)
+            DeinitializeGameWindows();
+        m_GameRunner = newRunner;
+        InitializeGameWindows();
+    }
 
-        m_RobotCreationWindow = new RobotCreationWindow(m_GameRunner.GetSave().GetRobotsManagement());
+    void GameGuiLayer::InitializeGameWindows()
+    {
+        DE_ASSERT(m_GameRunner != nullptr, "Trying to initialize game windows with no GameRunner attached");
+        m_StatusWindow = new StatusWindow(m_GameRunner->GetSave().GetVillageStats());
 
-        m_GameRunner.SetOnGameStarted(new EH_GameStarted([=](GameRunner& gameRunner) {
+        m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::HUNT);
+        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::MEDICINE);
+        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::CONSTRUCTION);
+        m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::PROTECTION);
+        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
+
+        m_RobotCreationWindow = new RobotCreationWindow(m_GameRunner->GetSave().GetRobotsManagement());
+
+        m_GameRunner->SetOnGameStarted(new EH_GameStarted([=](GameRunner &gameRunner) {
             m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
             m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
             m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
@@ -32,13 +44,52 @@ namespace Application
         }));
     }
 
+    void GameGuiLayer::DeinitializeGameWindows()
+    {
+        delete m_StatusWindow;
+
+        delete m_FunctionWindows[(int)RobotFunction::HUNT];
+        delete m_FunctionWindows[(int)RobotFunction::MEDICINE];
+        delete m_FunctionWindows[(int)RobotFunction::CONSTRUCTION];
+        delete m_FunctionWindows[(int)RobotFunction::PROTECTION];
+        delete m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING];
+
+        delete m_RobotCreationWindow;
+
+
+        //TODO: unregister this event:
+        // m_GameRunner->SetOnGameStarted(new EH_GameStarted([=](GameRunner &gameRunner) {
+        //     m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+        //     m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+        //     m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+        //     m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+        //     m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
+        //     return false;
+        // }));
+    }
+
     void GameGuiLayer::ImGuiDescription()
     {
-        //TODO: do not show if it's EA
-        if (m_GameRunner.IsGameLost()) {
-            LostScreenDescription();
-            return;
+        if (m_GameRunner == nullptr)
+            NoGameAttachedGuiDescription();
+        else if (m_GameRunner->IsGameLost())
+            GameLostGuiDescription();
+        else
+            MainGameGuiDescription();
+    }
+
+    void GameGuiLayer::NoGameAttachedGuiDescription()
+    {
+        ImGui::Begin("NoGameAttached");
+        {
+            ImGui::Text("NO GAME IS ATTACHED TO THIS GUI");
         }
+        ImGui::End();
+    }
+
+    void GameGuiLayer::MainGameGuiDescription()
+    {
+        DE_ASSERT(m_GameRunner != nullptr);
 
         ImGuiWindowFlags windowFlags = ImGuiBackendFlags_None;
 
@@ -56,7 +107,6 @@ namespace Application
         }
         ImGui::End();
 
-
         for (int i = 0; i < FUNCTION_QTY; i++)
         {
             m_FunctionWindows[i]->Render();
@@ -66,36 +116,37 @@ namespace Application
         m_RobotCreationWindow->Render();
     }
 
-    void GameGuiLayer::LostScreenDescription() {
+    void GameGuiLayer::GameLostGuiDescription()
+    {
+        DE_ASSERT(m_GameRunner != nullptr);
+
         bool restart, quit;
         const static auto xSize = 300u, ySize = 125u;
         ImGui::SetNextWindowPos(
-            {
-                ImGui::GetMainViewport()->Pos.x + (ImGui::GetMainViewport()->Size.x - xSize) /2, 
-                ImGui::GetMainViewport()->Pos.y + (ImGui::GetMainViewport()->Size.y - ySize ) /2
-            });
+            {ImGui::GetMainViewport()->Pos.x + (ImGui::GetMainViewport()->Size.x - xSize) / 2,
+             ImGui::GetMainViewport()->Pos.y + (ImGui::GetMainViewport()->Size.y - ySize) / 2});
         ImGui::SetNextWindowSize({xSize, ySize});
         ImGui::Begin("Game Over", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
         {
             ImGui::Text("Game Over");
-            ImGui::Text("%s", m_GameRunner.GetGameLostReason().c_str());
+            ImGui::Text("%s", m_GameRunner->GetGameLostReason().c_str());
 
             ImGui::Text("Do you want to play again?");
 
-            restart =  ImGui::Button("Yes"); 
+            restart = ImGui::Button("Yes");
             ImGui::SameLine();
             quit = ImGui::Button("No");
-
         }
         ImGui::End();
 
-        if (quit) DampEngine::Application::GetCurrent().Stop();
-        else if (restart) {
+        if (quit)
+            DampEngine::Application::GetCurrent().Stop();
+        else if (restart)
+        {
             for (int i = 0; i < FUNCTION_QTY; i++)
                 m_FunctionWindows[i]->ClearTaskWindows();
 
-            m_GameRunner.Start();
+            m_GameRunner->Start();
         }
-
     }
 } // namespace Application

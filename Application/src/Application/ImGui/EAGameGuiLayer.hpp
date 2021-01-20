@@ -36,7 +36,7 @@ namespace Application
     class EAGameGuiLayer final : public DampEngine::ImGuiLayer
     {
     public:
-        EAGameGuiLayer(GameRunner &gameRunner);
+        EAGameGuiLayer();
 
         inline void SetOnSettingsChanged(EH_EAGameSettingsChanged* eventHandler) { m_EventListener.Register(eventHandler); }
     private:
@@ -44,10 +44,14 @@ namespace Application
 
 
     private:
+        //TODO: move to a better place
         const static int SCRIPT_FUNCT_SIZE = 7;
 
-        GameRunner &m_GameRunner;
-        EAAlgorithm::EAController m_EAController;
+        //Not this class' responsibility to free
+        GameRunner *m_MainGameRunner;
+
+
+        EAAlgorithm::EAController *m_EAController;
         EventListener m_EventListener;
 
 

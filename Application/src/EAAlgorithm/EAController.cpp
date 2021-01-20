@@ -30,7 +30,7 @@ static void convertScripts()
 
 namespace EAAlgorithm
 {
-    EAController::EAController(GameRunner &mainGameRunner) : m_MainGameRunner(mainGameRunner), m_Algorithm(*this)
+    EAController::EAController() : m_Algorithm(*this)
     {
     }
 

@@ -21,13 +21,12 @@ namespace EAAlgorithm
         using GameplayResult = std::vector<TimeResult>;
 
     private:
-        GameRunner &m_MainGameRunner;
         EvolutionaryAlgorithm m_Algorithm;
         std::vector<GameplayResult> m_GameplayResults;
 
 
     public:
-        EAController(GameRunner &mainGameRunner);
+        EAController();
         
         void StartEA();
         

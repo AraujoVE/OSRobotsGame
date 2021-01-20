@@ -15,8 +15,8 @@ using namespace EAAlgorithm;
 namespace Application
 {
 
-    EAGameGuiLayer::EAGameGuiLayer(GameRunner &gameRunner)
-        : m_GameRunner(gameRunner), m_EAController(gameRunner)
+    EAGameGuiLayer::EAGameGuiLayer()
+        : m_MainGameRunner(nullptr), m_EAController(new EAController())
     {
     }
 
@@ -50,7 +50,7 @@ namespace Application
 
         if (startPressed && !m_EAState.Started) {
             m_EAState.Started = true;
-            m_EAController.StartEA();
+            m_EAController->StartEA();
         }
 
         
