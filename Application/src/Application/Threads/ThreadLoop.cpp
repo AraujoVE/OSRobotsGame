@@ -31,8 +31,6 @@ namespace Application
     {
         while (m_Running)
         {
-
-
             m_FunctsMutex.Lock();
             {
                 if (!m_AliveCheckFunction()) {
@@ -63,7 +61,6 @@ namespace Application
     {
         m_FunctsMutex.Lock();
         {
-            m_Running = false;
             m_AliveCheckFunction = s_StoppedAliveCheckFunction;
             m_TickFunction = []() {};
         }

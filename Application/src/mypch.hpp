@@ -2,7 +2,7 @@
 #define ALALALALALALA
     //TEMPORARY
     //TODO: REMOVE
-    const int DELAY_MICRO = 500;
+    const int DELAY_MICRO = 100;
     //TEMPORARY ^
 #endif  //!ALALALALALALA
 

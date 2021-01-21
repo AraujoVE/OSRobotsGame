@@ -30,7 +30,7 @@ namespace Application
 
         m_Running = false;
 
-        m_EventListener.reset(new EventListener());
+        m_EventListener = new EventListener();
 
         //TODO: fix memory leak
         //TODO: release those functions from threadloop when this object is dead
@@ -47,6 +47,8 @@ namespace Application
     {
         m_Running = false;
         m_ThreadLoop->Abandon();
+
+        delete m_EventListener;
     }
 
     int Task::CalcLostRobots()

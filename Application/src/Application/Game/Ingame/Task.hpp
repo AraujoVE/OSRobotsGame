@@ -40,7 +40,7 @@ namespace Application
         inline time_t GetLastUpdate() const { return lastUpdateTime; }
 
     private:
-        std::unique_ptr<EventListener> m_EventListener;
+        EventListener *m_EventListener;
 
         ThreadLoop *m_ThreadLoop;
         bool m_Running;

@@ -17,12 +17,12 @@
 
 namespace Application
 {
-    typedef std::unique_ptr<void *> GenericEventHandlerPtr;
-    typedef std::vector<GenericEventHandlerPtr> HandlerQueue;
+    //TODO: fix ml
+    typedef std::vector<void*> HandlerQueue;
     class EventListener final
     {
         DampEngine::Mutex m_MapMutex;
-        std::unordered_map<std::string, HandlerQueue> handlerQueueMap;
+        std::unordered_map<std::string, HandlerQueue> handlerQueueMap = {};
 
     public:
         template <class EventHandlerType>

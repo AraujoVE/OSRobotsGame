@@ -5,6 +5,7 @@
 #include "DampEngine/Core/Macros/Log.hpp"
 #include "DampEngine/Core/Macros/Assert.hpp"
 
+#include "EvoAlg/Script.hpp"
 #include "EvoAlg/Types.hpp"
 
 #include <vector>
@@ -21,8 +22,11 @@ namespace EvoAlg
     class ScriptRunner
     {
     private:
+        Script &m_Script;
         GameRunner &m_GameRunner;
-        std::string srcFile, m_DebugName;
+        const Individual& m_Individual;
+
+
         pthread_t scriptThread;
         std::vector<std::vector<std::vector<std::string>>> gameScript;
         const static int DIRECTIONS_SIZE = 7;
@@ -32,7 +36,7 @@ namespace EvoAlg
 
 
     public:
-        ScriptRunner(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName);
+        ScriptRunner(Script& script, GameRunner &gameRunner, const Individual& individual);
 
         ~ScriptRunner();
 

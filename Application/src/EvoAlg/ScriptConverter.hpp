@@ -8,6 +8,7 @@
 
 namespace EvoAlg
 {
+    class Script;
     class ScriptConverter
     {
     private:
@@ -23,10 +24,14 @@ namespace EvoAlg
         std::vector<std::string> m_Gameplay;
 
         std::fstream m_OutputFile;
+        std::string m_HumanScriptsFolderPath;
+        size_t m_LastSize = 0;
 
     public:
-        ScriptConverter();
+        ScriptConverter(const std::string& humanScriptsFolderPath);
         ~ScriptConverter();
+
+        Script *Convert();
 
         void removeSpaces(std::string &desiredStr);
         void removeParenthesis(std::string &desiredStr);

@@ -211,7 +211,9 @@ namespace Application
 
             avenueVS[POPULATION_INDEX]->up();
 
-            m_EventListener.On<EH_StatsDecayed>();
+            //TODO: send more events
+            if (population <= 0)
+                m_EventListener.On<EH_StatsDecayed>();
 
             if (m_GameConstsCache.ATTACK_FREQUENCY == 0)
                 it = -1;

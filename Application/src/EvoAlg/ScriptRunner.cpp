@@ -25,10 +25,8 @@ namespace EvoAlg
         return script->scriptLoop();
     }
 
-    ScriptRunner::ScriptRunner(GameRunner &gameRunner, const std::string& filePath, const std::string& debugName) 
-        : m_GameRunner(gameRunner),
-          srcFile(filePath),
-          m_DebugName(debugName)
+    ScriptRunner::ScriptRunner(Script& script, GameRunner &gameRunner, const Individual& individual) 
+        : m_Script(script), m_GameRunner(gameRunner), m_Individual(individual)
     {
         initScriptDirections();
     }
@@ -45,12 +43,10 @@ namespace EvoAlg
 
     void ScriptRunner::initScriptDirections()
     {
-        std::fstream myFile;
         int tokenPos, curGameplay = -1, curOp;
-        myFile.open(srcFile, std::ios::in);
         std::string line;
 
-        while (std::getline(myFile, line))
+        for (auto line : m_Script.m_Instructions)
         {
             if (line[0] == '#')
             {
@@ -161,7 +157,7 @@ namespace EvoAlg
         auto &_gameScript = gameScript;
 
         m_GameRunner.SetOnGameStarted(new EH_GameStarted([this, &_gameScript, &it](GameRunner &_) {
-            DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", m_DebugName);
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", m_Individual.ID);
 
             for (int i = 1; i < (int)_gameScript.at(it).size(); i++)
             {
@@ -175,7 +171,7 @@ namespace EvoAlg
         auto &gameRunner = m_GameRunner;
 
         m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &measuredDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults, &gameRunner](GameRunner &_,int elapsedTimeInTicks) {
-            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_DebugName);
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_Individual.ID);
 
             measuredDurationInTicks = elapsedTimeInTicks;
             endSem.Post();
@@ -185,13 +181,14 @@ namespace EvoAlg
 
         for (int m = 0; m < (int)gameScript.size(); m++)
         {
-            DE_INFO("(ScriptRunner -- {0}) Starting gameplay #{1}", m_DebugName, m);
+            // DE_ASSERT(m_GameRunner.IsGameLost());
+            DE_INFO("(ScriptRunner -- {0}) Starting gameplay #{1}", m_Individual.ID, m);
             m_GameRunner.Start();
 
 
-            DE_DEBUG("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_DebugName, m);
+            DE_DEBUG("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_Individual.ID, m);
             endSem.Wait();
-            DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_DebugName, m);
+            DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_Individual.ID, m);
 
             //Callback para saber quando acaba o jogo
             //quando isso acontece : endTime = time(0)
@@ -203,7 +200,7 @@ namespace EvoAlg
             DE_ASSERT(measuredDurationInTicks >= 0, "Game duration not calculated correctly");
             DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but it's not lost!!! **");
 
-            DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_DebugName);
+            DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_Individual.ID);
         }
 
         return gameplaysResults;

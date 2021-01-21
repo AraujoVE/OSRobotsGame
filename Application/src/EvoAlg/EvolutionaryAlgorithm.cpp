@@ -55,10 +55,10 @@ namespace EvoAlg
         population.randu(); // initialize with values between 0 and 1
 
         //TODO: find a better way to pass a non-variable to lambda
-        auto &_attributesValues = attributesValues;
+        // auto &_attributesValues = attributesValues;
         if (tournmentType == INITIALS) {
             int index = 0;
-            population.each_col([&_attributesValues, &index](arma::vec& popCol) { popCol = _attributesValues[index].min + popCol * (_attributesValues[index].max - _attributesValues[index].min); index++; } );
+            population.each_col([=, &index](arma::vec& popCol) { popCol = attributesValues[index].min + popCol * (attributesValues[index].max - attributesValues[index].min); index++; } );
             // for(int j = 0; j < NB_PARAMETERS; j++)
             //     population.col(j) = attributesValues[j].min + population.col(j)*(attributesValues[j].max - attributesValues[j].min); // if a normal EA is taking place, just multiply the population by a givern value
         }

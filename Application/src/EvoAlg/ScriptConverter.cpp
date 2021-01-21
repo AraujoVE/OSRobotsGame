@@ -1,6 +1,7 @@
 #include "ScriptConverter.hpp"
 
 #include "Application/Util/path.hpp"
+#include "EvoAlg/Script.hpp"
 
 #include "mypch.hpp"
 
@@ -95,28 +96,29 @@ namespace EvoAlg
         std::vector<std::string> splittedStr = splitText(command);
         std::fstream myFile;
 
-        m_OutputFile << (pos ? "\n#" : "#") << splittedStr[0] << std::endl;
-        for (int i = 0; i < (int)m_Gameplay.size(); i++)
-        {
-            m_OutputFile << m_Gameplay[i];
-            if (i != (int)(m_Gameplay.size() - 1))
-                m_OutputFile << std::endl;
-        }
-        m_Gameplay.clear();
+        auto &targetEndTime = splittedStr[0];
+
+        m_Gameplay.emplace(m_Gameplay.begin() + m_LastSize, "#" + targetEndTime);
+        m_LastSize = m_Gameplay.size();
     }
 
-    ScriptConverter::ScriptConverter()
+    ScriptConverter::ScriptConverter(const std::string& humanScriptsFolderPath)
+    : m_HumanScriptsFolderPath(humanScriptsFolderPath)
     {
-        int i = 0;
+    }
+
+    //TODO: fix ml (with reference, e.g. Ref<Script> sc = new Script())
+    Script *ScriptConverter::Convert() 
+    {
+        m_Gameplay.clear();
+
+        Script *convertedScript = new Script();
+
         std::fstream inputFile;
+        inputFile.open(m_HumanScriptsFolderPath + std::to_string(0) + ".txt", std::ios::in);
+
+        int i = 0;
         std::string line;
-
-        const std::string& scriptFolder = Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER);
-
-        m_OutputFile.open(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_MACHINE), std::ios::out);
-
-        inputFile.open(scriptFolder + std::to_string(0) + ".txt", std::ios::in);
-
         while (!inputFile.fail())
         {
             while (std::getline(inputFile, line))
@@ -132,12 +134,16 @@ namespace EvoAlg
                 }
             }
             inputFile.close();
-            inputFile.open(scriptFolder + "/scripts/" + std::to_string(++i) + ".txt", std::ios::in);
+            inputFile.open(m_HumanScriptsFolderPath + std::to_string(++i) + ".txt", std::ios::in);
         }
 
         inputFile.close();
-        m_OutputFile.close();
+
+        convertedScript->m_Instructions = m_Gameplay;
+
+        return convertedScript;
     }
+
 
     ScriptConverter::~ScriptConverter() {}
 } // namespace EvoAlg

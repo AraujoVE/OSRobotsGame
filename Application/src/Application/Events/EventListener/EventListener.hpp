@@ -28,10 +28,18 @@ namespace Application
         const std::string eventType = EventHandlerType::GetTypeStatic();
         bool eventConsumed = false;
 
+        static unsigned long count = 0;
+        count++;
         m_MapMutex.Lock();
 
         do
         {
+            // auto findIt = handlerQueueMap.find(eventType);
+            // if (findIt == handlerQueueMap.end()) {
+            //     handlerQueueMap[eventType] = {};
+            // }
+
+            (void) handlerQueueMap[eventType].begin();
             const HandlerQueue &queue = handlerQueueMap[eventType];
             if (queue.empty())
             {
@@ -43,8 +51,9 @@ namespace Application
             for (auto handlerIt = queue.begin(); !eventConsumed && handlerIt != queue.end(); handlerIt++)
             {
 
-                void *genericEventHandler = *handlerIt->get();
+                void *genericEventHandler = *handlerIt;
                 EventHandlerType *eventHandler = (EventHandlerType *)genericEventHandler;
+                if (eventHandler->GetType() == "") continue;
 
                 eventConsumed = std::apply(eventHandler->m_Handler, argTuple);
             }
@@ -82,7 +91,7 @@ namespace Application
     {
         std::string eventType = eventHandler->GetType();
         m_MapMutex.Lock();
-        handlerQueueMap[eventType].push_back(std::make_unique<void *>((void *)eventHandler));
+        handlerQueueMap[eventType].push_back((void *)eventHandler);
         m_MapMutex.Unlock();
     }
 } // namespace Application

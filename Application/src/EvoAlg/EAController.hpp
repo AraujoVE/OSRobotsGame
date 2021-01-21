@@ -4,6 +4,7 @@
 #include "EvoAlg/Types.hpp"
 
 #include "Application/Game/GameRunner.hpp"
+#include "Script.hpp"
 
 using namespace Application;
 
@@ -23,6 +24,10 @@ namespace EvoAlg
 
         //Index of array corresponds to IndividualID
         std::vector<GameplayResult> m_GameplayResults;
+        
+        //TODO: unique_ptr, or delete
+        Script *m_Script;
+        
 
 
     public:
