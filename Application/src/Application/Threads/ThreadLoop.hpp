@@ -63,6 +63,7 @@ namespace Application
         void Pause(bool paused = true);
         inline void Unpause() { Pause(false); }
         inline bool IsPaused() { return m_Paused; }
+        inline bool IsRunning() { return m_State == State::RUNNING; }
         void Start(uint32_t tickDelay);
         void Stop();
         void Abandon();

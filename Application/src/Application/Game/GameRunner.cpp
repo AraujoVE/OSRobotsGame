@@ -44,7 +44,8 @@ namespace Application
         m_EventListener->OnAsync<EH_GameStarted>(*this);
         
         SetupGameOverConditions();
-        m_GameSave->GetVillageStats()->startStatsDecayment();
+        //TODO: register villagestats::onGameStarted on GameRunner::m_EventListener ?
+        m_GameSave->GetVillageStats()->onGameStarted();
     }
 
     void GameRunner::Stop()

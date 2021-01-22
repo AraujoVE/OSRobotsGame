@@ -10,8 +10,10 @@ namespace Application
 {
 
     //TODO: fix ml
+    //PRIVATE:
     GameSave::GameSave(): m_GameConsts(new GameConsts()) {}
 
+    //PUBLIC:
     GameSave::GameSave(GameConsts *gameConsts) : m_GameConsts(gameConsts)
     {
         Reset();

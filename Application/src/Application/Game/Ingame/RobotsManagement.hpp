@@ -71,7 +71,7 @@ namespace Application
         
         bool createRobots(uint64_t createCount);
         bool destroyRobots(uint64_t destroyCount);
-        bool moveRobot(Task &targetTask, uint64_t moveCount);
+        bool moveRobot(Task &targetTask, int64_t moveCount);
 
         const std::unordered_map<Task::TaskID, Task*> &getTasks(RobotFunction function) const;
         std::optional<Task*> findTask(Task::TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;

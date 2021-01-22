@@ -33,7 +33,7 @@ namespace Application
         : m_GameConstsCache(gameConsts), m_DecayThreadLoop("VillageStatsDecay")
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
-        initializeStats();
+        
         initializeVSAvenues();
 
         m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::decayStats, this));
@@ -54,7 +54,7 @@ namespace Application
 
     VillageStats::~VillageStats()
     {
-        if (m_DecayThreadLoop.GetState() == ThreadLoop::State::RUNNING)
+        if (m_DecayThreadLoop.IsRunning())
             m_DecayThreadLoop.Abandon();
 
         for (int i = 0; i < BASE_STATS_NO + 1; i++)
@@ -78,11 +78,11 @@ namespace Application
     {
         for (int i = 0; i < BASE_STATS_NO; i++)
         {
-            avenueVS[i] = new Avenue(baseStats[i]);
+            avenueVS[i] = new Avenue<double>(baseStats[i]);
             avenueVS[i]->startConsumer();
         }
 
-        avenueVS[POPULATION_INDEX] = new Avenue(population);
+        avenueVS[POPULATION_INDEX] = new Avenue<double>(population);
         avenueVS[POPULATION_INDEX]->startConsumer();
     }
 
@@ -196,10 +196,17 @@ namespace Application
             population = maxPop;
     }
 
-    void VillageStats::startStatsDecayment()
+    void VillageStats::onGameStarted()
     {
-        DE_TRACE("VillageStats::startStatsDecayment()");
+        DE_TRACE("VillageStats::onGameStarted()");
+        initializeStats();
         m_DecayThreadLoop.Start(m_GameConstsCache.TICK_DELAY_MICRO);
+    }
+
+    void VillageStats::onGameEnded() {
+        if (m_DecayThreadLoop.IsRunning()) {
+            m_DecayThreadLoop.Abandon();
+        }
     }
 
     void VillageStats::setStatsDecaymentPaused(bool paused)

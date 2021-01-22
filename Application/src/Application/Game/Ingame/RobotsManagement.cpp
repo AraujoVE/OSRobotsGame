@@ -263,7 +263,7 @@ namespace Application
         map.erase(id); 
     }
     
-    bool RobotsManagement::moveRobot(Task &choosenTask, uint64_t robotsNo)
+    bool RobotsManagement::moveRobot(Task &choosenTask, int64_t robotsNo)
     {   
         if (robotsNo == 0)
             return true; //If no robots are added or removed, nothing to do
@@ -272,7 +272,7 @@ namespace Application
 
         robotsAvenues[FREE_ROBOTS]->down();
 
-        if (robotsNo > 0 && freeRobots < robotsNo)
+        if (robotsNo > 0 && freeRobots < (uint64_t) robotsNo)
             returnValue = false; // Can't add robots to a task if there are not enough free robots
         else if (robotsNo < 0 && choosenTask.GetRobotsNo() + robotsNo < 0)
             returnValue = false; //Can't remove robots from a task if there are not enough robots in the given task

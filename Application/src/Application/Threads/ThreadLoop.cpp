@@ -36,42 +36,42 @@ namespace Application
         m_State = State::RUNNING;
         while (m_State == State::RUNNING)
         {
-            DE_DEBUG("(ThreadLoop::InnerLoop) Start of loop");
+            DE_DEBUG("(ThreadLoop[{0}] inner) Start of loop", m_DebugName);
 
             if (!m_Paused)
             {
-                DE_DEBUG("(ThreadLoop::InnerLoop) Not paused, checking if abandoned...");
+                DE_DEBUG("(ThreadLoop[{0}] inner) Not paused, checking if abandoned...", m_DebugName);
 
                 m_FunctsMutex.Lock();
                 if (m_State == State::ABANDONED)
                 {
                     m_FunctsMutex.Unlock();
-                    DE_DEBUG("(ThreadLoop::InnerLoop) Abandoned!! breaking execution loop");
+                    DE_DEBUG("(ThreadLoop[{0}] inner) Abandoned!! breaking execution loop", m_DebugName);
                     break;
                 }
 
-                DE_ASSERT(m_AliveCheckFunction != nullptr, "(ThreadLoop::InnerLoop::InnerLoop) m_AliveCheckFunction is nullptr!!");
-                DE_ASSERT(m_TickFunction != nullptr, "(ThreadLoop::InnerLoop::InnerLoop) m_TickFunction is nullptr!!");
+                DE_ASSERT(m_AliveCheckFunction != nullptr, "(ThreadLoop::InnerLoop) m_AliveCheckFunction is nullptr!!");
+                DE_ASSERT(m_TickFunction != nullptr, "(ThreadLoop::InnerLoop) m_TickFunction is nullptr!!");
 
-                DE_DEBUG("(ThreadLoop::InnerLoop) Checking if still alive");
+                DE_DEBUG("(ThreadLoop[{0}] inner) Checking if still alive", m_DebugName);
                 if (!m_AliveCheckFunction())
                 {
-                    DE_DEBUG("(ThreadLoop::InnerLoop) ThreadLoop MARKED AS NOT ALIVE, leaving execution loop");
+                    DE_DEBUG("(ThreadLoop[{0}] inner) ThreadLoop MARKED AS NOT ALIVE, leaving execution loop", m_DebugName);
                     m_State = State::FINISHED;
                     m_FunctsMutex.Unlock();
                     break;
                 }
 
-                DE_DEBUG("(ThreadLoop::InnerLoop) Calling tick...");
+                DE_DEBUG("(ThreadLoop[{0}] inner) Calling tick...", m_DebugName);
                 m_TickFunction();
                 m_FunctsMutex.Unlock();
             }
             else
             {
-                DE_DEBUG("(ThreadLoop::InnerLoop) Ignoring paused tick...");
+                DE_DEBUG("(ThreadLoop[{0}] inner) Ignoring paused tick...", m_DebugName);
             }
 
-            DE_DEBUG("(ThreadLoop::InnerLoop) Repeating loop...");
+            DE_DEBUG("(ThreadLoop[{0}] inner) Repeating loop...", m_DebugName);
 
             usleep(m_TickDelay);
         }
@@ -83,8 +83,9 @@ namespace Application
             m_EventListener->On<EH_ThreadEnded>(ThreadEndedReason::FORCED_STOP);
         else if (m_State == State::FINISHED)
             m_EventListener->On<EH_ThreadEnded>(ThreadEndedReason::FINISHED);
-        else if (m_State == State::ABANDONED)
-            DE_TRACE("(ThreadLoop) Ignoring abandoned thread");
+        else if (m_State == State::ABANDONED) {
+            DE_DEBUG("(ThreadLoop[{0}] inner) Ignoring abandoned thread", m_DebugName);
+        }
 
         m_State = State::INACTIVE;
     }

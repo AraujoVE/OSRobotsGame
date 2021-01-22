@@ -60,8 +60,8 @@ namespace Application
         float calcRatio(int);
         float adjustStatsLimits(int,float,float,bool);
 
-        void startStatsDecayment();
-        void stopStatsDecayment();
+        void onGameStarted();
+        void onGameEnded();
 
         void setStatsDecaymentPaused(bool paused);
         inline bool isStatusDecaymentPaused() { return m_DecayThreadLoop.IsPaused(); }
