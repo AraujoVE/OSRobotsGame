@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Application/Game/GameConsts.hpp"
 #include "DampEngine/Threads/Mutex.hpp"
 
 #include <functional>
@@ -45,6 +46,8 @@ namespace Application
 
         State m_State;
         bool m_Paused;
+
+        uint32_t m_TickDelay = HUMAN_TICK_DELAY_MICRO;
     public:
         EventListener *m_EventListener;
 
@@ -60,7 +63,7 @@ namespace Application
         void Pause(bool paused = true);
         inline void Unpause() { Pause(false); }
         inline bool IsPaused() { return m_Paused; }
-        void Start();
+        void Start(uint32_t tickDelay);
         void Stop();
         void Abandon();
     };

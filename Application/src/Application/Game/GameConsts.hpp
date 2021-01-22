@@ -8,6 +8,8 @@
 #include "Application/Events/EventHandler/DefaultHandlers.fwd.hpp"
 #include "Application/Events/EventListener/EventListener.fwd.hpp"
 
+#define HUMAN_TICK_DELAY_MICRO 500e3
+
 namespace Application
 {
     class GameConsts;
@@ -65,12 +67,15 @@ namespace Application
 
         std::unordered_map<std::string, ParameterData> m_ConstsMap;
         EventListener *m_EventListener;
+        uint32_t TICK_DELAY_MICRO = HUMAN_TICK_DELAY_MICRO;
 
         //Static to force all instances to open file synchronously
         static DampEngine::Mutex s_FileMutex;
         DampEngine::Mutex m_MapMutex;
 
         void SetValue(const std::string &key, float newValue);
+
+        
 
     public:
         GameConsts();
@@ -84,6 +89,11 @@ namespace Application
 
         void SetOnValueChanged(EH_GameConstsChanged *eHandler);
 
+        //TODO: prohibit change in the middle of a gameplay (if it's an EA playing)
+        inline void SetTickDelay(uint32_t newTickDelay) { TICK_DELAY_MICRO = newTickDelay; }
+
+        //Gets the current tick delay in microsseconds
+        inline uint32_t GetTickDelay() { return TICK_DELAY_MICRO; }
         
     };
 
@@ -111,6 +121,7 @@ namespace Application
         int REWARD_RANGE;
         int FAILURE_TAX;
         int AVG_REWARD;
+        uint32_t TICK_DELAY_MICRO;
 
     private:
         GameConsts &m_GameConsts;
@@ -146,6 +157,9 @@ namespace Application
             FAILURE_TAX = m_GameConsts.GetValue("FAILURE_TAX");
 
             AVG_REWARD = (int)(((float)TIME_STEP) * ((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0) / 2.0) * ((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0) / 2.0));
+
+            TICK_DELAY_MICRO = m_GameConsts.GetTickDelay();
+
 
             for (auto updateFn : m_AditionalUpdates)
                 updateFn();

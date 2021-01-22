@@ -46,6 +46,8 @@ namespace EvoAlg
         int tokenPos, curGameplay = -1, curOp;
         std::string line;
 
+        uint32_t currentTickDelay = m_GameRunner.GetGameConsts().GetTickDelay();
+
         for (auto line : m_Script.m_Instructions)
         {
             if (line[0] == '#')
@@ -71,7 +73,7 @@ namespace EvoAlg
 
                 //If it is a wait operation, hijack another parameter with DELAY_MICRO
                 if (gameScript.at(curGameplay).at(curOp).at(0) == "6")
-                    gameScript.at(curGameplay).at(curOp).push_back(std::to_string(DELAY_MICRO));
+                    gameScript.at(curGameplay).at(curOp).push_back(std::to_string(currentTickDelay));
             }
         }
     }
@@ -156,13 +158,15 @@ namespace EvoAlg
 
         auto &_gameScript = gameScript;
 
-        m_GameRunner.SetOnGameStarted(new EH_GameStarted([this, &_gameScript, &it](GameRunner &_) {
+        m_GameRunner.SetOnGameStarted(new EH_GameStarted([this, &_gameScript, &it](GameRunner &gameRunner) {
             DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", m_Individual.ID);
+
+            uint32_t currentTickDelay = gameRunner.GetGameConsts().GetTickDelay();
 
             for (int i = 1; i < (int)_gameScript.at(it).size(); i++)
             {
                 (this->*(scriptLoopFuncts[stoi(_gameScript.at(it).at(i).at(0))]))(_gameScript.at(it).at(i));
-                usleep(DELAY_MICRO);
+                usleep(currentTickDelay);
             }
 
             return false;

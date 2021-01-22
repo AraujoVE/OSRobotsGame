@@ -86,7 +86,7 @@ namespace Application
     void Task::Start()
     {
         DE_TRACE("Starting Task #{0} (Function:{1})", id, getRobotFunctionString(function));
-        m_ThreadLoop->Start();
+        m_ThreadLoop->Start(m_GameConstsCache.TICK_DELAY_MICRO);
     }
 
     void Task::Cancel()

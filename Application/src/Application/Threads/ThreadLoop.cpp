@@ -73,7 +73,7 @@ namespace Application
 
             DE_DEBUG("(ThreadLoop::InnerLoop) Repeating loop...");
 
-            usleep(DELAY_MICRO);
+            usleep(m_TickDelay);
         }
 
         DE_ASSERT(m_State != State::RUNNING, "(ThreadLoop::InnerLoop) Invalid Running state after while m_State == State::RUNNING");
@@ -95,11 +95,13 @@ namespace Application
         m_Paused = paused;
     }
 
-    void ThreadLoop::Start()
+    void ThreadLoop::Start(uint32_t tickDelay)
     {
         DE_ASSERT(m_AliveCheckFunction != nullptr, "(ThreadLoop::Start) Trying to start a ThreadLoop with m_AliveCheckFunction == nullptr!!");
         DE_ASSERT(m_TickFunction != nullptr, "(ThreadLoop::Start) Trying to start a ThreadLoop with m_TickFunction == nullptr!!");
         DE_ASSERT(m_State == State::INACTIVE, "(ThreadLoop::Start) Trying to start a ThreadLoop while it's already running!!!")
+
+        m_TickDelay = tickDelay;
 
         m_Paused = false;
         pthread_create(&m_Thread, NULL, &threadRountine, this);

@@ -10,7 +10,7 @@ namespace Application
     //Each set must enter in the semaphore
     uint64_t VillageStats::getStat(RobotFunction robotFunc) const
     {
-        return baseStats[(uint8_t) robotFunc];
+        return baseStats[(uint8_t)robotFunc];
     }
 
     uint64_t VillageStats::getPopulation() const
@@ -35,22 +35,21 @@ namespace Application
         std::srand(std::time(nullptr)); // use current time as seed for random generator
         initializeStats();
         initializeVSAvenues();
-        
+
         m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::decayStats, this));
-        m_DecayThreadLoop.SetAliveCheckFunction([this]{return this->getPopulation() > 0;});
+        m_DecayThreadLoop.SetAliveCheckFunction([this] {
+            return this->getPopulation() > 0;
+        });
 
-
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadStarted([]{
+        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadStarted([] {
             DE_TRACE("(VillageStats) m_DecayThreadLoop started successfully.");
             return false;
         }));
 
-
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([](ThreadEndedReason::ThreadEndedReason_t reason){
+        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([](ThreadEndedReason::ThreadEndedReason_t reason) {
             DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
             return false;
         }));
-
     }
 
     VillageStats::~VillageStats()
@@ -176,7 +175,8 @@ namespace Application
         reduction = adjustStatsLimits((int)RobotFunction::CONSTRUCTION, reduction, 1, false);
 
         maxPop = baseStats[(int)RobotFunction::CONSTRUCTION] * m_GameConstsCache.POP_PER_CONSTRUCTION;
-        if (maxPop < 0) maxPop = 1.7e308;
+        if (maxPop < 0)
+            maxPop = 1.7e308;
     }
 
     //LAST
@@ -199,12 +199,12 @@ namespace Application
     void VillageStats::startStatsDecayment()
     {
         DE_TRACE("VillageStats::startStatsDecayment()");
-        m_DecayThreadLoop.Start();
+        m_DecayThreadLoop.Start(m_GameConstsCache.TICK_DELAY_MICRO);
     }
 
     void VillageStats::setStatsDecaymentPaused(bool paused)
     {
-        DE_TRACE("VillageStats::setStatsDecaymentPaused({0})",paused);
+        DE_TRACE("VillageStats::setStatsDecaymentPaused({0})", paused);
         m_DecayThreadLoop.Pause(paused);
     }
 
@@ -245,7 +245,8 @@ namespace Application
         DE_TRACE("Tick = {0}", m_ElapsedTicks);
     }
 
-    unsigned int VillageStats::GetElapsedTimeTicks(){
+    unsigned int VillageStats::GetElapsedTimeTicks()
+    {
         return m_ElapsedTicks;
     }
 
