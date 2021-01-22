@@ -11,7 +11,7 @@
 
 // #define DE_DEBUG(...) 
 // #define DE_TRACE(...) 
-// #define DE_INFO(...) DampEngine::Logger::GetClientLogger()->info(__VA_ARGS__) 
+// #define DE_INFO(...) 
 // #define DE_WARN(...) 
 // #define DE_ERROR(...) 
 // #define DE_CRITICAL(...) 

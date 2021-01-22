@@ -224,8 +224,8 @@ namespace Application
         avenueVS[POPULATION_INDEX]->up();
 
         //TODO: send more events
-        // if (population <= 0)
-        //     m_EventListener.On<EH_StatsDecayed>();
+        if (population <= 0)
+            m_EventListener.On<EH_StatsDecayed>();
 
         m_ElapsedTicks += 1;
         DE_TRACE("Tick = {0}", m_ElapsedTicks);
