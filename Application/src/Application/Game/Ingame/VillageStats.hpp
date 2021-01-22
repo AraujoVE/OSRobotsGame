@@ -8,6 +8,8 @@
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 #include "Application/Game/GameConsts.hpp"
 
+#include "Application/Threads/ThreadLoop.hpp"
+
 namespace Application
 {
     class VillageStats
@@ -15,15 +17,10 @@ namespace Application
     private:
         EventListener m_EventListener;
         GameConstsCache m_GameConstsCache;
-        bool m_MarkedForDeletion = false;
-        
-        bool m_DecaymentPaused = false;
-
     public:
         const static int BASE_STATS_NO = FUNCTION_QTY;
         const static int POPULATION_INDEX = BASE_STATS_NO;
     private:
-        int elapsedTimeTicks;
         bool onAttack;
         float statTax;
         int maxPop;
@@ -37,16 +34,17 @@ namespace Application
         */
 
         Avenue *avenueVS[BASE_STATS_NO+1];
-        pthread_t decayThread;
 
-        void (VillageStats::*decayStatsFuncts[BASE_STATS_NO - 1])(int,int,float&) = {
+        ThreadLoop m_DecayThreadLoop;
+
+        void (VillageStats::*decayStatsFuncts[BASE_STATS_NO - 1])(int,float&) = {
             &VillageStats::decayFood,
             &VillageStats::decayHealth,
             &VillageStats::decayStructures,
             &VillageStats::decayDefenses,
         };
 
-
+        unsigned int m_ElapsedTicks = 0;
         int population; // if population reaches zero, the game is over -> pop calculated based on other village stats
 
         void initializeVSAvenues();
@@ -63,22 +61,23 @@ namespace Application
         float adjustStatsLimits(int,float,float,bool);
 
         void startStatsDecayment();
-        void setStatsDecaymentPaused(bool paused);
-        inline bool isStatusDecaymentPaused() { return m_DecaymentPaused; }
+        void stopStatsDecayment();
 
-        void decayStat(int,int);
+        void setStatsDecaymentPaused(bool paused);
+        inline bool isStatusDecaymentPaused() { return m_DecayThreadLoop.IsPaused(); }
+
+        void decayStat(int);
         void setOnStatusDecayed(EH_StatsDecayed *eventHandler) { m_EventListener.Register(eventHandler); }
 
-        void decayDefenses(int,int,float&);
-        void decayFood(int,int,float&);
-        void decayHealth(int,int,float&);
-        void decayStructures(int,int,float&);
-        void decayResources(int,int,float&);
+        void decayDefenses(int,float&);
+        void decayFood(int,float&);
+        void decayHealth(int,float&);
+        void decayStructures(int,float&);
+        void decayResources(int,float&);
 
         void decayPopulation();
 
-        Avenue *getAvenue(int type);
-
+        inline Avenue *getAvenue(RobotFunction robotFunc) { return avenueVS[(uint8_t)robotFunc]; }
         int getStat(int) const;
         int getPopulation() const;
         int getResources() const;
@@ -92,7 +91,7 @@ namespace Application
         void initializeStats();
         void addTaskResources(RobotFunction, time_t, int);
 
-        int getElapsedTimeTicks();
+        unsigned int GetElapsedTimeTicks();
     };
 
     void *runDecay (void *decayFuncObject);

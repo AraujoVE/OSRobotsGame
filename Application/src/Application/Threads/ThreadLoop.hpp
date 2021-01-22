@@ -13,33 +13,52 @@ namespace Application
     {
         enum ThreadEndedReason_t
         {
-            STOP,
+            FORCED_STOP,
             FINISHED
         };
     }
 
-    class ThreadLoop
+    
+
+    class ThreadLoop final
     {
+    public:
+
+        enum class State {
+            INACTIVE, RUNNING, FORCED_STOP, FINISHED, ABANDONED
+        };
+
+        using TickFunction = std::function<void()>;
+        using AliveCheckFunction = std::function<bool()>;
+
+
     private:
         pthread_t m_Thread;
 
         std::function<void()> m_TickFunction;
         std::function<bool()> m_AliveCheckFunction;
-        bool m_Running;
 
         void InnerLoop();
         friend void *threadRountine(void *threadLoopV);
-        const static std::function<bool()> s_DefaultAliveCheckFunction;
-        const static std::function<bool()> s_StoppedAliveCheckFunction;
 
         DampEngine::Mutex m_FunctsMutex;
+
+        State m_State;
+        bool m_Paused;
     public:
-        std::unique_ptr<EventListener> m_EventListener;
+        EventListener *m_EventListener;
 
-        ThreadLoop(
-            std::function<void()> loopFunction,
-            std::function<bool()> aliveCheckFunction = s_DefaultAliveCheckFunction);
+        ThreadLoop();
+        ~ThreadLoop();
 
+        inline void SetTickFunction(TickFunction &&func) { m_TickFunction = func; }
+        inline void SetAliveCheckFunction(AliveCheckFunction &&func) { m_AliveCheckFunction = func; }
+
+        inline ThreadLoop::State GetState() { return m_State; }
+
+        void Pause(bool paused = true);
+        inline void Unpause() { Pause(false); }
+        inline bool IsPaused() { return m_Paused; }
         void Start();
         void Stop();
         void Abandon();

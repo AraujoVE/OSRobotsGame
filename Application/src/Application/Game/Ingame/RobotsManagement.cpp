@@ -81,9 +81,9 @@ namespace Application
 
     bool RobotsManagement::canAddRobots() const{
         robotsAvenues[PROD_COST]->down();
-        villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING)->down();
+        villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING)->down();
         bool canAdd = villageStats->getResources() >= prodCost;
-        villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING)->up();
+        villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING)->up();
         robotsAvenues[PROD_COST]->up();
 
         return canAdd;
@@ -156,7 +156,7 @@ namespace Application
         bool hasCreated = false;
 
         price = prodCost * no;
-        VSResourcesAvenue = villageStats->getAvenue((int)RobotFunction::RESOURCE_GATHERING);
+        VSResourcesAvenue = villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING);
         VSResourcesAvenue->down();
         currentResources = villageStats->getResources();
 

@@ -91,7 +91,6 @@ namespace Application::GameWindows
         
         for (auto deletePair : m_TaskWindowMap)
         {
-            m_RobotsManagement->cancelTask(deletePair.second->GetTask());
             DE_DEBUG("Deleting TaskWindow ID={0}, Index={1}, Function={2}", deletePair.first, deletePair.second->GetIndex(), getRobotFunctionString(deletePair.second->GetTask().GetRobotFunction()));
             delete deletePair.second;
         }

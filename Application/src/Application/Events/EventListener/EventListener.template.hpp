@@ -40,6 +40,9 @@ namespace Application
         template <class EventHandlerType>
         void Register(EventHandlerType *eventHandler);
 
+        template <class EventHandlerType>
+        void Unregister(EventHandlerType *eventHandler);
+
         void Clear()
         {
             m_MapMutex.Lock();

@@ -23,6 +23,7 @@ namespace Application
 
     void GameSave::Reset()
     {
+        DE_TRACE("(GameSave) Starting new GameSave");
         m_VillageStats.reset(new VillageStats(*m_GameConsts));
         m_RobotsManagement.reset(new RobotsManagement(*m_GameConsts));
         m_RobotsManagement->setVillageStats(m_VillageStats.get());

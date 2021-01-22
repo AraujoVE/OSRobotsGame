@@ -5,6 +5,7 @@
 #include "Application/Game/Ingame/RobotFunctions.hpp"
 #include "Application/Threads/ThreadLoop.hpp"
 #include "Application/Game/GameConsts.hpp"
+#include "DampEngine/Threads/Mutex.hpp"
 
 #include <memory>
 
@@ -40,10 +41,10 @@ namespace Application
         inline time_t GetLastUpdate() const { return lastUpdateTime; }
 
     private:
+        DampEngine::Mutex m_ELMutex;
         EventListener *m_EventListener;
 
         ThreadLoop *m_ThreadLoop;
-        bool m_Running;
 
         const int id;
         const RobotFunction function;
@@ -66,7 +67,6 @@ namespace Application
 
         void Start();
         void Cancel();
-        void MarkAsIgnored();
 
         bool OnThreadLoopStarted();
         bool OnThreadLoopEnded(ThreadEndedReason::ThreadEndedReason_t reason);

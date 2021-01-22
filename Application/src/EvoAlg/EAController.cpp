@@ -45,11 +45,9 @@ namespace EvoAlg
             ScriptRunner *scriptRunner;
         };
 
-        std::vector<IndividualRun *> gameRuns;
+        auto *aaa= new GameRunner();;
 
         //TODO: DELAY MCRO from UI
-
-        // GameRunner *globalDeletemeGR = new GameRunner();
 
         DE_INFO("(EAController) Preparing population to be executed...");
         for (unsigned int i = 0; i < populationGenes.size(); i++)
@@ -60,31 +58,34 @@ namespace EvoAlg
             Individual *currentIndividual = new Individual{i, populationGenes[i]};
 
             DE_INFO("(EAController) Creating game runner for individual #{0}", i);
-            GameRunner *currentGameRunner = new GameRunner();
+            GameRunner *currentGameRunner = aaa;
             
             DE_DEBUG("(RunPopulationInGame) Loading game runner with cromossome...");
             currentGameRunner->GetGameConsts().LoadFromCromossome(populationGenes[i]);
 
             DE_DEBUG("(RunPopulationInGame) Loaded Successfully.");
 
-            gameRuns.push_back(new IndividualRun{
+            auto *run = new IndividualRun{
                 currentIndividual,
                 currentGameRunner,
-                new ScriptRunner(*m_Script, *currentGameRunner, *currentIndividual)});
-        }
+                new ScriptRunner(*m_Script, *currentGameRunner, *currentIndividual)};
 
-        // bool syncExecution = false;
-        DE_INFO("(EAController) Executing all individuals");
-        for (auto &currentRun : gameRuns)
-        {
-            DE_DEBUG("(EAController) Executing script on individual {0}...", currentRun->individual->ID);
-            GameplayResult *result = (GameplayResult *)currentRun->scriptRunner->scriptLoop();
+            GameplayResult *result = (GameplayResult *)run->scriptRunner->scriptLoop();
             m_GameplayResults.push_back(*result);
 
-            //TODO: allow UI to execute synchronously
-            // if (syncExecution) script->*script->joinScriptThread();
-            // change UI to next gameRunner
         }
+
+        // // bool syncExecution = false;
+        // DE_INFO("(EAController) Executing all individuals");
+        // for (auto &currentRun : gameRuns)
+        // {
+        //     DE_DEBUG("(EAController) Executing script on individual {0}...", currentRun->individual->ID);
+            
+
+        //     //TODO: allow UI to execute synchronously
+        //     // if (syncExecution) script->*script->joinScriptThread();
+        //     // change UI to next gameRunner
+        // }
 
         // //TODO: remove, using vec of struct above
         // int debug_ind_ind = 0;

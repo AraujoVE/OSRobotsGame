@@ -11,7 +11,7 @@
 namespace Application
 {
     //Inicialização e destruição de classe
-    Task::Task(RobotFunction funct, GameConstsCache& gameConsts, Task::TaskID id)
+    Task::Task(RobotFunction funct, GameConstsCache &gameConsts, Task::TaskID id)
         : m_GameConstsCache(gameConsts),
           id(id),
           function(funct)
@@ -28,27 +28,30 @@ namespace Application
         rewardMultiplier = m_GameConstsCache.MIN_REWARD + (std::rand() % m_GameConstsCache.REWARD_RANGE);
         predictedTime = 0;
 
-        m_Running = false;
-
         m_EventListener = new EventListener();
 
         //TODO: fix memory leak
         //TODO: release those functions from threadloop when this object is dead
-        auto tlTickFn = std::bind(&Task::UpdateTask, this);
-        auto tlStopFn = [=]() { return !this->IsTaskCompleted(); };
-        m_ThreadLoop = new ThreadLoop(tlTickFn, tlStopFn);
+
+        m_ThreadLoop = new ThreadLoop();
+
+        m_ThreadLoop->SetTickFunction(std::bind(&Task::UpdateTask, this));
+        m_ThreadLoop->SetAliveCheckFunction([this] { return !IsTaskCompleted(); });
 
         m_ThreadLoop->m_EventListener->Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
         m_ThreadLoop->m_EventListener->Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
-
     }
 
     Task::~Task()
     {
-        m_Running = false;
-        m_ThreadLoop->Abandon();
+        m_ELMutex.Lock();
+        {
+            delete m_EventListener;
+            m_EventListener = nullptr;
+        }
+        m_ELMutex.Unlock();
 
-        delete m_EventListener;
+        m_ThreadLoop->Abandon();
     }
 
     int Task::CalcLostRobots()
@@ -78,8 +81,6 @@ namespace Application
         remainingTime = robotsNo == 0 ? -1 : (progressLength - curProgress) / robotsNo;
         gainedGoods = (pow((float)curProgress, 2) / (float)progressLength) * (float)rewardMultiplier;
         lastUpdateTime = curTime;
-
-        
     }
 
     void Task::Start()
@@ -91,29 +92,37 @@ namespace Application
     void Task::Cancel()
     {
         DE_TRACE("Stopping Task #{0} (Function:{1})", id, getRobotFunctionString(function));
-        
-        m_ThreadLoop->Stop();
-    }
 
-    void Task::MarkAsIgnored()
-    {
-        DE_TRACE("Detaching Task #{0} (Function:{1})", id, getRobotFunctionString(function));
-        m_ThreadLoop->m_EventListener->Clear();
         m_ThreadLoop->Stop();
     }
 
     bool Task::OnThreadLoopStarted()
     {
-        m_EventListener->On<EH_TaskStarted>(*this);
-        return true;
+        m_ELMutex.Lock();
+        {
+            m_EventListener->On<EH_TaskStarted>(*this);
+        }
+        m_ELMutex.Unlock();
+        return false;
     }
+    
     bool Task::OnThreadLoopEnded(ThreadEndedReason::ThreadEndedReason_t reason)
     {
-        switch (reason) {
-            case ThreadEndedReason::STOP: m_EventListener->On<EH_TaskCancelled>(*this); break;
-            case ThreadEndedReason::FINISHED: m_EventListener->On<EH_TaskFinished>(*this); break;
+        m_ELMutex.Lock();
+        if (m_EventListener != nullptr)
+        {
+            switch (reason)
+            {
+                case ThreadEndedReason::FORCED_STOP:
+                    m_EventListener->On<EH_TaskCancelled>(*this);
+                    break;
+                case ThreadEndedReason::FINISHED:
+                    m_EventListener->On<EH_TaskFinished>(*this);
+                    break;
+            }
         }
-        
+        m_ELMutex.Unlock();
+
         return false;
     }
 

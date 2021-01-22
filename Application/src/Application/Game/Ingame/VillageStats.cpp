@@ -32,10 +32,25 @@ namespace Application
     VillageStats::VillageStats(GameConsts &gameConsts)
         : m_GameConstsCache(gameConsts)
     {
-        elapsedTimeTicks = 0;
         std::srand(std::time(nullptr)); // use current time as seed for random generator
         initializeStats();
         initializeVSAvenues();
+        
+        m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::decayStats, this));
+        m_DecayThreadLoop.SetAliveCheckFunction([this]{return this->getPopulation() > 0;});
+
+    }
+
+    VillageStats::~VillageStats()
+    {
+        if (m_DecayThreadLoop.GetState() == ThreadLoop::State::RUNNING)
+            m_DecayThreadLoop.Abandon();
+
+        for (int i = 0; i < BASE_STATS_NO + 1; i++)
+        {
+            avenueVS[i]->stopConsumer();
+            delete avenueVS[i];
+        }
     }
 
     void VillageStats::initializeStats()
@@ -102,16 +117,16 @@ namespace Application
     }
 
     //FIRST
-    void VillageStats::decayDefenses(int it, int ratio, float &reduction)
+    void VillageStats::decayDefenses(int ratio, float &reduction)
     {
-        if (it == m_GameConstsCache.ATTACK_FREQUENCY)
+        if (m_ElapsedTicks % m_GameConstsCache.ATTACK_FREQUENCY == 0)
             reduction = calcReduction(ratio, m_GameConstsCache.ON_ATTACK_DECAY_TAX);
 
         reduction = adjustStatsLimits((int)RobotFunction::PROTECTION, reduction, 1, true);
     }
 
     //SECOND
-    void VillageStats::decayFood(int it, int ratio, float &reduction)
+    void VillageStats::decayFood(int ratio, float &reduction)
     {
         int inAttackVar = onAttack ? m_GameConstsCache.ON_ATTACK_MULTIPLIER : 1;
 
@@ -126,7 +141,7 @@ namespace Application
     }
 
     //THIRD
-    void VillageStats::decayHealth(int it, int ratio, float &reduction)
+    void VillageStats::decayHealth(int ratio, float &reduction)
     {
         int inAttackVar = onAttack ? m_GameConstsCache.ON_ATTACK_MULTIPLIER : 1;
 
@@ -141,7 +156,7 @@ namespace Application
     }
 
     //FOURTH
-    void VillageStats::decayStructures(int it, int ratio, float &reduction)
+    void VillageStats::decayStructures(int ratio, float &reduction)
     {
         if (onAttack)
             reduction = calcReduction(ratio, m_GameConstsCache.NORMAL_DECAY_TAX);
@@ -170,23 +185,22 @@ namespace Application
 
     void VillageStats::startStatsDecayment()
     {
-        DE_ASSERT(!m_MarkedForDeletion);
-        pthread_create(&decayThread, NULL, runDecay, this);
+        m_DecayThreadLoop.Start();
     }
 
     void VillageStats::setStatsDecaymentPaused(bool paused)
     {
-        m_DecaymentPaused = paused;
+        m_DecayThreadLoop.Pause(paused);
     }
 
-    void VillageStats::decayStat(int it, int pos)
+    void VillageStats::decayStat(int pos)
     {
         avenueVS[pos]->down();
 
         float ratio = calcRatio(pos);
         float reduction = m_GameConstsCache.MIN_LOSS[pos];
 
-        (this->*(decayStatsFuncts[pos]))(it, ratio, reduction);
+        (this->*(decayStatsFuncts[pos]))(ratio, reduction);
 
         setStat(pos, reduction);
 
@@ -196,70 +210,27 @@ namespace Application
     //The stats are decreased
     void VillageStats::decayStats()
     {
-        int it = 0;
-        while (!m_MarkedForDeletion)
+        avenueVS[POPULATION_INDEX]->down();
+
+        onAttack = false;
+        for (int i = 0; i < BASE_STATS_NO - 1; i++)
         {
-            avenueVS[POPULATION_INDEX]->down();
-
-            onAttack = false;
-            for (int i = 0; i < BASE_STATS_NO - 1; i++)
-            {
-                decayStat(it, i);
-            }
-
-            decayPopulation();
-
-            avenueVS[POPULATION_INDEX]->up();
-
-            //TODO: send more events
-            if (population <= 0)
-                m_EventListener.On<EH_StatsDecayed>();
-
-            if (m_GameConstsCache.ATTACK_FREQUENCY == 0)
-                it = -1;
-            else
-                it = (it + 1 + m_GameConstsCache.ATTACK_FREQUENCY) % m_GameConstsCache.ATTACK_FREQUENCY;
-
-
-            elapsedTimeTicks += 1;
-            do
-            {   
-                //TODO: different struct
-                usleep(DELAY_MICRO);
-            } while (m_DecaymentPaused);
+            decayStat(i);
         }
-        DE_TRACE("decayStats thread stopped!");
+
+        decayPopulation();
+
+        avenueVS[POPULATION_INDEX]->up();
+
+        //TODO: send more events
+        if (population <= 0)
+            m_EventListener.On<EH_StatsDecayed>();
+
+        m_ElapsedTicks += 1;
     }
 
-    Avenue *VillageStats::getAvenue(int type)
-    {
-        return avenueVS[type];
-    }
-
-    void *runDecay(void *decayFuncObject)
-    {
-        VillageStats *village = (VillageStats *)decayFuncObject;
-        village->decayStats();
-        return NULL;
-    }
-
-    VillageStats::~VillageStats()
-    {
-        m_MarkedForDeletion = true;
-
-        // DE_DEBUG("Danger: joining decayThread... @VillageStats::~VillageStats");
-        // pthread_join(decayThread, NULL);
-        // DE_DEBUG("Success: decayThread ended @VillageStats::~VillageStats");
-
-        for (int i = 0; i < BASE_STATS_NO + 1; i++)
-        {
-            avenueVS[i]->stopConsumer();
-            delete avenueVS[i];
-        }
-    }
-
-    int VillageStats::getElapsedTimeTicks(){
-        return elapsedTimeTicks;
+    unsigned int VillageStats::GetElapsedTimeTicks(){
+        return m_ElapsedTicks;
     }
 
 } // namespace Application

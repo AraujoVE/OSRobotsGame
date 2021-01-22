@@ -6,7 +6,7 @@ namespace Application
 {
     const int FUNCTION_QTY = 5;
 
-    enum class RobotFunction : short
+    enum class RobotFunction : uint8_t
     {
         PROTECTION = 0,
         HUNT,
