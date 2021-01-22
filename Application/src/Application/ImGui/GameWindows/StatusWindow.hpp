@@ -21,12 +21,12 @@ namespace Application::GameWindows
             SetNextPos();
             SetNextSize();
 
-            unsigned population = m_VillageStatus->getPopulation();
-            unsigned protection = m_VillageStatus->getStat((int)RobotFunction::PROTECTION);
-            unsigned hunt = m_VillageStatus->getStat((int)RobotFunction::HUNT);
-            unsigned medicine = m_VillageStatus->getStat((int)RobotFunction::MEDICINE);
-            unsigned construction = m_VillageStatus->getStat((int)RobotFunction::CONSTRUCTION);
-            unsigned resource_gathering = m_VillageStatus->getStat((int)RobotFunction::RESOURCE_GATHERING);
+            uint64_t population = m_VillageStatus->getPopulation();
+            uint64_t protection = m_VillageStatus->getStat(RobotFunction::PROTECTION);
+            uint64_t hunt = m_VillageStatus->getStat(RobotFunction::HUNT);
+            uint64_t medicine = m_VillageStatus->getStat(RobotFunction::MEDICINE);
+            uint64_t construction = m_VillageStatus->getStat(RobotFunction::CONSTRUCTION);
+            uint64_t resource_gathering = m_VillageStatus->getStat(RobotFunction::RESOURCE_GATHERING);
 
             const char *statusTitle = m_VillageStatus->isStatusDecaymentPaused() ? "Status (PAUSED)" : "Status";
 
@@ -34,17 +34,17 @@ namespace Application::GameWindows
             {
                 ImGui::Text("%s",statusTitle);
                 
-                ImGui::Text("Population: %d", population);
+                ImGui::Text("Population: %lu", population);
                 ImGui::SameLine();
-                ImGui::Text("Protection: %d", protection);
+                ImGui::Text("Protection: %lu", protection);
                 ImGui::SameLine();
-                ImGui::Text("Hunt: %d", hunt);
+                ImGui::Text("Hunt: %lu", hunt);
                 ImGui::SameLine();
-                ImGui::Text("Medicine: %d", medicine);
+                ImGui::Text("Medicine: %lu", medicine);
                 ImGui::SameLine();
-                ImGui::Text("Construction: %d", construction);
+                ImGui::Text("Construction: %lu", construction);
                 ImGui::SameLine();
-                ImGui::Text("Resources: %d", resource_gathering);
+                ImGui::Text("Resources: %lu", resource_gathering);
             }
             ImGui::End();
         }

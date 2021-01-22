@@ -61,12 +61,12 @@ namespace Application
 
     //Gets de cada um dos parâmetros
 
-    int RobotsManagement::getTotRobots() const
+    uint64_t RobotsManagement::getTotRobots() const
     {
         return totRobots;
     }
 
-    int RobotsManagement::getFreeRobots() const
+    uint64_t RobotsManagement::getFreeRobots() const
     {
         return freeRobots;
     }
@@ -97,7 +97,7 @@ namespace Application
     void RobotsManagement::setOnRobotsMoved(EH_RobotsMoved* eHandler) { m_EventListener.Register(eHandler); }
 
 
-    int RobotsManagement::getProdCost() const
+    uint64_t RobotsManagement::getProdCost() const
     {
         return prodCost;
     }
@@ -128,17 +128,17 @@ namespace Application
 
     //Sets de cada um dos parâmetros
 
-    void RobotsManagement::setTotRobots(int newTotRobots)
+    void RobotsManagement::setTotRobots(uint64_t newTotRobots)
     {
         totRobots = newTotRobots;
     }
 
-    void RobotsManagement::setFreeRobots(int newFreeRobots)
+    void RobotsManagement::setFreeRobots(uint64_t newFreeRobots)
     {
         freeRobots = newFreeRobots;
     }
 
-    void RobotsManagement::setProdCost(int newProdCost)
+    void RobotsManagement::setProdCost(uint64_t newProdCost)
     {
         prodCost = newProdCost;
     }
@@ -148,11 +148,11 @@ namespace Application
         villageStats = newVillageStats;
     }
 
-    bool RobotsManagement::createRobots(int no)
+    bool RobotsManagement::createRobots(uint64_t no)
     {   
         int currentResources;
         int price;
-        Avenue *VSResourcesAvenue;
+        Avenue<double> *VSResourcesAvenue;
         bool hasCreated = false;
 
         price = prodCost * no;
@@ -182,7 +182,7 @@ namespace Application
         return hasCreated;
     }
 
-    bool RobotsManagement::destroyRobots(int no)
+    bool RobotsManagement::destroyRobots(uint64_t no)
     {
         bool hasDestroyed = false;
 
@@ -263,7 +263,7 @@ namespace Application
         map.erase(id); 
     }
     
-    bool RobotsManagement::moveRobot(Task &choosenTask, int robotsNo)
+    bool RobotsManagement::moveRobot(Task &choosenTask, uint64_t robotsNo)
     {   
         if (robotsNo == 0)
             return true; //If no robots are added or removed, nothing to do

@@ -26,15 +26,15 @@ namespace Application
     private:
         int m_NextTaskID = 0;
 
-        int totRobots;
-        int freeRobots;
-        int prodCost; //TODO: Implementation to change this value
+        uint64_t totRobots;
+        uint64_t freeRobots;
+        uint64_t prodCost; //TODO: Implementation to change this value
 
         GameConstsCache m_GameConstsCache;
 
         VillageStats *villageStats;
         std::unordered_map<Task::TaskID, Task*> tasks[FUNCTION_QTY];
-        Avenue *robotsAvenues[3];
+        Avenue<uint64_t> *robotsAvenues[3];
         pthread_t consumers[3];
         pthread_mutex_t tasksMutex;
 
@@ -48,9 +48,9 @@ namespace Application
         void initializeStats();
         ~RobotsManagement();
 
-        int getTotRobots() const;
-        int getFreeRobots() const;
-        int getProdCost() const;
+        uint64_t getTotRobots() const;
+        uint64_t getFreeRobots() const;
+        uint64_t getProdCost() const;
         
         bool canRemoveRobots() const;
         bool canAddRobots() const;
@@ -64,14 +64,14 @@ namespace Application
 
         
 
-        void setTotRobots(int newTotRobots);
-        void setFreeRobots(int newFreeRobots);
-        void setProdCost(int newProdCost);
+        void setTotRobots(uint64_t newTotRobots);
+        void setFreeRobots(uint64_t newFreeRobots);
+        void setProdCost(uint64_t newProdCost);
         void setVillageStats(VillageStats *newVillageStats);
         
-        bool createRobots(int);
-        bool destroyRobots(int);
-        bool moveRobot(Task &, int);
+        bool createRobots(uint64_t createCount);
+        bool destroyRobots(uint64_t destroyCount);
+        bool moveRobot(Task &targetTask, uint64_t moveCount);
 
         const std::unordered_map<Task::TaskID, Task*> &getTasks(RobotFunction function) const;
         std::optional<Task*> findTask(Task::TaskID taskID, RobotFunction functionHint = (RobotFunction) 0) const;

@@ -22,10 +22,11 @@ namespace Application
         const static int POPULATION_INDEX = BASE_STATS_NO;
     private:
         bool onAttack;
-        float statTax;
-        int maxPop;
+        double statTax;
+        double maxPop;
+        double population; // if population reaches zero, the game is over -> pop calculated based on other village stats
 
-        int baseStats[BASE_STATS_NO];/*
+        double baseStats[BASE_STATS_NO];/*
             defenses;
             food;
             health;
@@ -33,7 +34,7 @@ namespace Application
             resources;
         */
 
-        Avenue *avenueVS[BASE_STATS_NO+1];
+        Avenue<double> *avenueVS[BASE_STATS_NO+1];
 
         ThreadLoop m_DecayThreadLoop;
 
@@ -45,7 +46,6 @@ namespace Application
         };
 
         unsigned int m_ElapsedTicks = 0;
-        int population; // if population reaches zero, the game is over -> pop calculated based on other village stats
 
         void initializeVSAvenues();
         bool updateGameConsts();
@@ -77,12 +77,12 @@ namespace Application
 
         void decayPopulation();
 
-        inline Avenue *getAvenue(RobotFunction robotFunc) { return avenueVS[(uint8_t)robotFunc]; }
-        int getStat(int) const;
-        int getPopulation() const;
-        int getResources() const;
+        inline Avenue<double> *getAvenue(RobotFunction robotFunc) { return avenueVS[(uint8_t)robotFunc]; }
+        uint64_t getStat(RobotFunction robotFunc) const;
+        uint64_t getPopulation() const;
+        uint64_t getResources() const;
         
-        void setResources(int);
+        void setResources(uint64_t);
 
         void setStat(int,float);
         void changeStat(int type, int increase);

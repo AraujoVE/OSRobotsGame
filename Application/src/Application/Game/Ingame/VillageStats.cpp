@@ -8,22 +8,22 @@ namespace Application
 
     // ======================== GETS/SETS ========================
     //Each set must enter in the semaphore
-    int VillageStats::getStat(int statType) const
+    uint64_t VillageStats::getStat(RobotFunction robotFunc) const
     {
-        return baseStats[statType];
+        return baseStats[(uint8_t) robotFunc];
     }
 
-    int VillageStats::getPopulation() const
+    uint64_t VillageStats::getPopulation() const
     {
         return population;
     }
 
-    int VillageStats::getResources() const
+    uint64_t VillageStats::getResources() const
     {
         return baseStats[4];
     }
 
-    void VillageStats::setResources(int quantity)
+    void VillageStats::setResources(uint64_t quantity)
     {
         baseStats[4] = quantity;
     }
@@ -85,7 +85,7 @@ namespace Application
 
     float VillageStats::calcRatio(int statType)
     {
-        return (float)baseStats[statType] / (float)population;
+        return (double)baseStats[statType] / (double)population;
     }
 
     float VillageStats::calcReduction(float ratio, float decay)
@@ -113,7 +113,7 @@ namespace Application
 
     void VillageStats::setStat(int statType, float reductionTax)
     {
-        baseStats[statType] = (int)((float)baseStats[statType] * (1.0 - reductionTax));
+        baseStats[statType] = (uint64_t)((double)baseStats[statType] * (1.0 - reductionTax));
     }
 
     //FIRST
@@ -163,22 +163,23 @@ namespace Application
 
         reduction = adjustStatsLimits((int)RobotFunction::CONSTRUCTION, reduction, 1, false);
 
-        maxPop = baseStats[(int)RobotFunction::CONSTRUCTION] *m_GameConstsCache.POP_PER_CONSTRUCTION;
+        maxPop = baseStats[(int)RobotFunction::CONSTRUCTION] * m_GameConstsCache.POP_PER_CONSTRUCTION;
+        if (maxPop < 0) maxPop = 1.7e308;
     }
 
     //LAST
     void VillageStats::decayPopulation()
     {
-        int popReduct = (int)((float)population * (1 - statTax));
-        if ((population - popReduct) > (int)(m_GameConstsCache.TAX_REDUCT * (float)population))
+        double popReduct = ((double)population * (1 - statTax));
+        if ((population - popReduct) > (uint64_t)(m_GameConstsCache.TAX_REDUCT * (double)population))
         {
             population -= popReduct;
         }
         else
         {
-            population = (int)(m_GameConstsCache.TAX_REDUCT * (float)population);
+            population = m_GameConstsCache.TAX_REDUCT * (double)population;
         }
-        population = (int)((float)population * m_GameConstsCache.POP_INCREASE_TAX);
+        population = (double)population * m_GameConstsCache.POP_INCREASE_TAX;
         if (population > maxPop)
             population = maxPop;
     }
@@ -223,10 +224,11 @@ namespace Application
         avenueVS[POPULATION_INDEX]->up();
 
         //TODO: send more events
-        if (population <= 0)
-            m_EventListener.On<EH_StatsDecayed>();
+        // if (population <= 0)
+        //     m_EventListener.On<EH_StatsDecayed>();
 
         m_ElapsedTicks += 1;
+        DE_TRACE("Tick = {0}", m_ElapsedTicks);
     }
 
     unsigned int VillageStats::GetElapsedTimeTicks(){
