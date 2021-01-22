@@ -168,9 +168,7 @@ namespace EvoAlg
             return false;
         }));
 
-        auto &gameRunner = m_GameRunner;
-
-        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &measuredDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults, &gameRunner](GameRunner &_,int elapsedTimeInTicks) {
+        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &measuredDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults](GameRunner &gameRunner,int elapsedTimeInTicks) {
             DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_Individual.ID);
 
             measuredDurationInTicks = elapsedTimeInTicks;

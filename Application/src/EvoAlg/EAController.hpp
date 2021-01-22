@@ -1,10 +1,12 @@
 #pragma once
 
 #include "EvoAlg/EvolutionaryAlgorithm.hpp"
+
 #include "EvoAlg/Types.hpp"
+#include "EvoAlg/Script.hpp"
+#include "EvoAlg/EAStatus.hpp"
 
 #include "Application/Game/GameRunner.hpp"
-#include "Script.hpp"
 
 using namespace Application;
 
@@ -22,18 +24,19 @@ namespace EvoAlg
     private:
         EvolutionaryAlgorithm m_Algorithm;
 
-        //Index of array corresponds to IndividualID
-        std::vector<GameplayResult> m_GameplayResults;
         
         //TODO: unique_ptr, or delete
         Script *m_Script;
-        
 
+        EAStatus m_Status;
 
     public:
         EAController();
         
-        void StartEA();
+        void Start();
+        void Cancel();
+
+        inline bool IsRunning() { return m_Status.CurrentStage != EAStage::INACTIVE; }
         
 
         //DO NOT CALL ASYNCHRONOUSLY

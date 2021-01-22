@@ -30,7 +30,7 @@ namespace Application
 
     // ======================== CONSTRUCTOR / INITIALIZE VILLAGES STATS ========================
     VillageStats::VillageStats(GameConsts &gameConsts)
-        : m_GameConstsCache(gameConsts)
+        : m_GameConstsCache(gameConsts), m_DecayThreadLoop("VillageStatsDecay")
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
         initializeStats();
@@ -38,6 +38,18 @@ namespace Application
         
         m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::decayStats, this));
         m_DecayThreadLoop.SetAliveCheckFunction([this]{return this->getPopulation() > 0;});
+
+
+        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadStarted([]{
+            DE_TRACE("(VillageStats) m_DecayThreadLoop started successfully.");
+            return false;
+        }));
+
+
+        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([](ThreadEndedReason::ThreadEndedReason_t reason){
+            DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
+            return false;
+        }));
 
     }
 
@@ -186,11 +198,13 @@ namespace Application
 
     void VillageStats::startStatsDecayment()
     {
+        DE_TRACE("VillageStats::startStatsDecayment()");
         m_DecayThreadLoop.Start();
     }
 
     void VillageStats::setStatsDecaymentPaused(bool paused)
     {
+        DE_TRACE("VillageStats::setStatsDecaymentPaused({0})",paused);
         m_DecayThreadLoop.Pause(paused);
     }
 

@@ -12,14 +12,12 @@ namespace Application
 {
     //PUBLIC:
     //TODO: fix ml on new GameConsts()
-    GameRunner::GameRunner() : GameRunner(std::make_shared<GameSave>(new GameConsts()))
+    GameRunner::GameRunner(GameConsts *gameConsts) : m_GameSave(new GameSave(gameConsts)), m_GameConsts(gameConsts), m_EventListener(new EventListener())
     {
     }
 
-    GameRunner::GameRunner(const std::shared_ptr<GameSave> &gameSave)
+    GameRunner::GameRunner(const std::shared_ptr<GameSave> &gameSave) : m_GameSave(gameSave), m_GameConsts(&gameSave->GetGameConsts()), m_EventListener(new EventListener())
     {
-        m_GameSave = gameSave;
-        m_EventListener = new EventListener();
     }
 
     GameRunner::~GameRunner()
@@ -43,7 +41,7 @@ namespace Application
         m_GameStatus.GameStarted = true;
         m_GameStatus.GamePaused = false;
         
-        m_EventListener->On<EH_GameStarted>(*this);
+        m_EventListener->OnAsync<EH_GameStarted>(*this);
         
         SetupGameOverConditions();
         m_GameSave->GetVillageStats()->startStatsDecayment();

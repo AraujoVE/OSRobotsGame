@@ -37,7 +37,7 @@ namespace Application
 
         std::function<void()> m_TickFunction;
         std::function<bool()> m_AliveCheckFunction;
-
+        
         void InnerLoop();
         friend void *threadRountine(void *threadLoopV);
 
@@ -48,7 +48,8 @@ namespace Application
     public:
         EventListener *m_EventListener;
 
-        ThreadLoop();
+        std::string m_DebugName;
+        ThreadLoop(const std::string& debugName);
         ~ThreadLoop();
 
         inline void SetTickFunction(TickFunction &&func) { m_TickFunction = func; }

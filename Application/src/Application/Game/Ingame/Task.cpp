@@ -33,7 +33,7 @@ namespace Application
         //TODO: fix memory leak
         //TODO: release those functions from threadloop when this object is dead
 
-        m_ThreadLoop = new ThreadLoop();
+        m_ThreadLoop = new ThreadLoop(std::string("Task #") + std::to_string(id));
 
         m_ThreadLoop->SetTickFunction(std::bind(&Task::UpdateTask, this));
         m_ThreadLoop->SetAliveCheckFunction([this] { return !IsTaskCompleted(); });

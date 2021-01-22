@@ -6,7 +6,8 @@
 namespace Application
 {
 
-    struct GameStatus {
+    struct GameStatus
+    {
         bool
             GameStarted = false,
             GamePaused = false,
@@ -19,11 +20,10 @@ namespace Application
     class EH_GameEnded;
     class EventListener;
     class GameRunner final
-    {
-
+    {  
     public:
-        GameRunner();
-        GameRunner(const std::shared_ptr<GameSave>& gameSave);
+        GameRunner(GameConsts *gameConsts);
+        GameRunner(const std::shared_ptr<GameSave> &gameSave);
         ~GameRunner();
 
         void SetOnGameStarted(EH_GameStarted *eventHandler);
@@ -36,23 +36,24 @@ namespace Application
         void Pause();
         void Unpause();
 
-        void OnGameLost(const std::string& reason);
+        void OnGameLost(const std::string &reason);
 
-        inline bool IsGameLost() const { return m_GameStatus.GameLost; };
-        
         inline bool IsGamePaused() const { return m_GameStatus.GamePaused && m_GameStatus.GameStarted; };
 
-        inline const std::string& GetGameLostReason() const { return m_GameStatus.GameLostReason; };
+        inline bool IsGameLost() const { return m_GameStatus.GameLost; };
+        inline const std::string &GetGameLostReason() const { return m_GameStatus.GameLostReason; };
 
-        inline GameSave &GetSave() { return *m_GameSave.get(); } 
-        inline GameConsts &GetGameConsts() { return m_GameSave->GetGameConsts(); }
+        inline GameSave &GetSave() { return *m_GameSave.get(); }
+
+        inline GameConsts &GetGameConsts() { return *m_GameConsts; }
 
     private:
         void SetupGameOverConditions();
+
     private:
         std::shared_ptr<GameSave> m_GameSave;
+        GameConsts *m_GameConsts;
         EventListener *m_EventListener;
-
 
         GameStatus m_GameStatus;
     };

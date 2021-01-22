@@ -76,7 +76,6 @@ namespace DampEngine
 
     void LayerStack::PushOverlay(ImGuiLayer *overlay)
     {
-        DE_TRACE("MUTEX LOCK: LayerStack::PushOverlay");
         m_LayerStackMutex.Lock();
 
         DE_ASSERT(overlay != nullptr);
@@ -90,7 +89,6 @@ namespace DampEngine
             overlay->OnAttach();
         }
 
-        DE_TRACE("MUTEX UNLOCK: LayerStack::PushOverlay");
         m_LayerStackMutex.Unlock();
     }
 
@@ -110,7 +108,7 @@ namespace DampEngine
 
     void LayerStack::PushLayer(ImGuiLayer *layer)
     {
-        DE_TRACE("MUTEX LOCK: LayerStack::PushLayer");
+        DE_DEBUG("MUTEX LOCK: LayerStack::PushLayer");
         m_LayerStackMutex.Lock();
 
         DE_ASSERT(layer != nullptr);
@@ -124,7 +122,7 @@ namespace DampEngine
             m_OverlayStartIndex++;
         }
 
-        DE_TRACE("MUTEX UNLOCK: LayerStack::PushLayer");
+        DE_DEBUG("MUTEX UNLOCK: LayerStack::PushLayer");
         m_LayerStackMutex.Unlock();
     }
 

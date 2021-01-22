@@ -19,13 +19,6 @@ namespace Application
             ManualMode = false;
     };
 
-    struct EAState
-    {
-        bool
-            Started = false, 
-            Running = false; 
-    };
-
 
     class GameSave;
     class GameRunner;
@@ -56,6 +49,5 @@ namespace Application
 
 
         EAGameSettings m_Settings;
-        EAState m_EAState;
     };
 } // namespace Application

@@ -53,34 +53,30 @@ namespace Application
         {
             DE_TRACE("MyApplication::InitLayers()");
 
+
+            // Simple Game Code:
+            // m_GameGuiLayer = new GameGuiLayer();
+            // GameRunner *runner = new GameRunner();
+            // runner->GetSave().GetGameConsts().LoadValuesFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+            // m_GameGuiLayer->SetGameRunner(runner);
+            // runner->Start();
+            // m_LayerStack.PushOverlay(m_GameGuiLayer);
+           
+            // EA Code:
             m_GameGuiLayer = new GameGuiLayer();
-            // m_EAGameGuiLayer = new EAGameGuiLayer();
-
-            GameRunner *runner = new GameRunner();
-            runner->GetSave().GetGameConsts().LoadValuesFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
-            m_GameGuiLayer->SetGameRunner(runner);
-            runner->Start();
-            m_LayerStack.PushOverlay(m_GameGuiLayer);
+            m_EAGameGuiLayer = new EAGameGuiLayer();
+            m_LayerStack.PushOverlay(m_EAGameGuiLayer);
             
-            // m_LayerStack.PushOverlay(m_EAGameGuiLayer);
-            
-            // auto *l_LayerStack = &m_LayerStack;
-            // auto *l_GameGuiLayer = m_GameGuiLayer;
+            auto *l_LayerStack = &m_LayerStack;
+            auto *l_GameGuiLayer = m_GameGuiLayer;
 
-            // m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGameSettingsChanged([=](EAGameSettings newSettings) {
-            //     if (newSettings.ShowGame)
-            //         l_LayerStack->PushOverlay(l_GameGuiLayer);
-            //     else
-            //         l_LayerStack->PopOverlay(l_GameGuiLayer);
-
-            //     //TODO: pause and unpause if game is attached (probably just pass to MainGameLayer as a Pause() method)
-            //     // if (newSettings.PauseGame)
-            //     //     l_GameRunner->Pause();
-            //     // else
-            //     //     l_GameRunner->Unpause();
-
-            //     return false;
-            // }));           
+            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGameSettingsChanged([=](EAGameSettings newSettings) {
+                if (newSettings.ShowGame)
+                    l_LayerStack->PushOverlay(l_GameGuiLayer);
+                else
+                    l_LayerStack->PopOverlay(l_GameGuiLayer);
+                return false;
+            }));           
         }
 
         virtual void OnUpdate() override

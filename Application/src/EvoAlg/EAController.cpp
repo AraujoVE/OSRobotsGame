@@ -17,14 +17,20 @@ namespace EvoAlg
     {
     }
 
-    void EAController::StartEA()
+    void EAController::Start()
     {
+        DE_ASSERT(m_Status.CurrentStage == EAStage::INACTIVE, "(EAController) Trying to start twice");
         ScriptConverter converter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
         m_Script = converter.Convert();
 
         //m_Script.Save()
 
         m_Algorithm.startAlgorithm();
+    }
+
+    void EAController::Cancel()
+    {
+        DE_ASSERT(m_Status.CurrentStage != EAStage::INACTIVE, "(EAController) Trying to cancel a inactive controller");
     }
 
     //TODO: Sync or Async UI
@@ -34,8 +40,8 @@ namespace EvoAlg
         DE_ASSERT(m_Script != nullptr);
 
         DE_DEBUG("EAController::RunPopulationInGame()");
-        //TODO: maybe local variable instead of class member
-        m_GameplayResults.clear();
+        //Index of array corresponds to IndividualID
+        std::vector<GameplayResult> gameplayResults;
 
         //TODO: use this struct in a vector instead of 2 vecs below
         struct IndividualRun
@@ -45,7 +51,7 @@ namespace EvoAlg
             ScriptRunner *scriptRunner;
         };
 
-        auto *aaa= new GameRunner();;
+        auto *aaa = new GameRunner(new GameConsts());
 
         //TODO: DELAY MCRO from UI
 
@@ -59,7 +65,7 @@ namespace EvoAlg
 
             DE_INFO("(EAController) Creating game runner for individual #{0}", i);
             GameRunner *currentGameRunner = aaa;
-            
+
             DE_DEBUG("(RunPopulationInGame) Loading game runner with cromossome...");
             currentGameRunner->GetGameConsts().LoadFromCromossome(populationGenes[i]);
 
@@ -71,8 +77,9 @@ namespace EvoAlg
                 new ScriptRunner(*m_Script, *currentGameRunner, *currentIndividual)};
 
             GameplayResult *result = (GameplayResult *)run->scriptRunner->scriptLoop();
-            m_GameplayResults.push_back(*result);
-
+            gameplayResults.push_back(*result);
+            //TODO: fix ml
+            //delete result;
         }
 
         // // bool syncExecution = false;
@@ -80,7 +87,6 @@ namespace EvoAlg
         // for (auto &currentRun : gameRuns)
         // {
         //     DE_DEBUG("(EAController) Executing script on individual {0}...", currentRun->individual->ID);
-            
 
         //     //TODO: allow UI to execute synchronously
         //     // if (syncExecution) script->*script->joinScriptThread();
@@ -101,7 +107,7 @@ namespace EvoAlg
         //TODO: free all scripts and gameRunners
 
         DE_DEBUG("(RunPopulationInGame) All individuals have been tested! returning results");
-        return m_GameplayResults;
+        return gameplayResults;
     }
 
 } // namespace EvoAlg
