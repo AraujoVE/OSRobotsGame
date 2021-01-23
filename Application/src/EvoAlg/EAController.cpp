@@ -25,7 +25,8 @@ namespace EvoAlg
 
         //m_Script.Save()
 
-        m_Algorithm.startAlgorithm();
+        // m_Algorithm.startAlgorithm();
+        RunPopulationInGame({});
     }
 
     void EAController::Cancel()
@@ -37,6 +38,10 @@ namespace EvoAlg
     //TODO: assert is being called from only one thread (maybe mutex)
     std::vector<GameplayResult> EAController::RunPopulationInGame(const std::vector<GeneVec> &populationGenes)
     {
+        GameConsts *fileGameConsts = new GameConsts();
+        fileGameConsts->LoadValuesFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+
+
         DE_ASSERT(m_Script != nullptr);
 
         DE_DEBUG("EAController::RunPopulationInGame()");
@@ -51,24 +56,24 @@ namespace EvoAlg
             ScriptRunner *scriptRunner;
         };
 
-        GameConsts *gameConsts = new GameConsts();
-        gameConsts->SetTickDelay(1);
-        auto *aaa = new GameRunner(gameConsts);
+        // GameConsts *gameConsts = new GameConsts();
+        // gameConsts->SetTickDelay(1);
+        auto *aaa = new GameRunner(fileGameConsts);
         //TODO: DELAY MCRO from UI
 
         DE_INFO("(EAController) Preparing population to be executed...");
-        for (unsigned int i = 0; i < populationGenes.size(); i++)
+        for (unsigned int i = 0;  i < 20; i++)
         {
             DE_INFO("(EAController) Preparing individual #{0}", i);
 
             DE_INFO("(EAController) Copying genes individual #{0}", i);
-            Individual *currentIndividual = new Individual{i, populationGenes[i]};
+            Individual *currentIndividual = new Individual{i, {}};
 
             DE_INFO("(EAController) Creating game runner for individual #{0}", i);
             GameRunner *currentGameRunner = aaa;
 
             DE_DEBUG("(RunPopulationInGame) Loading game runner with cromossome...");
-            currentGameRunner->GetGameConsts().LoadFromCromossome(populationGenes[i]);
+            // currentGameRunner->GetGameConsts().LoadFromCromossome(populationGenes[i]);
 
             DE_DEBUG("(RunPopulationInGame) Loaded Successfully.");
 
