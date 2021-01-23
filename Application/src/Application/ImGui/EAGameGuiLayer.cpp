@@ -13,7 +13,7 @@ namespace Application
 {
 
     EAGameGuiLayer::EAGameGuiLayer()
-        : m_MainGameRunner(nullptr), m_EAController(new EAController())
+        : m_MainGameRunner(nullptr), m_EAController(new EAController(m_EAGuiProps))
     {
     }
 
@@ -25,7 +25,7 @@ namespace Application
         bool settingsChanged = false;
         ImGui::Begin("Settings");
         {
-            settingsChanged |= ImGui::Checkbox("Show game", &m_Settings.ShowGame);
+            settingsChanged |= ImGui::Checkbox("Show game", &m_EAGuiProps.ShowGame);
             //TODO: attach gamerunner to gameGuiLayer in presentation mode
         }
         ImGui::End();
@@ -42,7 +42,7 @@ namespace Application
             ImGui::Text("Evolutionary Algorithm (status: %s)", status);
             startPressed = ImGui::Button("Start EA");
 
-            settingsChanged |= ImGui::Checkbox("Pause", &m_Settings.PauseGame);
+            ImGui::Checkbox("Pause", &m_EAGuiProps.Pause);
             ImGui::Text("Current Generation: %lu", (uint64_t) 0);
             ImGui::Text("Current Individual: %lu", (uint64_t) 0);
             ImGui::Text("Population: %lu", (uint64_t) 0);
@@ -54,10 +54,10 @@ namespace Application
         ImGui::End();
 
 
-        if (settingsChanged)
-        {
-            m_EventListener.OnAsync<EH_EAGameSettingsChanged>(m_Settings);
-        }
+        // if (settingsChanged)
+        // {
+        //     m_EventListener.OnAsync<EH_EAGuiPropsChanged>(m_EAGuiProps);
+        // }
 
 
         if (startPressed && !m_EAController->IsRunning()) {

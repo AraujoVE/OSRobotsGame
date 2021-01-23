@@ -13,7 +13,7 @@
 
 namespace EvoAlg
 {
-    EAController::EAController() : m_Algorithm(*this), m_Script(nullptr)
+    EAController::EAController(EAGuiProps& guiProps) : m_Algorithm(*this), m_Script(nullptr), m_GuiProps(guiProps)
     {
     }
 
@@ -48,7 +48,6 @@ namespace EvoAlg
         //Index of array corresponds to IndividualID
         std::vector<GameplayResult> gameplayResults;
 
-        //TODO: use this struct in a vector instead of 2 vecs below
         struct IndividualRun
         {
             Individual *individual;
@@ -59,7 +58,8 @@ namespace EvoAlg
         // GameConsts *gameConsts = new GameConsts();
         // gameConsts->SetTickDelay(1);
         auto *aaa = new GameRunner(fileGameConsts);
-        //TODO: DELAY MCRO from UI
+        m_GuiProps.MainGameRunner = aaa;
+
 
         DE_INFO("(EAController) Preparing population to be executed...");
         for (unsigned int i = 0;  i < 20; i++)

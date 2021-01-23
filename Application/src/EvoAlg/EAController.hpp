@@ -29,9 +29,10 @@ namespace EvoAlg
         Script *m_Script;
 
         EAStatus m_Status;
+        EAGuiProps &m_GuiProps;
 
     public:
-        EAController();
+        EAController(EAGuiProps& guiProps);
         
         void Start();
         void Cancel();

@@ -72,12 +72,15 @@ namespace Application
             auto *l_LayerStack = &m_LayerStack;
             auto *l_GameGuiLayer = m_GameGuiLayer;
 
-            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGameSettingsChanged([=](EAGameSettings newSettings) {
+            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGuiPropsChanged([=](const EvoAlg::EAGuiProps& newSettings) {
                 if (newSettings.ShowGame)
                     l_LayerStack->PushOverlay(l_GameGuiLayer);
                 else
                     l_LayerStack->PopOverlay(l_GameGuiLayer);
                 return false;
+
+                l_GameGuiLayer->SetGameRunner(newSettings.MainGameRunner);
+
             }));           
         }
 

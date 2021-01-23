@@ -5,21 +5,15 @@
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
+#include "Application/Game/GameRunner.hpp"
+
 #include "EvoAlg/EAController.hpp"
+#include "EvoAlg/Types.hpp"
 
 #include <memory>
 
 namespace Application
 {
-    struct EAGameSettings
-    {
-        bool
-            ShowGame = false,
-            PauseGame = false,
-            ManualMode = false;
-    };
-
-
     class GameSave;
     class GameRunner;
     class StatusWindow;
@@ -31,7 +25,7 @@ namespace Application
     public:
         EAGameGuiLayer();
 
-        inline void SetOnSettingsChanged(EH_EAGameSettingsChanged* eventHandler) { m_EventListener.Register(eventHandler); }
+        inline void SetOnSettingsChanged(EH_EAGuiPropsChanged* eventHandler) { m_EventListener.Register(eventHandler); }
     private:
         virtual void ImGuiDescription() override;
 
@@ -48,6 +42,6 @@ namespace Application
         EventListener m_EventListener;
 
 
-        EAGameSettings m_Settings;
+        EvoAlg::EAGuiProps m_EAGuiProps;
     };
 } // namespace Application
