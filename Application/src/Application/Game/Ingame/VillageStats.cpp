@@ -46,8 +46,10 @@ namespace Application
             return false;
         }));
 
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([](ThreadEndedReason::ThreadEndedReason_t reason) {
+        auto &eventListener = m_EventListener;
+        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([&eventListener](ThreadEndedReason::ThreadEndedReason_t reason) {
             DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
+            eventListener.OnAsync<EH_DecaymentStopped>();
             return false;
         }));
     }
@@ -243,10 +245,6 @@ namespace Application
         decayPopulation();
 
         avenueVS[POPULATION_INDEX]->up();
-
-        //TODO: send more events
-        if (population <= 0)
-            m_EventListener.On<EH_StatsDecayed>();
 
         m_ElapsedTicks += 1;
         DE_TRACE("Tick = {0}", m_ElapsedTicks);

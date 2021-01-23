@@ -183,13 +183,18 @@ namespace EvoAlg
 
         for (int m = 0; m < (int)gameScript.size(); m++)
         {
-            // DE_ASSERT(m_GameRunner.IsGameLost());
             DE_INFO("(ScriptRunner -- {0}) Starting gameplay #{1}", m_Individual.ID, m);
             m_GameRunner.Start();
 
-
             DE_DEBUG("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_Individual.ID, m);
             endSem.Wait();
+
+            while (!m_GameRunner.IsGameLost()) {
+                DE_ERROR("(ScriptRunner -- {0}) After EH_GameEnded (gameplay #{1}), the game is not lost yet, waiting 1sec..." ,m_Individual.ID, m);
+                usleep(1e6); 
+            }
+
+
             DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_Individual.ID, m);
 
             //Callback para saber quando acaba o jogo

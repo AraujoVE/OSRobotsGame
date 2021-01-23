@@ -52,8 +52,8 @@ namespace Application
     {
         DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running");
 
-        m_EventListener->On<EH_GameEnded>({*this, m_GameSave->GetVillageStats()->GetElapsedTimeTicks()});
         m_GameStatus.GameStarted = false;
+        m_EventListener->OnAsync<EH_GameEnded>({*this, m_GameSave->GetVillageStats()->GetElapsedTimeTicks()});
 
         //TODO: stop village stats decayment
     }
@@ -100,10 +100,13 @@ namespace Application
             return false;
         }));
 
-        villageStats->setOnStatusDecayed(new EH_StatsDecayed([=]() {
+        villageStats->setOnPopReachZero(new EH_DecaymentStopped([=]() {
+            DE_TRACE("(GameRunner) Received EH_DecaymentStopped");
             if (villageStats->getPopulation() <= 0 && !IsGameLost())
             {
                 this->OnGameLost(popuDeadReason);
+            } else {
+                DE_TRACE("(GameRunner) Ignoring EH_DecaymentStopped, POP={0}, GameLost={1}", villageStats->getPopulation(), IsGameLost());
             }
 
             return false;

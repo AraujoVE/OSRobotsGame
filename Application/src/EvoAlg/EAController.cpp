@@ -51,8 +51,9 @@ namespace EvoAlg
             ScriptRunner *scriptRunner;
         };
 
-        auto *aaa = new GameRunner(new GameConsts());
-
+        GameConsts *gameConsts = new GameConsts();
+        gameConsts->SetTickDelay(1);
+        auto *aaa = new GameRunner(gameConsts);
         //TODO: DELAY MCRO from UI
 
         DE_INFO("(EAController) Preparing population to be executed...");

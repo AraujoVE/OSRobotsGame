@@ -18,7 +18,7 @@ namespace Application
     DA_EVENT_FWD(EH_RobotsMoved, bool, (Task&, int));
 
     /* VILLAGE STATS EVENT HANDLERS */
-    DA_EVENT_FWD(EH_StatsDecayed, bool, (void));
+    DA_EVENT_FWD(EH_DecaymentStopped, bool, (void));
 
     /* GAME RUNNER EVENT HANDLERS */
     DA_EVENT_FWD(EH_GameStarted, bool, (GameRunner&));

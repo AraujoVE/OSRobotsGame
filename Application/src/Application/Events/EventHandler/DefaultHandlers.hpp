@@ -20,7 +20,7 @@ namespace Application
     DA_EVENT(EH_RobotsMoved, bool, (Task&, int));
 
     /* VILLAGE STATS EVENT HANDLERS */
-    DA_EVENT(EH_StatsDecayed, bool, (void));
+    DA_EVENT(EH_DecaymentStopped, bool, (void));
 
     /* GAME RUNNER EVENT HANDLERS */
     DA_EVENT(EH_GameStarted, bool, (GameRunner&));

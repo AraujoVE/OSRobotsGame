@@ -67,7 +67,7 @@ namespace Application
         inline bool isStatusDecaymentPaused() { return m_DecayThreadLoop.IsPaused(); }
 
         void decayStat(int);
-        void setOnStatusDecayed(EH_StatsDecayed *eventHandler) { m_EventListener.Register(eventHandler); }
+        inline void setOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Register(eventHandler); }
 
         void decayDefenses(int,float&);
         void decayFood(int,float&);
