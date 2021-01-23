@@ -28,7 +28,7 @@ namespace EvoAlg
 
 
         pthread_t scriptThread;
-        std::vector<std::vector<std::vector<std::string>>> gameScript;
+        std::vector<std::vector<std::vector<std::string>>> m_GameScript;
         const static int DIRECTIONS_SIZE = 7;
         const static int HUMAN_OP_DELAY = 500000;
         const static int HUMAN_GP_TICK_DELAY = 500000;

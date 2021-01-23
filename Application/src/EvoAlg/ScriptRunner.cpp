@@ -52,28 +52,28 @@ namespace EvoAlg
         {
             if (line[0] == '#')
             {
-                gameScript.push_back(std::vector<std::vector<std::string>>());
+                m_GameScript.push_back(std::vector<std::vector<std::string>>());
                 curGameplay++;
                 curOp = 0;
-                gameScript.at(curGameplay).push_back(std::vector<std::string>());
-                gameScript.at(curGameplay).at(curOp).push_back(line.substr(1, line.length() - 1));
+                m_GameScript.at(curGameplay).push_back(std::vector<std::string>());
+                m_GameScript.at(curGameplay).at(curOp).push_back(line.substr(1, line.length() - 1));
             }
             else
             {
-                gameScript.at(curGameplay).push_back(std::vector<std::string>());
+                m_GameScript.at(curGameplay).push_back(std::vector<std::string>());
                 curOp++;
                 tokenPos = line.find(",");
                 while (tokenPos != -1)
                 {
-                    gameScript.at(curGameplay).at(curOp).push_back(line.substr(0, tokenPos));
+                    m_GameScript.at(curGameplay).at(curOp).push_back(line.substr(0, tokenPos));
                     line = line.substr(tokenPos + 1, line.length() - (1 + tokenPos));
                     tokenPos = line.find(",");
                 }
-                gameScript.at(curGameplay).at(curOp).push_back(line);
+                m_GameScript.at(curGameplay).at(curOp).push_back(line);
 
                 //If it is a wait operation, hijack another parameter with DELAY_MICRO
-                if (gameScript.at(curGameplay).at(curOp).at(0) == "6")
-                    gameScript.at(curGameplay).at(curOp).push_back(std::to_string(currentTickDelay));
+                if (m_GameScript.at(curGameplay).at(curOp).at(0) == "6")
+                    m_GameScript.at(curGameplay).at(curOp).push_back(std::to_string(currentTickDelay));
             }
         }
     }
@@ -145,67 +145,85 @@ namespace EvoAlg
     }
 
     //TODO: Jogo versão normal ou calibração
-    //TODO: Velocidade dos segundos do jogo -> slider
 
     std::vector<TimeResult> *ScriptRunner::scriptLoop()
     {
         int measuredDurationInTicks = -1;
-        int it = 0;
+
+        size_t currentGameplay = 0;
 
         auto *gameplaysResults = new std::vector<TimeResult>();
 
-        Application::Semaphore endSem;
+        std::promise<void> gameStartedPromise, gameEndedPromise;
 
-        auto &_gameScript = gameScript;
-
-        m_GameRunner.SetOnGameStarted(new EH_GameStarted([this, &_gameScript, &it](GameRunner &gameRunner) {
+        auto gameStartedConfirmationCB = [this, &gameStartedPromise](GameRunner &gameRunner) {
             DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", m_Individual.ID);
+            gameStartedPromise.set_value();
+            return false;
+        };
 
-            uint32_t currentTickDelay = gameRunner.GetGameConsts().GetTickDelay();
+        auto gameEndedConfirmationCB = [this, &measuredDurationInTicks, &gameEndedPromise](GameRunner &gameRunner,int elapsedTimeInTicks) {
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_Individual.ID);
+            measuredDurationInTicks = elapsedTimeInTicks;
+            gameEndedPromise.set_value();
+            return false;
+        };
 
-            for (int i = 1; i < (int)_gameScript.at(it).size(); i++)
+        m_GameRunner.SetOnGameStarted(new EH_GameStarted(gameStartedConfirmationCB));
+        m_GameRunner.SetOnGameEnded(new EH_GameEnded(gameEndedConfirmationCB));
+
+        uint64_t currentTickDelay = m_GameRunner.GetGameConsts().GetTickDelay();
+        while (currentGameplay < m_GameScript.size())
+        {
+            DE_INFO("(ScriptRunner -- {0}) Requesting gameplay #{1} to start", m_Individual.ID, currentGameplay);
+
+            std::future<void> gameEndedFuture = gameEndedPromise.get_future();
+            std::future<void> gameStartedFuture = gameStartedPromise.get_future();
+            m_GameRunner.Start();
+            gameStartedFuture.get();
+          
+            DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} to started successfully", m_Individual.ID, currentGameplay);
+
+
+
+            DE_DEBUG("(ScriptRunner -- {0}) Starting operations of gameplay #{1}...", m_Individual.ID, currentGameplay);
+
+            auto &operations = m_GameScript.at(currentGameplay);
+
+            for (size_t i = 1; i < operations.size(); i++)
             {
-                (this->*(scriptLoopFuncts[stoi(_gameScript.at(it).at(i).at(0))]))(_gameScript.at(it).at(i));
+                DE_DEBUG("(ScriptRunner -- {0}) Executing operation #{2} of gameplay #{1}", m_Individual.ID, currentGameplay, i);
+
+                (this->*(scriptLoopFuncts[stoi(operations[i].at(0))]))(operations[i]);
+
+                //TODO: check if this is correct 
                 usleep(currentTickDelay);
             }
 
-            return false;
-        }));
+            m_GameRunner.Stop();
 
-        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &measuredDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults](GameRunner &gameRunner,int elapsedTimeInTicks) {
-            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_Individual.ID);
+            DE_DEBUG("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_Individual.ID, currentGameplay);
+            //Waits for game to end
+            gameEndedFuture.get();
 
-            measuredDurationInTicks = elapsedTimeInTicks;
-            endSem.Post();
-
-            return false;
-        }));
-
-        for (int m = 0; m < (int)gameScript.size(); m++)
-        {
-            DE_INFO("(ScriptRunner -- {0}) Starting gameplay #{1}", m_Individual.ID, m);
-            m_GameRunner.Start();
-
-            DE_DEBUG("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_Individual.ID, m);
-            endSem.Wait();
-
-            while (!m_GameRunner.IsGameLost()) {
-                DE_ERROR("(ScriptRunner -- {0}) After EH_GameEnded (gameplay #{1}), the game is not lost yet, waiting 1sec..." ,m_Individual.ID, m);
-                usleep(1e6); 
+            if (!m_GameRunner.IsGameLost()) {
+                DE_CRITICAL("(ScriptRunner -- {0}) After EH_GameEnded (gameplay #{1}), the game is not lost yet, waiting 1sec..." ,m_Individual.ID, currentGameplay);
             }
 
 
-            DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_Individual.ID, m);
+            DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_Individual.ID, currentGameplay);
 
-            //Callback para saber quando acaba o jogo
-            //quando isso acontece : endTime = time(0)
-            double targetDurationAU = stol(_gameScript.at(it).at(0).at(0));
+
+
+
+
+            double targetDurationAU = stol(m_GameScript.at(currentGameplay).at(0).at(0));
             double measuredDurationAU = measuredDurationInTicks * AU_PER_TICK;
             gameplaysResults->push_back(TimeResult{targetDurationAU, measuredDurationAU});
-            it++;
+            currentGameplay++;
 
             DE_ASSERT(measuredDurationInTicks >= 0, "Game duration not calculated correctly");
-            DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but it's not lost!!! **");
+            DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but currentGameplay's not lost!!! **");
 
             DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_Individual.ID);
         }

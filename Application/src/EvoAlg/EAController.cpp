@@ -76,39 +76,20 @@ namespace EvoAlg
             // currentGameRunner->GetGameConsts().LoadFromCromossome(populationGenes[i]);
 
             DE_DEBUG("(RunPopulationInGame) Loaded Successfully.");
+            ScriptRunner *currentScriptRunner = new ScriptRunner(*m_Script, *currentGameRunner, *currentIndividual);
 
-            auto *run = new IndividualRun{
-                currentIndividual,
-                currentGameRunner,
-                new ScriptRunner(*m_Script, *currentGameRunner, *currentIndividual)};
+            // IndividualRun *run = new IndividualRun{
+            //     currentIndividual,
+            //     currentGameRunner,
+            //     currentScriptRunner
+            // };
 
-            GameplayResult *result = (GameplayResult *)run->scriptRunner->scriptLoop();
+            //TODO: allow async with MAX_THREADS control
+            GameplayResult *result = (GameplayResult *)currentScriptRunner->scriptLoop();
             gameplayResults.push_back(*result);
             //TODO: fix ml
             //delete result;
         }
-
-        // // bool syncExecution = false;
-        // DE_INFO("(EAController) Executing all individuals");
-        // for (auto &currentRun : gameRuns)
-        // {
-        //     DE_DEBUG("(EAController) Executing script on individual {0}...", currentRun->individual->ID);
-
-        //     //TODO: allow UI to execute synchronously
-        //     // if (syncExecution) script->*script->joinScriptThread();
-        //     // change UI to next gameRunner
-        // }
-
-        // //TODO: remove, using vec of struct above
-        // int debug_ind_ind = 0;
-        // for (auto &currentRun : gameRuns)
-        // {
-        //     DE_DEBUG("(RunPopulationInGame) Waiting for script to end (script of individual {0})...", ++debug_ind_ind);
-        //     //TODO: fix ml
-        //     GameplayResult *result = currentRun->scriptRunner->joinScriptThread();
-
-        //     m_GameplayResults.push_back(*result);
-        // }
 
         //TODO: free all scripts and gameRunners
 
