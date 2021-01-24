@@ -4,6 +4,8 @@
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Game/Ingame/RobotFunctions.hpp"
 
+#include "Application/Events/EventHandler/DefaultHandlers.fwd.hpp"
+
 using namespace DampEngine;
 namespace Application
 {
@@ -38,11 +40,12 @@ namespace Application
         
         const static int SCRIPT_FUNCT_SIZEE = 7;
 
-        //Not this class responsibility to free game runner
+        //It is not this class' responsibility to free game runner
         GameRunner *m_GameRunner;
+        EH_GameStarted *m_GameStartedEventHandler;
 
         GameWindows::StatusWindow *m_StatusWindow;
-        GameWindows::FunctionWindow *m_FunctionWindows[FUNCTION_QTY];
+        GameWindows::FunctionWindow *m_FunctionWindows[FUNCTION_QTY];  
         GameWindows::RobotCreationWindow *m_RobotCreationWindow;
     };
 } // namespace Application

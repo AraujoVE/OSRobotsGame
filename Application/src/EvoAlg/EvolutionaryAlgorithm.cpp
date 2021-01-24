@@ -544,7 +544,7 @@ namespace EvoAlg
 
     
 
-    void EvolutionaryAlgorithm::calcFitness(const std::vector<GameplayResult> &gameplayResultsPop)
+    void EvolutionaryAlgorithm::calcFitness(const std::vector<IndividualRunResult> &gameplayResultsPop)
     {
         int pos = 0;
         for (auto &indivResults : gameplayResultsPop)

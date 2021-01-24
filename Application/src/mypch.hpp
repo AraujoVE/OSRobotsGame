@@ -27,5 +27,7 @@
 #include <unistd.h>
 #include <optional>
 
+#include <future>
+
 
 #include <boost/algorithm/string.hpp>

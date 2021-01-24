@@ -29,9 +29,10 @@ namespace EvoAlg
         Script *m_Script;
 
         EAStatus m_Status;
+        EAGuiProps &m_GuiProps;
 
     public:
-        EAController();
+        EAController(EAGuiProps& guiProps);
         
         void Start();
         void Cancel();
@@ -40,7 +41,7 @@ namespace EvoAlg
         
 
         //DO NOT CALL ASYNCHRONOUSLY
-        std::vector<GameplayResult> RunPopulationInGame(const std::vector<GeneVec> &population);
+        std::vector<IndividualRunResult> RunPopulationInGame(const std::vector<GeneVec> &population);
         
     };
 } // namespace EAAlgorithm

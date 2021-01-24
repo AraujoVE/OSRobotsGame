@@ -36,7 +36,7 @@ namespace Application
         
         initializeVSAvenues();
 
-        m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::decayStats, this));
+        m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::DecayStats, this));
         m_DecayThreadLoop.SetAliveCheckFunction([this] {
             return this->getPopulation() > 0;
         });
@@ -46,8 +46,10 @@ namespace Application
             return false;
         }));
 
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([](ThreadEndedReason::ThreadEndedReason_t reason) {
+        auto &eventListener = m_EventListener;
+        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([&eventListener](ThreadEndedReason::ThreadEndedReason_t reason) {
             DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
+            eventListener.OnAsync<EH_DecaymentStopped>();
             return false;
         }));
     }
@@ -122,9 +124,11 @@ namespace Application
         return reductionTax;
     }
 
-    void VillageStats::setStat(int statType, float reductionTax)
+    void VillageStats::setStat(RobotFunction statType, float reductionTax)
     {
-        baseStats[statType] = (uint64_t)((double)baseStats[statType] * (1.0 - reductionTax));
+        DE_ASSERT(statType != RobotFunction::RESOURCE_GATHERING, "You should call setResources instead of setStat(RobotFunction::RESOURCE, ...)");
+
+        baseStats[(int)statType] = (uint64_t)((double)baseStats[(int)statType] * (1.0 - reductionTax));
     }
 
     //FIRST
@@ -224,13 +228,13 @@ namespace Application
 
         (this->*(decayStatsFuncts[pos]))(ratio, reduction);
 
-        setStat(pos, reduction);
+        setStat((RobotFunction)pos, reduction);
 
         avenueVS[pos]->up();
     }
 
     //The stats are decreased
-    void VillageStats::decayStats()
+    void VillageStats::DecayStats()
     {
         avenueVS[POPULATION_INDEX]->down();
 
@@ -244,12 +248,11 @@ namespace Application
 
         avenueVS[POPULATION_INDEX]->up();
 
-        //TODO: send more events
-        if (population <= 0)
-            m_EventListener.On<EH_StatsDecayed>();
-
         m_ElapsedTicks += 1;
-        DE_TRACE("Tick = {0}", m_ElapsedTicks);
+
+        if (m_ElapsedTicks % 10){
+            DE_TRACE("VillageStats is alive!");
+        }
     }
 
     unsigned int VillageStats::GetElapsedTimeTicks()

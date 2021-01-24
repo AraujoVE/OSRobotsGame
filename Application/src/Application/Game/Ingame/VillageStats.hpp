@@ -50,24 +50,15 @@ namespace Application
         void initializeVSAvenues();
         bool updateGameConsts();
 
-    public:
-        VillageStats(GameConsts& gameConsts);
-        VillageStats(const VillageStats&) = delete;
-        VillageStats(VillageStats&&) = delete;
-        ~VillageStats();
+    private:
+        void initializeStats();
+
 
         float calcReduction(float,float);
         float calcRatio(int);
         float adjustStatsLimits(int,float,float,bool);
 
-        void onGameStarted();
-        void onGameEnded();
-
-        void setStatsDecaymentPaused(bool paused);
-        inline bool isStatusDecaymentPaused() { return m_DecayThreadLoop.IsPaused(); }
-
         void decayStat(int);
-        void setOnStatusDecayed(EH_StatsDecayed *eventHandler) { m_EventListener.Register(eventHandler); }
 
         void decayDefenses(int,float&);
         void decayFood(int,float&);
@@ -77,20 +68,32 @@ namespace Application
 
         void decayPopulation();
 
+
+    public:
+        VillageStats(GameConsts& gameConsts);
+        ~VillageStats();
+
+        
+        void onGameStarted();
+        void onGameEnded();
+
+
+        void setStatsDecaymentPaused(bool paused);
+        inline bool isStatusDecaymentPaused() { return m_DecayThreadLoop.IsPaused(); }
+
         inline Avenue<double> *getAvenue(RobotFunction robotFunc) { return avenueVS[(uint8_t)robotFunc]; }
         uint64_t getStat(RobotFunction robotFunc) const;
         uint64_t getPopulation() const;
         uint64_t getResources() const;
-        
+
+        void changeStat(int type, int increase);
+        void setStat(RobotFunction, float reductionTax);
         void setResources(uint64_t);
 
-        void setStat(int,float);
-        void changeStat(int type, int increase);
-        void decayStats();
 
-        void initializeStats();
-        void addTaskResources(RobotFunction, time_t, int);
-
+        void DecayStats();
+        inline void RegisterOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Register(eventHandler); }
+        inline void UnregisterOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Unregister(eventHandler); }
         unsigned int GetElapsedTimeTicks();
     };
 

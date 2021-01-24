@@ -5,6 +5,13 @@
 
 #include "mypch.hpp"
 
+#define TLL_ENABLED 0
+#if TLL_ENABLED == 1
+    #define TLL(MACRO, ...) MACRO(__VA_ARGS__)
+#else
+    #define TLL(MACRO, ...) 
+#endif
+
 namespace Application
 {
     void *threadRountine(void *threadLoopV)
@@ -36,42 +43,43 @@ namespace Application
         m_State = State::RUNNING;
         while (m_State == State::RUNNING)
         {
-            DE_DEBUG("(ThreadLoop[{0}] inner) Start of loop", m_DebugName);
+            TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Start of loop", m_DebugName);
 
             if (!m_Paused)
             {
-                DE_DEBUG("(ThreadLoop[{0}] inner) Not paused, checking if abandoned...", m_DebugName);
+                TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Not paused, checking if abandoned...", m_DebugName);
 
                 m_FunctsMutex.Lock();
                 if (m_State == State::ABANDONED)
                 {
                     m_FunctsMutex.Unlock();
-                    DE_DEBUG("(ThreadLoop[{0}] inner) Abandoned!! breaking execution loop", m_DebugName);
+                    TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Abandoned!! breaking execution loop", m_DebugName);
                     break;
                 }
 
+                TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Checking for nullptrs", m_DebugName);
                 DE_ASSERT(m_AliveCheckFunction != nullptr, "(ThreadLoop::InnerLoop) m_AliveCheckFunction is nullptr!!");
                 DE_ASSERT(m_TickFunction != nullptr, "(ThreadLoop::InnerLoop) m_TickFunction is nullptr!!");
 
-                DE_DEBUG("(ThreadLoop[{0}] inner) Checking if still alive", m_DebugName);
+                TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Checking if still alive", m_DebugName);
                 if (!m_AliveCheckFunction())
                 {
-                    DE_DEBUG("(ThreadLoop[{0}] inner) ThreadLoop MARKED AS NOT ALIVE, leaving execution loop", m_DebugName);
+                    TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) ThreadLoop MARKED AS NOT ALIVE, leaving execution loop", m_DebugName);
                     m_State = State::FINISHED;
                     m_FunctsMutex.Unlock();
                     break;
                 }
 
-                DE_DEBUG("(ThreadLoop[{0}] inner) Calling tick...", m_DebugName);
+                TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Calling tick...", m_DebugName);
                 m_TickFunction();
                 m_FunctsMutex.Unlock();
             }
             else
             {
-                DE_DEBUG("(ThreadLoop[{0}] inner) Ignoring paused tick...", m_DebugName);
+                TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Ignoring paused tick...", m_DebugName);
             }
 
-            DE_DEBUG("(ThreadLoop[{0}] inner) Repeating loop...", m_DebugName);
+            TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Repeating loop...", m_DebugName);
 
             usleep(m_TickDelay);
         }
@@ -123,6 +131,7 @@ namespace Application
 
             m_AliveCheckFunction = nullptr;
             m_TickFunction = nullptr;
+            TLL(DE_DEBUG, "(ThreadLoop[{0}] Abandon) Marking as ABANDONED", m_DebugName);
             m_State = State::ABANDONED;
         }
         m_FunctsMutex.Unlock();

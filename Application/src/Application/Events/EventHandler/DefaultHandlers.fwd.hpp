@@ -4,9 +4,14 @@
 
 #define DA_EVENT_FWD(name, ...) class name;
 
+namespace EvoAlg {
+    struct EAGuiProps;
+}
+
+
 namespace Application
 {
-    struct EAGameSettings;
+    
 
     /*  ROBOTS MANAGEMENT EVENT HANDLERS  */
     DA_EVENT_FWD(EH_TaskCreated, bool, (Task&));
@@ -18,7 +23,7 @@ namespace Application
     DA_EVENT_FWD(EH_RobotsMoved, bool, (Task&, int));
 
     /* VILLAGE STATS EVENT HANDLERS */
-    DA_EVENT_FWD(EH_StatsDecayed, bool, (void));
+    DA_EVENT_FWD(EH_DecaymentStopped, bool, (void));
 
     /* GAME RUNNER EVENT HANDLERS */
     DA_EVENT_FWD(EH_GameStarted, bool, (GameRunner&));
@@ -30,7 +35,7 @@ namespace Application
     DA_EVENT_FWD(EH_ThreadEnded, bool, (ThreadEndedReason::ThreadEndedReason_t));
 
     /* EAGAME GUI LAYER EVENTS */
-    DA_EVENT_FWD(EH_EAGameSettingsChanged, bool, (EAGameSettings));
+    DA_EVENT_FWD(EH_EAGuiPropsChanged, bool, (const EvoAlg::EAGuiProps&));
 
     /* GAME CONSTS EVENTS */
     DA_EVENT_FWD(EH_GameConstsChanged, bool, ());

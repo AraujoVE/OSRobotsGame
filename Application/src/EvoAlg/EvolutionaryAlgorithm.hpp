@@ -44,7 +44,7 @@ namespace EvoAlg
         void semiFinalsTournment(int);
         void finalTournment();
         void scriptLoop();
-        void calcFitness(const std::vector<GameplayResult> &);
+        void calcFitness(const std::vector<IndividualRunResult> &);
 
     private:
         pthread_t scriptThread;

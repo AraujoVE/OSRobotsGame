@@ -18,27 +18,14 @@ using namespace Application;
 #define EAS_SVS (m_GameRunner.GetSave().GetVillageStats())
 namespace EvoAlg
 {
-
-    static void *runScript(void *scriptFuncObject)
-    {
-        ScriptRunner *script = (ScriptRunner *)scriptFuncObject;
-        return script->scriptLoop();
-    }
-
-    ScriptRunner::ScriptRunner(Script& script, GameRunner &gameRunner, const Individual& individual) 
-        : m_Script(script), m_GameRunner(gameRunner), m_Individual(individual)
+    ScriptRunner::ScriptRunner(Script &script, GameRunner &gameRunner, const Individual &individual)
+        : m_Script(script), m_GameRunner(gameRunner), m_Individual(individual), m_OperationFunctions(gameRunner)
     {
         initScriptDirections();
     }
 
-    void ScriptRunner::startScript()
-    {
-        pthread_create(&scriptThread, NULL, runScript, this);
-    }
-
     ScriptRunner::~ScriptRunner()
     {
-        pthread_join(scriptThread, NULL);
     }
 
     void ScriptRunner::initScriptDirections()
@@ -52,38 +39,131 @@ namespace EvoAlg
         {
             if (line[0] == '#')
             {
-                gameScript.push_back(std::vector<std::vector<std::string>>());
+                m_GameScript.push_back(std::vector<std::vector<std::string>>());
                 curGameplay++;
                 curOp = 0;
-                gameScript.at(curGameplay).push_back(std::vector<std::string>());
-                gameScript.at(curGameplay).at(curOp).push_back(line.substr(1, line.length() - 1));
+                m_GameScript.at(curGameplay).push_back(std::vector<std::string>());
+                m_GameScript.at(curGameplay).at(curOp).push_back(line.substr(1, line.length() - 1));
             }
             else
             {
-                gameScript.at(curGameplay).push_back(std::vector<std::string>());
+                m_GameScript.at(curGameplay).push_back(std::vector<std::string>());
                 curOp++;
                 tokenPos = line.find(",");
                 while (tokenPos != -1)
                 {
-                    gameScript.at(curGameplay).at(curOp).push_back(line.substr(0, tokenPos));
+                    m_GameScript.at(curGameplay).at(curOp).push_back(line.substr(0, tokenPos));
                     line = line.substr(tokenPos + 1, line.length() - (1 + tokenPos));
                     tokenPos = line.find(",");
                 }
-                gameScript.at(curGameplay).at(curOp).push_back(line);
+                m_GameScript.at(curGameplay).at(curOp).push_back(line);
 
                 //If it is a wait operation, hijack another parameter with DELAY_MICRO
-                if (gameScript.at(curGameplay).at(curOp).at(0) == "6")
-                    gameScript.at(curGameplay).at(curOp).push_back(std::to_string(currentTickDelay));
+                if (m_GameScript.at(curGameplay).at(curOp).at(0) == "6")
+                    m_GameScript.at(curGameplay).at(curOp).push_back(std::to_string(currentTickDelay));
             }
         }
     }
 
-    void ScriptRunner::scriptFunct0(const std::vector<std::string> &params)
+    std::vector<TimeResult> *ScriptRunner::RunAllGameplays()
+    {
+
+        auto *gameplaysResults = new std::vector<TimeResult>();
+        uint64_t gameplayCount = m_GameScript.size();
+
+        //TODO?: async calling more gameplays (respecting MAX_THREADS) [problem with unique m_GameRunner]
+        for (uint64_t curGameplay = 0; curGameplay < gameplayCount; curGameplay++)
+        {
+            gameplaysResults->push_back(RunGameplay(curGameplay));
+            DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_Individual.ID);
+            break;
+        }
+
+        return gameplaysResults;
+    }
+
+    TimeResult ScriptRunner::RunGameplay(uint64_t gameplayIndex)
+    {
+        //Reference Tickdelay as copy, in case of
+        //TODO: assure that Tickdelay WON'T BE CHANGED in the middle of the gameplay (or else fitness will be wrong)
+        uint32_t currentTickDelay = m_GameRunner.GetGameConsts().GetTickDelay();
+
+        //TODO: change to bigger size (uint64/32)
+        int measuredDurationInTicks = -1;
+
+        //Create promises to synchronize this thread with game callbacks
+        std::promise<void> gameStartedPromise, gameEndedPromise;
+        std::future<void> gameEndedFuture = gameEndedPromise.get_future();
+        std::future<void> gameStartedFuture = gameStartedPromise.get_future();
+
+        //Defining game callbacks that will activate the promises above
+        auto gameStartedConfirmationCB = [this, &gameStartedPromise](GameRunner &gameRunner) {
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", m_Individual.ID);
+            gameStartedPromise.set_value();
+            return false;
+        };
+
+        auto gameEndedConfirmationCB = [this, &measuredDurationInTicks, &gameEndedPromise](GameRunner &gameRunner, int elapsedTimeInTicks) {
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_Individual.ID);
+            measuredDurationInTicks = elapsedTimeInTicks;
+            gameEndedPromise.set_value();
+            return false;
+        };
+
+        EH_GameStarted *gameStartedEventHandler = new EH_GameStarted(gameStartedConfirmationCB);
+        EH_GameEnded *gameEndedEventHandler = new EH_GameEnded(gameEndedConfirmationCB);
+
+        //Add to the GameRunner our callbacks
+        m_GameRunner.RegisterOnGameStarted(gameStartedEventHandler);
+        m_GameRunner.RegisterOnGameEnded(gameEndedEventHandler);
+
+        //Request the game to start and wait it to be completely started
+        DE_TRACE("(ScriptRunner -- {0}) Requesting gameplay #{1} to start", m_Individual.ID, gameplayIndex);
+        {
+            m_GameRunner.Start();
+            gameStartedFuture.get();
+        }
+        DE_TRACE("(ScriptRunner -- {0}) Gameplay #{1} to started successfully", m_Individual.ID, gameplayIndex);
+
+        //
+        DE_TRACE("(ScriptRunner -- {0}) Starting operations of gameplay #{1}...", m_Individual.ID, gameplayIndex);
+        auto &operations = m_GameScript.at(gameplayIndex);
+        for (size_t i = 1; i < operations.size(); i++)
+        {
+            DE_DEBUG("(ScriptRunner -- {0}) Executing operation #{2} of gameplay #{1}", m_Individual.ID, gameplayIndex, i);
+
+            m_OperationFunctions.Execute(operations[i]);
+
+            //TODO: check if this is correct
+            usleep(currentTickDelay);
+        }
+        DE_TRACE("(ScriptRunner -- {0}) All operations of gameplay #{1} executed Successfully!", m_Individual.ID, gameplayIndex);
+
+        //Waits for game to end
+        DE_TRACE("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_Individual.ID, gameplayIndex);
+        gameEndedFuture.get();
+        DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_Individual.ID, gameplayIndex);
+
+        DE_ASSERT(measuredDurationInTicks >= 0, "Game duration not calculated correctly");
+        DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but gameplay is not lost!!! **");
+
+        double targetDurationAU = stol(m_GameScript.at(gameplayIndex).at(0).at(0));
+        double measuredDurationAU = measuredDurationInTicks * AU_PER_TICK;
+
+        m_GameRunner.UnregisterOnGameStarted(gameStartedEventHandler);
+        m_GameRunner.UnregisterOnGameEnded(gameEndedEventHandler);
+
+        return TimeResult{targetDurationAU, measuredDurationAU};
+    }
+
+#pragma region ScriptFunctions
+
+    void ScriptFunctions::scriptFunct0(const std::vector<std::string> &params)
     {
         EAS_SRM->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
     }
 
-    void ScriptRunner::scriptFunct1(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct1(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -91,11 +171,11 @@ namespace EvoAlg
             DE_WARN("Ignoring invalid cancelTask #{0}", params.at(2));
             return;
         }
-        DE_ASSERT(curTask.has_value(), "(ScriptRunner:: scriptFunct1) Invalid Task " + params.at(2));
+        DE_ASSERT(curTask.has_value(), "(ScriptFunctions:: scriptFunct1) Invalid Task " + params.at(2));
         EAS_SRM->cancelTask(*curTask.value());
     }
 
-    void ScriptRunner::scriptFunct2(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct2(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -103,11 +183,11 @@ namespace EvoAlg
             DE_WARN("Ignoring invalid moveRobot++ @Task #{0}", params.at(2));
             return;
         }
-        DE_ASSERT(curTask.has_value(), "(ScriptRunner::scriptFunct2) Invalid Task " + params.at(2));
+        DE_ASSERT(curTask.has_value(), "(ScriptFunctions::scriptFunct2) Invalid Task " + params.at(2));
         EAS_SRM->moveRobot(*curTask.value(), 1);
     }
 
-    void ScriptRunner::scriptFunct3(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct3(const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -115,21 +195,21 @@ namespace EvoAlg
             DE_WARN("Ignoring invalid moveRobot-- @Task #{0}", params.at(2));
             return;
         }
-        DE_ASSERT(curTask.has_value(), "(ScriptRunner::scriptFunct3) Invalid Task " + params.at(2));
+        DE_ASSERT(curTask.has_value(), "(ScriptFunctions::scriptFunct3) Invalid Task " + params.at(2));
         EAS_SRM->moveRobot(*curTask.value(), -1);
     }
 
-    void ScriptRunner::scriptFunct4(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct4(const std::vector<std::string> &params)
     {
         EAS_SRM->createRobots(1);
     }
 
-    void ScriptRunner::scriptFunct5(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct5(const std::vector<std::string> &params)
     {
         EAS_SRM->destroyRobots(1);
     }
 
-    void ScriptRunner::scriptFunct6(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct6(const std::vector<std::string> &params)
     {
         double waitsPerSecond = 1e6 / HUMAN_OP_DELAY;
 
@@ -144,69 +224,7 @@ namespace EvoAlg
         usleep(waitCount * DELAY_MICRO);
     }
 
-    //TODO: Jogo versão normal ou calibração
-    //TODO: Velocidade dos segundos do jogo -> slider
-
-    std::vector<TimeResult> *ScriptRunner::scriptLoop()
-    {
-        int measuredDurationInTicks = -1;
-        int it = 0;
-
-        auto *gameplaysResults = new std::vector<TimeResult>();
-
-        Application::Semaphore endSem;
-
-        auto &_gameScript = gameScript;
-
-        m_GameRunner.SetOnGameStarted(new EH_GameStarted([this, &_gameScript, &it](GameRunner &gameRunner) {
-            DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", m_Individual.ID);
-
-            uint32_t currentTickDelay = gameRunner.GetGameConsts().GetTickDelay();
-
-            for (int i = 1; i < (int)_gameScript.at(it).size(); i++)
-            {
-                (this->*(scriptLoopFuncts[stoi(_gameScript.at(it).at(i).at(0))]))(_gameScript.at(it).at(i));
-                usleep(currentTickDelay);
-            }
-
-            return false;
-        }));
-
-        m_GameRunner.SetOnGameEnded(new EH_GameEnded([this, &measuredDurationInTicks, &endSem, &_gameScript, &it, gameplaysResults](GameRunner &gameRunner,int elapsedTimeInTicks) {
-            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_Individual.ID);
-
-            measuredDurationInTicks = elapsedTimeInTicks;
-            endSem.Post();
-
-            return false;
-        }));
-
-        for (int m = 0; m < (int)gameScript.size(); m++)
-        {
-            // DE_ASSERT(m_GameRunner.IsGameLost());
-            DE_INFO("(ScriptRunner -- {0}) Starting gameplay #{1}", m_Individual.ID, m);
-            m_GameRunner.Start();
-
-
-            DE_DEBUG("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_Individual.ID, m);
-            endSem.Wait();
-            DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_Individual.ID, m);
-
-            //Callback para saber quando acaba o jogo
-            //quando isso acontece : endTime = time(0)
-            double targetDurationAU = stol(_gameScript.at(it).at(0).at(0));
-            double measuredDurationAU = measuredDurationInTicks * AU_PER_TICK;
-            gameplaysResults->push_back(TimeResult{targetDurationAU, measuredDurationAU});
-            it++;
-
-            DE_ASSERT(measuredDurationInTicks >= 0, "Game duration not calculated correctly");
-            DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but it's not lost!!! **");
-
-            DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_Individual.ID);
-        }
-
-        return gameplaysResults;
-    }
+#pragma endregion
 
 } // namespace EvoAlg
 
