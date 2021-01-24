@@ -25,9 +25,7 @@ namespace Application
         delete m_EventListener;
     }
 
-    void GameRunner::SetOnGameStarted(EH_GameStarted *eventHandler) { m_EventListener->Register(eventHandler); }
-    void GameRunner::SetOnGameEnded(EH_GameEnded *eventHandler) { m_EventListener->Register(eventHandler); }
-
+    //TODO: use promises to call EH_GameStarted to assure game is totally started 
     void GameRunner::Start()
     {
         DE_ASSERT(!m_GameStatus.GameStarted, "Trying to start the game 2 times in the same runner");

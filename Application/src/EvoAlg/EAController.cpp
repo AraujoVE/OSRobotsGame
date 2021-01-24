@@ -36,7 +36,7 @@ namespace EvoAlg
 
     //TODO: Sync or Async UI
     //TODO: assert is being called from only one thread (maybe mutex)
-    std::vector<GameplayResult> EAController::RunPopulationInGame(const std::vector<GeneVec> &populationGenes)
+    std::vector<IndividualRunResult> EAController::RunPopulationInGame(const std::vector<GeneVec> &populationGenes)
     {
         GameConsts *fileGameConsts = new GameConsts();
         fileGameConsts->LoadValuesFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
@@ -46,7 +46,7 @@ namespace EvoAlg
 
         DE_DEBUG("EAController::RunPopulationInGame()");
         //Index of array corresponds to IndividualID
-        std::vector<GameplayResult> gameplayResults;
+        std::vector<IndividualRunResult> gameplayResults;
 
         struct IndividualRun
         {
@@ -85,7 +85,7 @@ namespace EvoAlg
             // };
 
             //TODO: allow async with MAX_THREADS control
-            GameplayResult *result = (GameplayResult *)currentScriptRunner->scriptLoop();
+            IndividualRunResult *result = currentScriptRunner->RunAllGameplays();
             gameplayResults.push_back(*result);
             //TODO: fix ml
             //delete result;

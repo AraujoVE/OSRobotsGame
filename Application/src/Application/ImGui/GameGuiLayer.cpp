@@ -6,6 +6,8 @@
 #include "Application/ImGui/GameWindows/StatusWindow.hpp"
 #include "Application/ImGui/GameWindows/RobotCreationWindow.hpp"
 
+#include "Application/Game/GameRunner.hpp"
+
 using namespace Application::GameWindows;
 namespace Application
 {
@@ -34,7 +36,7 @@ namespace Application
 
         m_RobotCreationWindow = new RobotCreationWindow(m_GameRunner->GetSave().GetRobotsManagement());
 
-        m_GameRunner->SetOnGameStarted(new EH_GameStarted([=](GameRunner &gameRunner) {
+        m_GameRunner->RegisterOnGameStarted(new EH_GameStarted([=](GameRunner &gameRunner) {
             m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
             m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
             m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
@@ -58,7 +60,7 @@ namespace Application
 
 
         //TODO: unregister this event:
-        // m_GameRunner->SetOnGameStarted(new EH_GameStarted([=](GameRunner &gameRunner) {
+        // m_GameRunner->RegisterOnGameStarted(new EH_GameStarted([=](GameRunner &gameRunner) {
         //     m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
         //     m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
         //     m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());

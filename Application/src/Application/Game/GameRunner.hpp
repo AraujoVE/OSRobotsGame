@@ -2,6 +2,7 @@
 
 // #include "Application/Events/Events.fwd.hpp"
 #include "Application/Game/GameSave.hpp"
+#include "Application/Events/EventListener/EventListener.template.hpp"
 
 namespace Application
 {
@@ -26,8 +27,10 @@ namespace Application
         GameRunner(const std::shared_ptr<GameSave> &gameSave);
         ~GameRunner();
 
-        void SetOnGameStarted(EH_GameStarted *eventHandler);
-        void SetOnGameEnded(EH_GameEnded *eventHandler);
+        inline void RegisterOnGameStarted(EH_GameStarted *eventHandler) { m_EventListener->Register(eventHandler); }
+        inline void RegisterOnGameEnded(EH_GameEnded *eventHandler) { m_EventListener->Register(eventHandler); }
+        inline void UnregisterOnGameStarted(EH_GameStarted *eventHandler) { m_EventListener->Unregister(eventHandler); }
+        inline void UnregisterOnGameEnded(EH_GameEnded *eventHandler) { m_EventListener->Unregister(eventHandler); }
 
         void Start();
         void Stop();

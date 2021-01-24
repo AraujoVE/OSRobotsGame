@@ -41,7 +41,7 @@ namespace EvoAlg
         
 
         //DO NOT CALL ASYNCHRONOUSLY
-        std::vector<GameplayResult> RunPopulationInGame(const std::vector<GeneVec> &population);
+        std::vector<IndividualRunResult> RunPopulationInGame(const std::vector<GeneVec> &population);
         
     };
 } // namespace EAAlgorithm

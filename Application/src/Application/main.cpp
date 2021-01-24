@@ -43,7 +43,8 @@ namespace Application
         {
             DE_TRACE("MyApplication::~MyApplication()");
         }
-
+        
+        //TODO: Jogo versão normal ou calibração
         virtual void OnStart() override
         {
             DE_TRACE("MyApplication::OnStart()");

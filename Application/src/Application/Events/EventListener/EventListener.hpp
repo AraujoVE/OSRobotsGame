@@ -109,7 +109,7 @@ namespace Application
         std::string eventType = eventHandlerAddress->GetType();
         m_MapMutex.Lock();
         {
-            const auto& queue = handlerQueueMap[eventType];
+            auto& queue = handlerQueueMap[eventType];
             auto it = std::find(queue.begin(), queue.end(), eventHandlerAddress);
             if (it == queue.end()) {
                 DE_ERROR("Trying to unregister a non-registered event of type '{0}'", eventType);

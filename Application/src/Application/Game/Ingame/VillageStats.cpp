@@ -247,7 +247,10 @@ namespace Application
         avenueVS[POPULATION_INDEX]->up();
 
         m_ElapsedTicks += 1;
-        DE_TRACE("Tick = {0}", m_ElapsedTicks);
+
+        if (m_ElapsedTicks % 10){
+            DE_TRACE("VillageStats is alive!");
+        }
     }
 
     unsigned int VillageStats::GetElapsedTimeTicks()

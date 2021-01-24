@@ -6,8 +6,6 @@
 
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 
-#include "Application/Game/GameRunner.hpp"
-
 #include <unordered_map>
 #include <string>
 #include <memory>
