@@ -11,24 +11,41 @@
 using namespace Application::GameWindows;
 namespace Application
 {
-    GameGuiLayer::GameGuiLayer() : m_GameRunner(nullptr)
+    GameGuiLayer::GameGuiLayer() : m_GameRunner(nullptr), m_GameStartedEventHandler(nullptr)
     {
-            
+        m_GameStartedEventHandler = new EH_GameStarted([=](GameRunner &eventGR){
+            DE_ASSERT(m_GameRunner != nullptr, "(GameGuiLayer) Receiving EH_GameStarted while no game is attached!! (did you forget to unregister the event?)");
+            DE_ASSERT(m_GameRunner == &eventGR, "(GameGuiLayer) Receiving EH_GameStarted from an invalid GameRunner (did you forget to unregister the event?)");
+
+
+            //Hacky way to update VillageStats and RobotsManagement references on the inner windows
+            DeinitializeGameWindows();
+            InitializeGameWindows();
+
+            return false;
+        });
     }
 
     void GameGuiLayer::SetGameRunner(GameRunner *newRunner)
     {
         if (m_GameRunner == newRunner) return;
 
-        if (m_GameRunner != nullptr) DeinitializeGameWindows();
+        if (m_GameRunner != nullptr) {
+            DeinitializeGameWindows();
+            m_GameRunner->UnregisterOnGameStarted(m_GameStartedEventHandler);
+        }
+
         m_GameRunner = newRunner;
-        if (newRunner != nullptr) InitializeGameWindows();
+
+        if (newRunner != nullptr) {
+            InitializeGameWindows();
+            m_GameRunner->RegisterOnGameStarted(m_GameStartedEventHandler);
+        }
     }
 
     void GameGuiLayer::InitializeGameWindows()
     {
         DE_ASSERT(m_GameRunner != nullptr, "Trying to initialize game windows with no GameRunner attached");
-        DE_ASSERT(m_GameRunner->HasStarted(), "Trying to create GameWindows without starting the game first");
 
         m_StatusWindow = new StatusWindow(m_GameRunner->GetSave().GetVillageStats());
 

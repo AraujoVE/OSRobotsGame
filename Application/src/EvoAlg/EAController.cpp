@@ -67,6 +67,9 @@ namespace EvoAlg
         // gameConsts->SetTickDelay(1);
         auto *aaa = new GameRunner(fileGameConsts);
         m_GuiProps.MainGameRunner = aaa;
+        
+        //TODO: event EH_GameAttached (wait for UI to be ready)
+        usleep(5e6);
 
 
         DE_INFO("(EAController) Preparing population to be executed...");

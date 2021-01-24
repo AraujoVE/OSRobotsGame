@@ -24,8 +24,10 @@ namespace Application
         static GameRunner *lastGameRunner = m_EAGuiProps.MainGameRunner;
         bool settingsChanged = false;
 
-        if (lastGameRunner != m_EAGuiProps.MainGameRunner) settingsChanged = true;
-        lastGameRunner = m_EAGuiProps.MainGameRunner;
+        if (lastGameRunner != m_EAGuiProps.MainGameRunner) {
+            settingsChanged = true;
+            lastGameRunner = m_EAGuiProps.MainGameRunner;
+        }
 
         ImGui::Begin("Settings");
         {
