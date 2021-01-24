@@ -13,37 +13,38 @@ namespace Application
 {
     GameGuiLayer::GameGuiLayer() : m_GameRunner(nullptr)
     {
+            
     }
 
     void GameGuiLayer::SetGameRunner(GameRunner *newRunner)
     {
-        if (m_GameRunner != nullptr)
-            DeinitializeGameWindows();
+        if (m_GameRunner == newRunner) return;
+
+        if (m_GameRunner != nullptr) DeinitializeGameWindows();
         m_GameRunner = newRunner;
-        InitializeGameWindows();
+        if (newRunner != nullptr) InitializeGameWindows();
     }
 
     void GameGuiLayer::InitializeGameWindows()
     {
         DE_ASSERT(m_GameRunner != nullptr, "Trying to initialize game windows with no GameRunner attached");
+        DE_ASSERT(m_GameRunner->HasStarted(), "Trying to create GameWindows without starting the game first");
+
         m_StatusWindow = new StatusWindow(m_GameRunner->GetSave().GetVillageStats());
 
         m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::HUNT);
-        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::MEDICINE);
         m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::CONSTRUCTION);
+        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::MEDICINE);
         m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::PROTECTION);
         m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
 
         m_RobotCreationWindow = new RobotCreationWindow(m_GameRunner->GetSave().GetRobotsManagement());
-
-        m_GameRunner->RegisterOnGameStarted(new EH_GameStarted([=](GameRunner &gameRunner) {
-            m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-            return false;
-        }));
+        
+        m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+        m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+        m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
     }
 
     void GameGuiLayer::DeinitializeGameWindows()
@@ -57,17 +58,6 @@ namespace Application
         delete m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING];
 
         delete m_RobotCreationWindow;
-
-
-        //TODO: unregister this event:
-        // m_GameRunner->RegisterOnGameStarted(new EH_GameStarted([=](GameRunner &gameRunner) {
-        //     m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-        //     m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-        //     m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-        //     m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-        //     m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(gameRunner.GetSave().GetRobotsManagement());
-        //     return false;
-        // }));
     }
 
     void GameGuiLayer::ImGuiDescription()

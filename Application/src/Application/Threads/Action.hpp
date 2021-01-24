@@ -1,10 +1,4 @@
-#include "Application/Events/EventHandler/DefaultHandlers.hpp"
-#include "Application/Events/EventListener/EventListener.hpp"
-
-#include "ThreadLoop.hpp"
-
-#include <memory>
-#include <vector>
+#pragma once
 
 #include <thread>
 

@@ -13,7 +13,7 @@ namespace Application
 {
 
     EAGameGuiLayer::EAGameGuiLayer()
-        : m_MainGameRunner(nullptr), m_EAController(new EAController(m_EAGuiProps))
+        : m_EAController(new EAController(m_EAGuiProps))
     {
     }
 
@@ -21,8 +21,12 @@ namespace Application
     {
         //TODO: stop using static
         static const char* status = "Stopped";
-
+        static GameRunner *lastGameRunner = m_EAGuiProps.MainGameRunner;
         bool settingsChanged = false;
+
+        if (lastGameRunner != m_EAGuiProps.MainGameRunner) settingsChanged = true;
+        lastGameRunner = m_EAGuiProps.MainGameRunner;
+
         ImGui::Begin("Settings");
         {
             settingsChanged |= ImGui::Checkbox("Show game", &m_EAGuiProps.ShowGame);
@@ -54,14 +58,15 @@ namespace Application
         ImGui::End();
 
 
-        // if (settingsChanged)
-        // {
-        //     m_EventListener.OnAsync<EH_EAGuiPropsChanged>(m_EAGuiProps);
-        // }
+        if (settingsChanged)
+        {
+            m_EventListener.OnAsync<EH_EAGuiPropsChanged>(m_EAGuiProps);
+        }
 
 
         if (startPressed && !m_EAController->IsRunning()) {
             m_EAController->Start();
+            
         }
 
         

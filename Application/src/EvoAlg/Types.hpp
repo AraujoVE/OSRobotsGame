@@ -29,7 +29,7 @@ namespace EvoAlg
             ShowGame = false,
             Pause = false;
 
-        Application::GameRunner *MainGameRunner;
+        Application::GameRunner *MainGameRunner = nullptr;
     };
 
 

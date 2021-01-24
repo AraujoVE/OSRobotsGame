@@ -7,6 +7,8 @@
 
 #include "Application/Util/path.hpp"
 
+#include "Application/Threads/Action.hpp"
+
 #include "mypch.hpp"
 
 #include "EvoAlg/Types.hpp"
@@ -26,7 +28,13 @@ namespace EvoAlg
         //m_Script.Save()
 
         // m_Algorithm.startAlgorithm();
-        RunPopulationInGame({});
+
+        Application::Action<> rpig([this]{
+            RunPopulationInGame({});
+        });
+        rpig.Invoke();
+
+
     }
 
     void EAController::Cancel()

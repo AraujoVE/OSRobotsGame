@@ -34,10 +34,6 @@ namespace Application
         //TODO: move to a better place
         const static int SCRIPT_FUNCT_SIZE = 7;
 
-        //Not this class' responsibility to free
-        GameRunner *m_MainGameRunner;
-
-
         EvoAlg::EAController *m_EAController;
         EventListener m_EventListener;
 

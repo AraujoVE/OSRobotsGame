@@ -64,13 +64,10 @@ namespace DampEngine
         // DE_ENGINE_INFO("LayerStack received event {0}", event);
         for (auto layer : Util::reverse<std::vector<ImGuiLayer *>>(m_LayerStack))
         {
-            m_LayerStackMutex.Lock();
-
             if (event.IsHandled())
                 break;
             layer->OnEvent(event);
 
-            m_LayerStackMutex.Unlock();
         }
     }
 

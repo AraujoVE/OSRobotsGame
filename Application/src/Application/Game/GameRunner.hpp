@@ -41,8 +41,8 @@ namespace Application
 
         void OnGameLost(const std::string &reason);
 
+        inline bool HasStarted() const { return m_GameStatus.GameStarted; }
         inline bool IsGamePaused() const { return m_GameStatus.GamePaused && m_GameStatus.GameStarted; };
-
         inline bool IsGameLost() const { return m_GameStatus.GameLost; };
         inline const std::string &GetGameLostReason() const { return m_GameStatus.GameLostReason; };
 
