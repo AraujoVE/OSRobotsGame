@@ -22,14 +22,16 @@ namespace Application
         return NULL;
     }
 
+    const uint32_t ThreadLoop::s_HumanTickDelay = HUMAN_TICK_DELAY_MICRO;
     ThreadLoop::ThreadLoop(const std::string &debugName)
         : m_TickFunction(nullptr), m_AliveCheckFunction(nullptr),
           m_State(State::INACTIVE), m_Paused(false),
+          m_TickDelay(&s_HumanTickDelay),
           m_EventListener(new EventListener()),
           m_DebugName(debugName)
     {
     }
-
+        
     ThreadLoop::~ThreadLoop()
     {
         m_EventListener->Clear();
@@ -81,7 +83,8 @@ namespace Application
 
             TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Repeating loop...", m_DebugName);
 
-            usleep(m_TickDelay);
+            //TODO: may cause segfault (check if m_TickDelay is a valid pointer (how?))
+            usleep(*m_TickDelay);
         }
 
         DE_ASSERT(m_State != State::RUNNING, "(ThreadLoop::InnerLoop) Invalid Running state after while m_State == State::RUNNING");
@@ -104,7 +107,7 @@ namespace Application
         m_Paused = paused;
     }
 
-    void ThreadLoop::Start(uint32_t tickDelay)
+    void ThreadLoop::Start(const uint32_t *tickDelay)
     {
         DE_ASSERT(m_AliveCheckFunction != nullptr, "(ThreadLoop::Start) Trying to start a ThreadLoop with m_AliveCheckFunction == nullptr!!");
         DE_ASSERT(m_TickFunction != nullptr, "(ThreadLoop::Start) Trying to start a ThreadLoop with m_TickFunction == nullptr!!");

@@ -89,10 +89,9 @@ namespace Application
 
         void SetOnValueChanged(EH_GameConstsChanged *eHandler);
 
-        //TODO: prohibit change in the middle of a gameplay (if it's an EA playing)
-        inline void SetTickDelay(uint32_t newTickDelay) { TICK_DELAY_MICRO = newTickDelay; }
 
-        //Gets the current tick delay in microsseconds
+        //Gets/sets the current tick delay in microsseconds
+        void SetTickDelay(uint32_t newTickDelay);
         inline uint32_t GetTickDelay() { return TICK_DELAY_MICRO; }
         
     };

@@ -204,7 +204,7 @@ namespace Application
     {
         DE_TRACE("VillageStats::onGameStarted()");
         initializeStats();
-        m_DecayThreadLoop.Start(m_GameConstsCache.TICK_DELAY_MICRO);
+        m_DecayThreadLoop.Start(&m_GameConstsCache.TICK_DELAY_MICRO);
     }
 
     void VillageStats::onGameEnded() {

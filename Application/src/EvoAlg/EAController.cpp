@@ -64,7 +64,6 @@ namespace EvoAlg
         // gameConsts->SetTickDelay(1);
         auto *aaa = new GameRunner(fileGameConsts);
         m_GuiProps.MainGameRunner = aaa;
-        fileGameConsts->SetTickDelay(5e3);
 
         //TODO: event EH_GameAttached (wait for UI to be ready)
         usleep(5e6);
@@ -106,9 +105,12 @@ namespace EvoAlg
                 usleep(5e6);
                 m_GuiProps.MainGameRunner = aaa;
             }
+            break;
         }
 
         //TODO: free all scripts and gameRunners
+
+        m_GuiProps.MainGameRunner = nullptr;
 
         DE_DEBUG("(RunPopulationInGame) All individuals have been tested! returning results");
         return gameplayResults;
