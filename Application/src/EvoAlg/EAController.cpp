@@ -15,7 +15,7 @@
 
 namespace EvoAlg
 {
-    EAController::EAController(EAGuiProps& guiProps) : m_Algorithm(*this), m_Script(nullptr), m_GuiProps(guiProps)
+    EAController::EAController(EAGuiProps &guiProps) : m_Algorithm(*this), m_Script(nullptr), m_GuiProps(guiProps)
     {
     }
 
@@ -29,12 +29,10 @@ namespace EvoAlg
 
         // m_Algorithm.startAlgorithm();
 
-        Application::Action<> rpig([this]{
+        Application::Action<> rpig([this] {
             RunPopulationInGame({});
         });
         rpig.Invoke();
-
-
     }
 
     void EAController::Cancel()
@@ -48,7 +46,6 @@ namespace EvoAlg
     {
         GameConsts *fileGameConsts = new GameConsts();
         fileGameConsts->LoadValuesFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
-
 
         DE_ASSERT(m_Script != nullptr);
 
@@ -67,13 +64,13 @@ namespace EvoAlg
         // gameConsts->SetTickDelay(1);
         auto *aaa = new GameRunner(fileGameConsts);
         m_GuiProps.MainGameRunner = aaa;
-        
+        fileGameConsts->SetTickDelay(5e3);
+
         //TODO: event EH_GameAttached (wait for UI to be ready)
         usleep(5e6);
 
-
         DE_INFO("(EAController) Preparing population to be executed...");
-        for (unsigned int i = 0;  i < 20; i++)
+        for (unsigned int i = 0; i < 20; i++)
         {
             DE_INFO("(EAController) Preparing individual #{0}", i);
 
@@ -100,7 +97,15 @@ namespace EvoAlg
             gameplayResults.push_back(*result);
             //TODO: fix ml
             //delete result;
-            break;
+
+            DE_TRACE("(RunPopulationInGame) Individual #{0} completed successfully", i);
+
+            //TODO: remove visual hint of change
+            {
+                m_GuiProps.MainGameRunner = nullptr;
+                usleep(5e6);
+                m_GuiProps.MainGameRunner = aaa;
+            }
         }
 
         //TODO: free all scripts and gameRunners
