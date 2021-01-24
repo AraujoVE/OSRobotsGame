@@ -45,17 +45,28 @@ namespace Application
             gameSpeed = m_EAGuiProps.MainGameRunner->GetGameConsts().GetTickDelay();
         uint32_t receivedSpeed = gameSpeed;
 
+
+        const EAStatus &eaStatus = m_EAController->GetStatus();
+        static const char* const stageMessage[] = {
+            "INACTIVE",
+            "WAITING_GENERATION",
+            "RUNNING_GENERATION",
+            "FINISHED",
+            "ABORTED"
+        };
+
+
         bool startPressed = false, abortPressed = false;
         ImGui::Begin("EAStatus");
         {
-            ImGui::Text("Evolutionary Algorithm (status: %s)", status);
+            ImGui::Text("Evolutionary Algorithm (stage: %s)", stageMessage[(int)eaStatus.m_ExecutionInfo.Stage]);
             startPressed = ImGui::Button("Start EA");
             ImGui::SameLine();
             abortPressed = ImGui::Button("Abort EA");
             ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.Pause);
 
             if (gameSpeed > 0)
-                ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, 1);
+                ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
 
             ImGui::Text("Current Generation: %lu", (uint64_t)0);
 

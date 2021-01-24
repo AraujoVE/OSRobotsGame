@@ -21,11 +21,12 @@ namespace EvoAlg
 
     void EAController::Start()
     {
-        DE_ASSERT(m_Status.CurrentStage == EAStage::INACTIVE, "(EAController) Trying to start twice");
+        DE_ASSERT(m_Status.m_ExecutionInfo.Stage == EAStage::INACTIVE, "(EAController) Trying to start twice");
         ScriptConverter converter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
         m_Script = converter.Convert();
 
         //m_Script.Save()
+        
 
         // m_Algorithm.startAlgorithm();
 
@@ -37,7 +38,7 @@ namespace EvoAlg
 
     void EAController::Cancel()
     {
-        DE_ASSERT(m_Status.CurrentStage != EAStage::INACTIVE, "(EAController) Trying to cancel a inactive controller");
+        DE_ASSERT(m_Status.m_ExecutionInfo.Stage != EAStage::INACTIVE, "(EAController) Trying to cancel a inactive controller");
     }
 
     //TODO: Sync or Async UI
@@ -100,16 +101,17 @@ namespace EvoAlg
             DE_TRACE("(RunPopulationInGame) Individual #{0} completed successfully", i);
 
             //TODO: remove visual hint of change
-            {
-                m_GuiProps.MainGameRunner = nullptr;
-                usleep(5e6);
-                m_GuiProps.MainGameRunner = aaa;
-            }
+            // {
+            //     m_GuiProps.MainGameRunner = nullptr;
+            //     usleep(5e6);
+            //     m_GuiProps.MainGameRunner = aaa;
+            // }
             break;
         }
 
         //TODO: free all scripts and gameRunners
 
+        m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
         m_GuiProps.MainGameRunner = nullptr;
 
         DE_DEBUG("(RunPopulationInGame) All individuals have been tested! returning results");
