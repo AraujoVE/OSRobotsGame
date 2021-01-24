@@ -30,7 +30,12 @@ namespace Application
     {
         DE_ASSERT(!m_GameStatus.GameStarted, "Trying to start the game 2 times in the same runner");
 
-        if (m_GameStatus.GameLost)
+        DE_ASSERT(m_GameSave->GetVillageStats()->GetElapsedTimeTicks() == 0, "VillageStats is in an invalid statem, more than 0 ticks have been done");
+        DE_ASSERT(m_GameSave->GetVillageStats()->GetElapsedTimeTicks() == 0, "VillageStats is already decaying before game start");
+        // DE_ASSERT() ROBOTMAN
+
+        //TODO: if someday the game needs to be saved, this will need to change
+        if (m_GameStatus.GameLost || true)
         {
             ResetSave();
             m_GameStatus.GameLost = false;
@@ -38,6 +43,7 @@ namespace Application
 
         m_GameStatus.GameStarted = true;
         m_GameStatus.GamePaused = false;
+        
         
         m_EventListener->OnAsync<EH_GameStarted>(*this);
         
@@ -51,9 +57,12 @@ namespace Application
         DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running");
 
         m_GameStatus.GameStarted = false;
-        m_EventListener->OnAsync<EH_GameEnded>({*this, m_GameSave->GetVillageStats()->GetElapsedTimeTicks()});
 
-        //TODO: stop village stats decayment
+
+        m_GameSave->GetVillageStats()->onGameEnded();
+
+        m_EventListener->OnAsync<EH_GameEnded>({*this, m_GameSave->GetVillageStats()->GetElapsedTimeTicks()});
+        //TODO: promise to join TASK + VS ended callbacks
     }
 
     void GameRunner::Pause()
@@ -98,7 +107,7 @@ namespace Application
             return false;
         }));
 
-        villageStats->setOnPopReachZero(new EH_DecaymentStopped([=]() {
+        villageStats->RegisterOnPopReachZero(new EH_DecaymentStopped([=]() {
             DE_TRACE("(GameRunner) Received EH_DecaymentStopped");
             if (villageStats->getPopulation() <= 0 && !IsGameLost())
             {

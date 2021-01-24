@@ -36,7 +36,7 @@ namespace Application
         
         initializeVSAvenues();
 
-        m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::decayStats, this));
+        m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::DecayStats, this));
         m_DecayThreadLoop.SetAliveCheckFunction([this] {
             return this->getPopulation() > 0;
         });
@@ -124,9 +124,11 @@ namespace Application
         return reductionTax;
     }
 
-    void VillageStats::setStat(int statType, float reductionTax)
+    void VillageStats::setStat(RobotFunction statType, float reductionTax)
     {
-        baseStats[statType] = (uint64_t)((double)baseStats[statType] * (1.0 - reductionTax));
+        DE_ASSERT(statType != RobotFunction::RESOURCE_GATHERING, "You should call setResources instead of setStat(RobotFunction::RESOURCE, ...)");
+
+        baseStats[(int)statType] = (uint64_t)((double)baseStats[(int)statType] * (1.0 - reductionTax));
     }
 
     //FIRST
@@ -226,13 +228,13 @@ namespace Application
 
         (this->*(decayStatsFuncts[pos]))(ratio, reduction);
 
-        setStat(pos, reduction);
+        setStat((RobotFunction)pos, reduction);
 
         avenueVS[pos]->up();
     }
 
     //The stats are decreased
-    void VillageStats::decayStats()
+    void VillageStats::DecayStats()
     {
         avenueVS[POPULATION_INDEX]->down();
 

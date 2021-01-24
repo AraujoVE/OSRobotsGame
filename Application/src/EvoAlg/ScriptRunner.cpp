@@ -76,6 +76,7 @@ namespace EvoAlg
         {
             gameplaysResults->push_back(RunGameplay(curGameplay));
             DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_Individual.ID);
+            break;
         }
 
         return gameplaysResults;
@@ -138,19 +139,9 @@ namespace EvoAlg
         }
         DE_TRACE("(ScriptRunner -- {0}) All operations of gameplay #{1} executed Successfully!", m_Individual.ID, gameplayIndex);
 
-        //TODO: remove test
-        m_GameRunner.Stop();
-
+        //Waits for game to end
         DE_TRACE("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_Individual.ID, gameplayIndex);
-        {
-            //Waits for game to end
-            gameEndedFuture.get();
-
-            if (!m_GameRunner.IsGameLost())
-            {
-                DE_CRITICAL("(ScriptRunner -- {0}) After EH_GameEnded (gameplay #{1}), the game is not lost yet, waiting 1sec...", m_Individual.ID, gameplayIndex);
-            }
-        }
+        gameEndedFuture.get();
         DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_Individual.ID, gameplayIndex);
 
         DE_ASSERT(measuredDurationInTicks >= 0, "Game duration not calculated correctly");

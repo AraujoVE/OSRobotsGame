@@ -57,6 +57,7 @@ namespace Application
                     break;
                 }
 
+                TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Checking for nullptrs", m_DebugName);
                 DE_ASSERT(m_AliveCheckFunction != nullptr, "(ThreadLoop::InnerLoop) m_AliveCheckFunction is nullptr!!");
                 DE_ASSERT(m_TickFunction != nullptr, "(ThreadLoop::InnerLoop) m_TickFunction is nullptr!!");
 
@@ -130,6 +131,7 @@ namespace Application
 
             m_AliveCheckFunction = nullptr;
             m_TickFunction = nullptr;
+            TLL(DE_DEBUG, "(ThreadLoop[{0}] Abandon) Marking as ABANDONED", m_DebugName);
             m_State = State::ABANDONED;
         }
         m_FunctsMutex.Unlock();

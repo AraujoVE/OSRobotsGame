@@ -89,6 +89,7 @@ namespace EvoAlg
             gameplayResults.push_back(*result);
             //TODO: fix ml
             //delete result;
+            break;
         }
 
         //TODO: free all scripts and gameRunners
