@@ -19,15 +19,8 @@ namespace Application
 
     void EAGameGuiLayer::ImGuiDescription()
     {
-        //TODO: stop using static
-        static GameRunner *lastGameRunner = m_EAGuiProps.MainGameRunner;
         bool settingsChanged = false;
 
-        if (lastGameRunner != m_EAGuiProps.MainGameRunner)
-        {
-            settingsChanged = true;
-            lastGameRunner = m_EAGuiProps.MainGameRunner;
-        }
         static int a = 0;
         ImGui::Begin("Settings");
         {
@@ -38,22 +31,19 @@ namespace Application
         }
         ImGui::End();
 
-        uint32_t gameSpeed = 0, min = 1, max = 500e3;
+        // uint32_t gameSpeed = 0, min = 1, max = 500e3;
 
-        if (m_EAGuiProps.MainGameRunner != nullptr)
-            gameSpeed = m_EAGuiProps.MainGameRunner->GetGameConsts().GetTickDelay();
-        uint32_t receivedSpeed = gameSpeed;
-
+        // if (m_EAGuiProps.MainGameRunner != nullptr)
+        //     gameSpeed = m_EAGuiProps.MainGameRunner->GetGameConsts().GetTickDelay();
+        // uint32_t receivedSpeed = gameSpeed;
 
         const EAStatus &eaStatus = m_EAController->GetStatus();
-        static const char* const stageMessage[] = {
+        static const char *const stageMessage[] = {
             "INACTIVE",
             "WAITING_GENERATION",
             "RUNNING_GENERATION",
             "FINISHED",
-            "ABORTED"
-        };
-
+            "ABORTED"};
 
         bool startPressed = false, abortPressed = false;
         ImGui::Begin("EAStatus");
@@ -64,8 +54,8 @@ namespace Application
             abortPressed = ImGui::Button("Abort EA");
             ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.Pause);
 
-            if (gameSpeed > 0)
-                ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
+            // if (gameSpeed > 0)
+            //     ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
 
             ImGui::Text("Current Generation: %lu", eaStatus.m_EvolutionInfo.CurrentGeneration);
 
@@ -95,10 +85,10 @@ namespace Application
             m_EAController->Start();
         }
 
-        if (gameSpeed != receivedSpeed)
-        {
-            m_EAGuiProps.MainGameRunner->GetGameConsts().SetTickDelay(gameSpeed);
-        }
+        // if (gameSpeed != receivedSpeed)
+        // {
+        //     m_EAGuiProps.MainGameRunner->GetGameConsts().SetTickDelay(gameSpeed);
+        // }
     }
 
 } // namespace Application

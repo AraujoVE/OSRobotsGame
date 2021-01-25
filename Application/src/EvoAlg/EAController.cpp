@@ -113,10 +113,11 @@ namespace EvoAlg
         m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
         m_GuiProps.MainGameRunner = nullptr;
 
+        //TODO: send m_EvolutionInfo to EvolutionaryAlgorithm.cpp to get more info, such as best and worst fitness, etc...
         m_Status.m_EvolutionInfo.CurrentGeneration++;
 
         DE_DEBUG("(RunPopulationInGame) All individuals have been tested! returning results");
-        usleep(500e3);
+        // usleep(50);
         return gameplayResults;
     }
 
