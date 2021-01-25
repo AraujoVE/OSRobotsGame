@@ -56,7 +56,7 @@ namespace EvoAlg
         };
 
         GameConsts *gameConsts = new GameConsts();
-        gameConsts->SetTickDelay(50e3);
+        gameConsts->SetTickDelay(5e3);
         auto *aaa = new GameRunner(gameConsts);
         m_GuiProps.MainGameRunner = aaa;
 
