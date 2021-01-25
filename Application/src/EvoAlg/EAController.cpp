@@ -12,6 +12,7 @@
 #include "mypch.hpp"
 
 #include "EvoAlg/Types.hpp"
+#include "EvoAlg/Threads/ThreadController.hpp"
 
 namespace EvoAlg
 {
@@ -46,69 +47,38 @@ namespace EvoAlg
 
         DE_DEBUG("EAController::RunPopulationInGame()");
         //Index of array corresponds to IndividualID
-        std::vector<IndividualRunResult> gameplayResults;
+        
 
-        struct IndividualRun
-        {
-            Individual *individual;
-            GameRunner *gameRunner;
-            ScriptRunner *scriptRunner;
-        };
+        ThreadController threadController;
 
-        GameConsts *gameConsts = new GameConsts();
-        gameConsts->SetTickDelay(5e2);
-        auto *aaa = new GameRunner(gameConsts);
-        m_GuiProps.MainGameRunner = aaa;
+        //TODO: change
+        m_GuiProps.MainGameRunner = nullptr;
 
-        //TODO: event EH_GameAttached (wait for UI to be ready (only if ShowGame is true))
+        //TODO: event EH_GGuiGameAttached (wait for UI to be ready (only if ShowGame is true))
         // usleep(1);
 
-        DE_INFO("(EAController) Preparing population to be executed...");
+        std::vector<void*> pointersPendingDeletion;
+        
         for (unsigned int i = 0; i < populationGenes.size(); i++)
-        {
-            //TODO: think what to do in async mode (probably vector of GameRunners)
-            m_GuiProps.MainGameRunner = aaa;
-            
-            DE_INFO("(EAController) Preparing individual #{0}", i);
+        {   
+            GameConsts *currentGameConsts = new GameConsts();
+            currentGameConsts->LoadFromCromossome(populationGenes[i]);
+            currentGameConsts->SetTickDelay(5e2);
 
-            DE_INFO("(EAController) Copying genes from individual #{0}", i);
-            Individual *currentIndividual = new Individual{i, {populationGenes[i]}};
 
-            DE_INFO("(EAController) Creating game runner for individual #{0}", i);
-            GameRunner *currentGameRunner = aaa;
-
-            DE_DEBUG("(RunPopulationInGame) Loading game runner with cromossome...");
-            currentGameRunner->GetGameConsts().LoadFromCromossome(populationGenes[i]);
-
-            DE_DEBUG("(RunPopulationInGame) Loaded Successfully.");
+            Individual *currentIndividual = new Individual{i, populationGenes[i]};
+            GameRunner *currentGameRunner = new GameRunner(currentGameConsts);
             ScriptRunner *currentScriptRunner = new ScriptRunner(*m_Script, *currentGameRunner, *currentIndividual);
 
-            // IndividualRun *run = new IndividualRun{
-            //     currentIndividual,
-            //     currentGameRunner,
-            //     currentScriptRunner
-            // };
-
-            //TODO: allow async with MAX_THREADS control
-            IndividualRunResult *result = currentScriptRunner->RunAllGameplays();
-            gameplayResults.push_back(*result);
-            //TODO: fix ml
-            //delete result;
-
-            DE_TRACE("(RunPopulationInGame) Individual #{0} completed successfully", i);
-
-            //TODO: remove visual hint of change
-            // {
-            //     m_GuiProps.MainGameRunner = nullptr;
-            //     usleep(5e6);
-            //     m_GuiProps.MainGameRunner = aaa;
-            // }
-            
-            m_GuiProps.MainGameRunner = nullptr;
+            threadController.AddIndividualRun(IndividualRun{
+                currentIndividual,
+                currentGameRunner,
+                currentScriptRunner
+            });
         }
 
-        //TODO: free all scripts and gameRunners
-        delete aaa;
+        std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteRuns();
+
 
         m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
         m_GuiProps.MainGameRunner = nullptr;
@@ -116,7 +86,9 @@ namespace EvoAlg
         //TODO: send m_EvolutionInfo to EvolutionaryAlgorithm.cpp to get more info, such as best and worst fitness, etc...
         m_Status.m_EvolutionInfo.CurrentGeneration++;
 
-        DE_DEBUG("(RunPopulationInGame) All individuals have been tested! returning results");
+
+        usleep(5e2);
+
         return gameplayResults;
     }
 

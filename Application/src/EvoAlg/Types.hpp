@@ -12,7 +12,7 @@ namespace EvoAlg
     
     struct Individual {
         unsigned int ID;
-        GeneVec Genes;
+        const GeneVec& Genes;
     };
 
     struct TimeResult {

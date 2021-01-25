@@ -478,7 +478,8 @@ namespace EvoAlg
             evaluatePop();
             selectionAndMutation();
 
-            saveGenerationData(generationIndex);
+            //TODO: solve exception
+            // saveGenerationData(generationIndex);
 
             checkEvents(); // checks if mutation should increase, predation or population reset should occur etc.
             // if fullPopReset() is called, continueEA = false

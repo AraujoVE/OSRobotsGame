@@ -1,43 +1,36 @@
 #pragma once
 
+#include "EvoAlg/Types.hpp"
+#include "EvoAlg/ScriptRunner.hpp"
+#include "Application/Game/GameRunner.hpp"
+
 #include <stdint.h>
 #include <queue>
 
 namespace EvoAlg
 {
+    struct IndividualRun
+    {
+        Individual *individual;
+        Application::GameRunner *gameRunner;
+        ScriptRunner *scriptRunner;
+    };
 
     class ThreadController
     {
     public:
-        void SetMaxThreads(uint8_t maxThreads) {
-            if (maxThreads < 2) DE_FATAL("Currently it's not possible to run this EA with less than 2 threads");
+        void SetMaxThreads(uint8_t maxThreads);
+        inline uint8_t GetMaxThreads() { return m_MaxIndividualThreads + m_MaxGameplayThreads; }
+        void AddIndividualRun(const IndividualRun& indRun);
 
-            //A pack is an IndividualThread + m_GameplaysPerIndividual threads
-            uint8_t packSize = m_GameplaysPerIndividual + 1;
-            if (maxThreads > (m_GameplaysPerIndividual + 1)) {
-                uint8_t threadPacks = maxThreads / packSize;
-                m_MaxIndividualThreads = threadPacks;
-                m_MaxGameplayThreads = threadPacks * m_GameplaysPerIndividual;
-            }
-            else {
-                m_MaxIndividualThreads = 1;
-                m_MaxGameplayThreads = maxThreads - 1;
-            }
-        }
-
-        void StartGameplay();
-        void StartIndividualRun();
-
-        void WaitForAllRuns();
+        std::vector<IndividualRunResult> ExecuteRuns();
 
     private:
 
-        void onMaxThreadsChanged() {
-            //TODO: start processing queued stuff
-            //TODO?: if maxThreads--, check if it is possible to pause some threads (nonimportant)
-        }
+        void OnMaxThreadsChanged();
 
-        std::queue<IndividualPackOrSomethingLikeThat> queuedOperations;
+        
+        std::queue<IndividualRun> m_QueuedRuns;
         uint8_t m_CurrentRunningThreads = 0;
 
         //TODO: get this dinamically
