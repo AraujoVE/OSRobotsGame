@@ -26,12 +26,9 @@ namespace EvoAlg
         m_Script = converter.Convert();
 
         //m_Script.Save()
-        
-
-        // m_Algorithm.startAlgorithm();
 
         Application::Action<> rpig([this] {
-            RunPopulationInGame({});
+            m_Algorithm.startAlgorithm();
         });
         rpig.Invoke();
     }
@@ -45,9 +42,6 @@ namespace EvoAlg
     //TODO: assert is being called from only one thread (maybe mutex)
     std::vector<IndividualRunResult> EAController::RunPopulationInGame(const std::vector<GeneVec> &populationGenes)
     {
-        GameConsts *fileGameConsts = new GameConsts();
-        fileGameConsts->LoadValuesFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
-
         DE_ASSERT(m_Script != nullptr);
 
         DE_DEBUG("EAController::RunPopulationInGame()");
@@ -61,27 +55,28 @@ namespace EvoAlg
             ScriptRunner *scriptRunner;
         };
 
-        // GameConsts *gameConsts = new GameConsts();
-        // gameConsts->SetTickDelay(1);
-        auto *aaa = new GameRunner(fileGameConsts);
+        GameConsts *gameConsts = new GameConsts();
+        gameConsts->SetTickDelay(50e3);
+        auto *aaa = new GameRunner(gameConsts);
         m_GuiProps.MainGameRunner = aaa;
 
         //TODO: event EH_GameAttached (wait for UI to be ready)
-        usleep(5e6);
+        usleep(1e6);
 
         DE_INFO("(EAController) Preparing population to be executed...");
-        for (unsigned int i = 0; i < 20; i++)
+        for (unsigned int i = 0; i < populationGenes.size(); i++)
         {
+            
             DE_INFO("(EAController) Preparing individual #{0}", i);
 
-            DE_INFO("(EAController) Copying genes individual #{0}", i);
-            Individual *currentIndividual = new Individual{i, {}};
+            DE_INFO("(EAController) Copying genes from individual #{0}", i);
+            Individual *currentIndividual = new Individual{i, {populationGenes[i]}};
 
             DE_INFO("(EAController) Creating game runner for individual #{0}", i);
             GameRunner *currentGameRunner = aaa;
 
             DE_DEBUG("(RunPopulationInGame) Loading game runner with cromossome...");
-            // currentGameRunner->GetGameConsts().LoadFromCromossome(populationGenes[i]);
+            currentGameRunner->GetGameConsts().LoadFromCromossome(populationGenes[i]);
 
             DE_DEBUG("(RunPopulationInGame) Loaded Successfully.");
             ScriptRunner *currentScriptRunner = new ScriptRunner(*m_Script, *currentGameRunner, *currentIndividual);
@@ -114,7 +109,10 @@ namespace EvoAlg
         m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
         m_GuiProps.MainGameRunner = nullptr;
 
+        m_Status.m_EvolutionInfo.CurrentGeneration++;
+
         DE_DEBUG("(RunPopulationInGame) All individuals have been tested! returning results");
+        usleep(500e3);
         return gameplayResults;
     }
 

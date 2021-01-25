@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DampEngine/Threads/Mutex.hpp"
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Game/Ingame/RobotFunctions.hpp"
@@ -37,6 +38,8 @@ namespace Application
         void GameLostGuiDescription();
 
     private:
+        DampEngine::Mutex m_GameRunnerMutex, m_GameWindowsMutex;
+        
         
         const static int SCRIPT_FUNCT_SIZEE = 7;
 

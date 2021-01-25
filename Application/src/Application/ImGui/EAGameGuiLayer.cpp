@@ -20,7 +20,6 @@ namespace Application
     void EAGameGuiLayer::ImGuiDescription()
     {
         //TODO: stop using static
-        static const char *status = "Stopped";
         static GameRunner *lastGameRunner = m_EAGuiProps.MainGameRunner;
         bool settingsChanged = false;
 
@@ -68,7 +67,7 @@ namespace Application
             if (gameSpeed > 0)
                 ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
 
-            ImGui::Text("Current Generation: %lu", (uint64_t)0);
+            ImGui::Text("Current Generation: %lu", eaStatus.m_EvolutionInfo.CurrentGeneration);
 
             if (ImGui::TreeNode("Running Games"))
             {
