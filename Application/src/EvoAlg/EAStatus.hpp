@@ -2,7 +2,7 @@
 
 namespace EvoAlg
 {
-
+    //TODO: remove if end up not being used
     enum class EAMode
     {
         PRESENTATION,
@@ -11,10 +11,22 @@ namespace EvoAlg
 
     enum class EAStage
     {
-        INACTIVE,
+        INACTIVE = 0,
         WAITING_GENERATION,
         RUNNING_GENERATION,
+        FINISHED,
         ABORTED
+    };
+
+
+    struct EvolutionInfo {
+        uint64_t CurrentGeneration = 0; //0 means not started yet
+    };
+
+    struct ExecutionInfo {
+        EAStage Stage = EAStage::INACTIVE;
+        EAMode Mode = EAMode::PRESENTATION;
+        uint8_t MaxThreads = 1;
     };
 
     struct EAStatus
@@ -34,9 +46,8 @@ namespace EvoAlg
 
     */
 
-        unsigned char MaxThreads = 1;
-        EAMode SelectedMode = EAMode::SPEED;
-        EAStage CurrentStage = EAStage::INACTIVE;
+        ExecutionInfo m_ExecutionInfo;
+        EvolutionInfo m_EvolutionInfo;
     };
 
 } // namespace EvoAlg

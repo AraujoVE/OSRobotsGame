@@ -37,7 +37,9 @@ namespace EvoAlg
         void Start();
         void Cancel();
 
-        inline bool IsRunning() { return m_Status.CurrentStage != EAStage::INACTIVE; }
+        inline bool IsRunning() { return m_Status.m_ExecutionInfo.Stage != EAStage::INACTIVE; }
+
+        inline const EAStatus &GetStatus() { return m_Status; }
         
 
         //DO NOT CALL ASYNCHRONOUSLY

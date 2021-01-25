@@ -121,8 +121,9 @@ namespace EvoAlg
         for (size_t i = 0; i < population.n_rows; ++i)
             populationVec2[i] = (arma::conv_to<std::vector<double>>::from(population.row(i)));
 
-        DE_TRACE("Sending population to EAController to execute it");
+        DE_TRACE("(EvolutionaryAlgorithm) Sending population to EAController to execute it");
         auto gameplayResults = m_EAController.RunPopulationInGame(populationVec2);
+        DE_TRACE("(EvolutionaryAlgorithm) Population received from EAController");
 
         DE_TRACE("Calculating fitness of population after gameplay results received");
         calcFitness(gameplayResults);
@@ -477,7 +478,8 @@ namespace EvoAlg
             evaluatePop();
             selectionAndMutation();
 
-            saveGenerationData(generationIndex);
+            //TODO: solve exception
+            // saveGenerationData(generationIndex);
 
             checkEvents(); // checks if mutation should increase, predation or population reset should occur etc.
             // if fullPopReset() is called, continueEA = false

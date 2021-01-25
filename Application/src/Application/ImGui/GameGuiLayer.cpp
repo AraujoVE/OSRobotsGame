@@ -13,10 +13,9 @@ namespace Application
 {
     GameGuiLayer::GameGuiLayer() : m_GameRunner(nullptr), m_GameStartedEventHandler(nullptr)
     {
-        m_GameStartedEventHandler = new EH_GameStarted([=](GameRunner &eventGR){
+        m_GameStartedEventHandler = new EH_GameStarted([=](GameRunner &eventGR) {
             DE_ASSERT(m_GameRunner != nullptr, "(GameGuiLayer) Receiving EH_GameStarted while no game is attached!! (did you forget to unregister the event?)");
             DE_ASSERT(m_GameRunner == &eventGR, "(GameGuiLayer) Receiving EH_GameStarted from an invalid GameRunner (did you forget to unregister the event?)");
-
 
             //Hacky way to update VillageStats and RobotsManagement references on the inner windows
             DeinitializeGameWindows();
@@ -28,67 +27,104 @@ namespace Application
 
     void GameGuiLayer::SetGameRunner(GameRunner *newRunner)
     {
-        if (m_GameRunner == newRunner) return;
+        m_GameRunnerMutex.Lock();
+        {
+            if (m_GameRunner == newRunner)
+            {
+                m_GameRunnerMutex.Unlock();
+                return;
+            }
 
-        if (m_GameRunner != nullptr) {
-            DeinitializeGameWindows();
-            m_GameRunner->UnregisterOnGameStarted(m_GameStartedEventHandler);
+            if (m_GameRunner != nullptr)
+            {
+                DeinitializeGameWindows();
+                m_GameRunner->UnregisterOnGameStarted(m_GameStartedEventHandler);
+            }
+
+            m_GameRunner = newRunner;
+
+            if (newRunner != nullptr)
+            {
+                InitializeGameWindows();
+                m_GameRunner->RegisterOnGameStarted(m_GameStartedEventHandler);
+            }
         }
-
-        m_GameRunner = newRunner;
-
-        if (newRunner != nullptr) {
-            InitializeGameWindows();
-            m_GameRunner->RegisterOnGameStarted(m_GameStartedEventHandler);
-        }
+        m_GameRunnerMutex.Unlock();
     }
 
     void GameGuiLayer::InitializeGameWindows()
     {
-        DE_ASSERT(m_GameRunner != nullptr, "Trying to initialize game windows with no GameRunner attached");
+        m_GameWindowsMutex.Lock();
+        {
+            DE_ASSERT(m_GameRunner != nullptr, "Trying to initialize game windows with no GameRunner attached");
 
-        m_StatusWindow = new StatusWindow(m_GameRunner->GetSave().GetVillageStats());
+            m_StatusWindow = new StatusWindow(m_GameRunner->GetSave().GetVillageStats());
 
-        m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::HUNT);
-        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::CONSTRUCTION);
-        m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::MEDICINE);
-        m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::PROTECTION);
-        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
+            m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::HUNT);
+            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::CONSTRUCTION);
+            m_FunctionWindows[(int)RobotFunction::MEDICINE] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::MEDICINE);
+            m_FunctionWindows[(int)RobotFunction::PROTECTION] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::PROTECTION);
+            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::RESOURCE_GATHERING);
 
-        m_RobotCreationWindow = new RobotCreationWindow(m_GameRunner->GetSave().GetRobotsManagement());
-        
-        m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
-        m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
-        m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
-        m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
-        m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+            m_RobotCreationWindow = new RobotCreationWindow(m_GameRunner->GetSave().GetRobotsManagement());
+
+            m_FunctionWindows[(int)RobotFunction::HUNT]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::MEDICINE]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
+        }
+        m_GameWindowsMutex.Unlock();
     }
 
     void GameGuiLayer::DeinitializeGameWindows()
     {
-        delete m_StatusWindow;
+        m_GameWindowsMutex.Lock();
+        {
+            delete m_StatusWindow;
+            m_StatusWindow = nullptr;
 
-        delete m_FunctionWindows[(int)RobotFunction::HUNT];
-        delete m_FunctionWindows[(int)RobotFunction::MEDICINE];
-        delete m_FunctionWindows[(int)RobotFunction::CONSTRUCTION];
-        delete m_FunctionWindows[(int)RobotFunction::PROTECTION];
-        delete m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING];
+            delete m_FunctionWindows[(int)RobotFunction::HUNT];
+            m_FunctionWindows[(int)RobotFunction::HUNT] = nullptr;
 
-        delete m_RobotCreationWindow;
+            delete m_FunctionWindows[(int)RobotFunction::MEDICINE];
+            m_FunctionWindows[(int)RobotFunction::MEDICINE] = nullptr;
+
+            delete m_FunctionWindows[(int)RobotFunction::CONSTRUCTION];
+            m_FunctionWindows[(int)RobotFunction::CONSTRUCTION] = nullptr;
+
+            delete m_FunctionWindows[(int)RobotFunction::PROTECTION];
+            m_FunctionWindows[(int)RobotFunction::PROTECTION] = nullptr;
+
+            delete m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING];
+            m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING] = nullptr;
+
+            delete m_RobotCreationWindow;
+            m_RobotCreationWindow = nullptr;
+        }
+        m_GameWindowsMutex.Unlock();
     }
 
     void GameGuiLayer::ImGuiDescription()
     {
-        if (m_GameRunner == nullptr)
-            NoGameAttachedGuiDescription();
-        else if (m_GameRunner->IsGameLost())
-            GameLostGuiDescription();
-        else
-            MainGameGuiDescription();
+        m_GameRunnerMutex.Lock();
+        m_GameWindowsMutex.Lock();
+        {
+            if (m_GameRunner == nullptr)
+                NoGameAttachedGuiDescription();
+            else if (m_GameRunner->IsGameLost())
+                GameLostGuiDescription();
+            else
+                MainGameGuiDescription();
+        }
+        m_GameWindowsMutex.Unlock();
+        m_GameRunnerMutex.Unlock();
     }
 
     void GameGuiLayer::NoGameAttachedGuiDescription()
     {
+        //MUTEXES ASSURED BY GameGuiLayer::ImGuiDescription
+
         ImGui::Begin("NoGameAttached");
         {
             ImGui::Text("NO GAME IS ATTACHED TO THIS GUI");
@@ -98,6 +134,8 @@ namespace Application
 
     void GameGuiLayer::MainGameGuiDescription()
     {
+        //MUTEXES ASSURED BY GameGuiLayer::ImGuiDescription
+
         DE_ASSERT(m_GameRunner != nullptr);
 
         ImGuiWindowFlags windowFlags = ImGuiBackendFlags_None;
@@ -126,7 +164,9 @@ namespace Application
     }
 
     void GameGuiLayer::GameLostGuiDescription()
-    {
+    {   
+        //MUTEXES ASSURED BY GameGuiLayer::ImGuiDescription
+
         DE_ASSERT(m_GameRunner != nullptr);
 
         bool restart, quit;

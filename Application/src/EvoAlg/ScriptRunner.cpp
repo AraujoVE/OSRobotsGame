@@ -14,12 +14,12 @@
 
 using namespace Application;
 
-#define EAS_SRM (m_GameRunner.GetSave().GetRobotsManagement())
-#define EAS_SVS (m_GameRunner.GetSave().GetVillageStats())
+#define EAS_SRM (gameRunner.GetSave().GetRobotsManagement())
+#define EAS_SVS (gameRunner.GetSave().GetVillageStats())
 namespace EvoAlg
 {
-    ScriptRunner::ScriptRunner(Script &script, GameRunner &gameRunner, const Individual &individual)
-        : m_Script(script), m_GameRunner(gameRunner), m_Individual(individual), m_OperationFunctions(gameRunner)
+    ScriptRunner::ScriptRunner(Script &script)
+        : m_Script(script)
     {
         initScriptDirections();
     }
@@ -32,8 +32,6 @@ namespace EvoAlg
     {
         int tokenPos, curGameplay = -1, curOp;
         std::string line;
-
-        uint32_t currentTickDelay = m_GameRunner.GetGameConsts().GetTickDelay();
 
         for (auto line : m_Script.m_Instructions)
         {
@@ -57,37 +55,28 @@ namespace EvoAlg
                     tokenPos = line.find(",");
                 }
                 m_GameScript.at(curGameplay).at(curOp).push_back(line);
-
-                //If it is a wait operation, hijack another parameter with DELAY_MICRO
-                if (m_GameScript.at(curGameplay).at(curOp).at(0) == "6")
-                    m_GameScript.at(curGameplay).at(curOp).push_back(std::to_string(currentTickDelay));
             }
         }
     }
 
-    std::vector<TimeResult> *ScriptRunner::RunAllGameplays()
+    std::vector<TimeResult> *ScriptRunner::RunAllGameplays(GameRunner &gameRunner, Individual &individual)
     {
 
         auto *gameplaysResults = new std::vector<TimeResult>();
         uint64_t gameplayCount = m_GameScript.size();
 
         //TODO?: async calling more gameplays (respecting MAX_THREADS) [problem with unique m_GameRunner]
-        for (uint64_t curGameplay = 0; curGameplay < gameplayCount; curGameplay++)
+        for (uint64_t curGameplayIdx = 0; curGameplayIdx < gameplayCount; curGameplayIdx++)
         {
-            gameplaysResults->push_back(RunGameplay(curGameplay));
-            DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_Individual.ID);
-            break;
+            gameplaysResults->push_back(RunGameplay(gameRunner, individual, curGameplayIdx));
+            DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", individual.ID);
         }
 
         return gameplaysResults;
     }
 
-    TimeResult ScriptRunner::RunGameplay(uint64_t gameplayIndex)
+    TimeResult ScriptRunner::RunGameplay(GameRunner &gameRunner, Individual &individual, uint64_t gameplayIndex)
     {
-        //Reference Tickdelay as copy, in case of
-        //TODO: assure that Tickdelay WON'T BE CHANGED in the middle of the gameplay (or else fitness will be wrong)
-        uint32_t currentTickDelay = m_GameRunner.GetGameConsts().GetTickDelay();
-
         //TODO: change to bigger size (uint64/32)
         int measuredDurationInTicks = -1;
 
@@ -97,14 +86,14 @@ namespace EvoAlg
         std::future<void> gameStartedFuture = gameStartedPromise.get_future();
 
         //Defining game callbacks that will activate the promises above
-        auto gameStartedConfirmationCB = [this, &gameStartedPromise](GameRunner &gameRunner) {
-            DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", m_Individual.ID);
+        auto gameStartedConfirmationCB = [&individual, &gameStartedPromise](GameRunner &gameRunner) {
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", individual.ID);
             gameStartedPromise.set_value();
             return false;
         };
 
-        auto gameEndedConfirmationCB = [this, &measuredDurationInTicks, &gameEndedPromise](GameRunner &gameRunner, int elapsedTimeInTicks) {
-            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", m_Individual.ID);
+        auto gameEndedConfirmationCB = [&individual, &measuredDurationInTicks, &gameEndedPromise](GameRunner &gameRunner, int elapsedTimeInTicks) {
+            DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", individual.ID);
             measuredDurationInTicks = elapsedTimeInTicks;
             gameEndedPromise.set_value();
             return false;
@@ -114,56 +103,56 @@ namespace EvoAlg
         EH_GameEnded *gameEndedEventHandler = new EH_GameEnded(gameEndedConfirmationCB);
 
         //Add to the GameRunner our callbacks
-        m_GameRunner.RegisterOnGameStarted(gameStartedEventHandler);
-        m_GameRunner.RegisterOnGameEnded(gameEndedEventHandler);
+        gameRunner.RegisterOnGameStarted(gameStartedEventHandler);
+        gameRunner.RegisterOnGameEnded(gameEndedEventHandler);
 
         //Request the game to start and wait it to be completely started
-        DE_TRACE("(ScriptRunner -- {0}) Requesting gameplay #{1} to start", m_Individual.ID, gameplayIndex);
+        DE_TRACE("(ScriptRunner -- {0}) Requesting gameplay #{1} to start", individual.ID, gameplayIndex);
         {
-            m_GameRunner.Start();
+            gameRunner.Start();
             gameStartedFuture.get();
         }
-        DE_TRACE("(ScriptRunner -- {0}) Gameplay #{1} to started successfully", m_Individual.ID, gameplayIndex);
+        DE_TRACE("(ScriptRunner -- {0}) Gameplay #{1} to started successfully", individual.ID, gameplayIndex);
 
         //
-        DE_TRACE("(ScriptRunner -- {0}) Starting operations of gameplay #{1}...", m_Individual.ID, gameplayIndex);
+        DE_TRACE("(ScriptRunner -- {0}) Starting operations of gameplay #{1}...", individual.ID, gameplayIndex);
         auto &operations = m_GameScript.at(gameplayIndex);
         for (size_t i = 1; i < operations.size(); i++)
         {
-            DE_DEBUG("(ScriptRunner -- {0}) Executing operation #{2} of gameplay #{1}", m_Individual.ID, gameplayIndex, i);
+            DE_DEBUG("(ScriptRunner -- {0}) Executing operation #{2} of gameplay #{1}", individual.ID, gameplayIndex, i);
 
-            m_OperationFunctions.Execute(operations[i]);
+            m_OperationFunctions.Execute(gameRunner, operations[i]);
 
             //TODO: check if this is correct
-            usleep(currentTickDelay);
+            usleep(gameRunner.GetGameConsts().GetTickDelay());
         }
-        DE_TRACE("(ScriptRunner -- {0}) All operations of gameplay #{1} executed Successfully!", m_Individual.ID, gameplayIndex);
+        DE_TRACE("(ScriptRunner -- {0}) All operations of gameplay #{1} executed Successfully!", individual.ID, gameplayIndex);
 
         //Waits for game to end
-        DE_TRACE("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", m_Individual.ID, gameplayIndex);
+        DE_TRACE("(ScriptRunner -- {0}) Waiting for gameplay #{1} to end...", individual.ID, gameplayIndex);
         gameEndedFuture.get();
-        DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", m_Individual.ID, gameplayIndex);
+        DE_INFO("(ScriptRunner -- {0}) Gameplay #{1} ended normally", individual.ID, gameplayIndex);
 
         DE_ASSERT(measuredDurationInTicks >= 0, "Game duration not calculated correctly");
-        DE_ASSERT(m_GameRunner.IsGameLost(), "** Game ended but gameplay is not lost!!! **");
+        DE_ASSERT(gameRunner.IsGameLost(), "** Game ended but gameplay is not lost!!! **");
 
         double targetDurationAU = stol(m_GameScript.at(gameplayIndex).at(0).at(0));
         double measuredDurationAU = measuredDurationInTicks * AU_PER_TICK;
 
-        m_GameRunner.UnregisterOnGameStarted(gameStartedEventHandler);
-        m_GameRunner.UnregisterOnGameEnded(gameEndedEventHandler);
+        gameRunner.UnregisterOnGameStarted(gameStartedEventHandler);
+        gameRunner.UnregisterOnGameEnded(gameEndedEventHandler);
 
         return TimeResult{targetDurationAU, measuredDurationAU};
     }
 
 #pragma region ScriptFunctions
 
-    void ScriptFunctions::scriptFunct0(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct0(GameRunner &gameRunner, const std::vector<std::string> &params)
     {
         EAS_SRM->createTask(static_cast<RobotFunction>(stoi(params.at(1))));
     }
 
-    void ScriptFunctions::scriptFunct1(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct1(GameRunner &gameRunner, const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -175,7 +164,7 @@ namespace EvoAlg
         EAS_SRM->cancelTask(*curTask.value());
     }
 
-    void ScriptFunctions::scriptFunct2(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct2(GameRunner &gameRunner, const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -187,7 +176,7 @@ namespace EvoAlg
         EAS_SRM->moveRobot(*curTask.value(), 1);
     }
 
-    void ScriptFunctions::scriptFunct3(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct3(GameRunner &gameRunner, const std::vector<std::string> &params)
     {
         auto curTask = EAS_SRM->findTask(stoi(params.at(2)), (RobotFunction)stoi(params.at(1)));
         if (!curTask.has_value())
@@ -199,17 +188,17 @@ namespace EvoAlg
         EAS_SRM->moveRobot(*curTask.value(), -1);
     }
 
-    void ScriptFunctions::scriptFunct4(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct4(GameRunner &gameRunner, const std::vector<std::string> &params)
     {
         EAS_SRM->createRobots(1);
     }
 
-    void ScriptFunctions::scriptFunct5(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct5(GameRunner &gameRunner, const std::vector<std::string> &params)
     {
         EAS_SRM->destroyRobots(1);
     }
 
-    void ScriptFunctions::scriptFunct6(const std::vector<std::string> &params)
+    void ScriptFunctions::scriptFunct6(GameRunner &gameRunner, const std::vector<std::string> &params)
     {
         double waitsPerSecond = 1e6 / HUMAN_OP_DELAY;
 
@@ -219,9 +208,13 @@ namespace EvoAlg
         if (waitCount > 0)
             waitCount--;
 
-        float DELAY_MICRO = std::stof(params.at(2));
+        while (waitCount-- > 0)
+            usleep(gameRunner.GetGameConsts().GetTickDelay());
+    }
 
-        usleep(waitCount * DELAY_MICRO);
+    void ScriptFunctions::Execute(GameRunner &gameRunner, const std::vector<std::string> &operation)
+    {
+        (this->*(scriptLoopFuncts[stoi(operation.at(0))]))(gameRunner, operation);
     }
 
 #pragma endregion

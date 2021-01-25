@@ -35,7 +35,8 @@ namespace Application
         std::srand(std::time(nullptr)); // use current time as seed for random generator
         
         initializeVSAvenues();
-
+        initializeStats();
+        
         m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::DecayStats, this));
         m_DecayThreadLoop.SetAliveCheckFunction([this] {
             return this->getPopulation() > 0;
@@ -204,7 +205,7 @@ namespace Application
     {
         DE_TRACE("VillageStats::onGameStarted()");
         initializeStats();
-        m_DecayThreadLoop.Start(m_GameConstsCache.TICK_DELAY_MICRO);
+        m_DecayThreadLoop.Start(&m_GameConstsCache.TICK_DELAY_MICRO);
     }
 
     void VillageStats::onGameEnded() {
@@ -249,10 +250,6 @@ namespace Application
         avenueVS[POPULATION_INDEX]->up();
 
         m_ElapsedTicks += 1;
-
-        if (m_ElapsedTicks % 10){
-            DE_TRACE("VillageStats is alive!");
-        }
     }
 
     unsigned int VillageStats::GetElapsedTimeTicks()

@@ -47,7 +47,8 @@ namespace Application
         State m_State;
         bool m_Paused;
 
-        uint32_t m_TickDelay = HUMAN_TICK_DELAY_MICRO;
+        const static uint32_t s_HumanTickDelay;
+        const uint32_t *m_TickDelay;
     public:
         EventListener *m_EventListener;
 
@@ -64,7 +65,7 @@ namespace Application
         inline void Unpause() { Pause(false); }
         inline bool IsPaused() { return m_Paused; }
         inline bool IsRunning() { return m_State == State::RUNNING; }
-        void Start(uint32_t tickDelay);
+        void Start(const uint32_t *tickDelay);
         void Stop();
         void Abandon();
     };

@@ -34,7 +34,10 @@ namespace Application
         totRobots =  m_GameConstsCache.TOT_ROBOTS_INI;
         freeRobots =  m_GameConstsCache.TOT_ROBOTS_INI;
         prodCost = m_GameConstsCache. PROD_COST_INI;
+        m_VillageStatsMutex.Lock();
         villageStats = NULL;
+        m_VillageStatsMutex.Unlock();
+
     }
 
     RobotsManagement::~RobotsManagement() {
@@ -79,12 +82,21 @@ namespace Application
         return canRemove;
     }
 
-    bool RobotsManagement::canAddRobots() const{
+    bool RobotsManagement::canAddRobots() {
+        bool canAdd = false;
+        m_VillageStatsMutex.Lock();
         robotsAvenues[PROD_COST]->down();
-        villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING)->down();
-        bool canAdd = villageStats->getResources() >= prodCost;
-        villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING)->up();
+        {
+            if (villageStats != nullptr) {
+                villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING)->down();
+                canAdd = villageStats->getResources() >= prodCost;
+                villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING)->up();
+            } else {
+                DE_WARN("(RobotsManagement::canAddRobots) return false because villageStats is nullptr");
+            }
+        }
         robotsAvenues[PROD_COST]->up();
+        m_VillageStatsMutex.Unlock();
 
         return canAdd;
     }
@@ -145,7 +157,12 @@ namespace Application
 
     void RobotsManagement::setVillageStats(VillageStats *newVillageStats)
     {
-        villageStats = newVillageStats;
+        //TODO: call this function when VS is destroyed (setVillageStats(nullptr))
+        m_VillageStatsMutex.Lock();
+        {
+            villageStats = newVillageStats;
+        }
+        m_VillageStatsMutex.Unlock();
     }
 
     bool RobotsManagement::createRobots(uint64_t no)
@@ -156,25 +173,36 @@ namespace Application
         bool hasCreated = false;
 
         price = prodCost * no;
-        VSResourcesAvenue = villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING);
-        VSResourcesAvenue->down();
-        currentResources = villageStats->getResources();
-
-        //Calcula se existe dinheiro o suficiente para criar um robô
-        if (currentResources >= price)
+        m_VillageStatsMutex.Lock();
         {
-            //Decrementa dos recursos o custo de produção do robô
-            villageStats->setResources(currentResources-price);
-            VSResourcesAvenue->up();
-            
-            //Incrementa o número total e o número de robôs livres
-            changeRobotsNum(TOT_ROBOTS, no);
-            changeRobotsNum(FREE_ROBOTS, no);
+            if (villageStats == nullptr) {
+                DE_WARN("(RobotsManagement) createRobots failed because villageStats == nullptr");
+                m_VillageStatsMutex.Unlock();
+                return false;
+            }
 
-            hasCreated = true;
-        } else {
-            VSResourcesAvenue->up();
+            VSResourcesAvenue = villageStats->getAvenue(RobotFunction::RESOURCE_GATHERING);
+            VSResourcesAvenue->down();
+            currentResources = villageStats->getResources();
+
+            //Calcula se existe dinheiro o suficiente para criar um robô
+            if (currentResources >= price)
+            {
+                //Decrementa dos recursos o custo de produção do robô
+                villageStats->setResources(currentResources-price);
+                VSResourcesAvenue->up();
+                
+                //Incrementa o número total e o número de robôs livres
+                changeRobotsNum(TOT_ROBOTS, no);
+                changeRobotsNum(FREE_ROBOTS, no);
+
+                hasCreated = true;
+            } else {
+                VSResourcesAvenue->up();
+            }
+
         }
+        m_VillageStatsMutex.Unlock();
 
 
         m_EventListener.On<EH_RobotsCreated>(no);
@@ -253,7 +281,14 @@ namespace Application
             prodCost = (int)((float)prodCost * increase);
             robotsAvenues[PROD_COST]->up();
         }
-        villageStats->changeStat((int)endedTask.GetRobotFunction(), (int)endedTask.GetGainedGoods());
+
+        m_VillageStatsMutex.Lock();
+        {
+            if (villageStats != nullptr) villageStats->changeStat((int)endedTask.GetRobotFunction(), (int)endedTask.GetGainedGoods());
+            else { DE_WARN("(RobotsManagement::taskEndedRoutine) ignoring villageStats->changeStat, since villageStats is nullptr"); }
+        }
+        m_VillageStatsMutex.Unlock();
+
 
         auto &map = tasks[(int)endedTask.GetRobotFunction()];
         Task::TaskID id = endedTask.GetID();

@@ -14,10 +14,9 @@ namespace Application
     const ParameterApplier PredefinedAppliers::defaultApplier = [](GameConsts *, float receivedValue, std::vector<std::string>) {
         return receivedValue;
     };
-    const ParameterApplier PredefinedAppliers::divParameters = [](GameConsts* gameConsts, float receivedValue,std::vector<std::string> paramsList) {
+    const ParameterApplier PredefinedAppliers::divParameters = [](GameConsts *gameConsts, float receivedValue, std::vector<std::string> paramsList) {
         return gameConsts->GetRawValue(paramsList.at(0)) / receivedValue;
     };
-
 
     GameConsts::GameConsts()
         : m_ConstsMap({}),
@@ -25,44 +24,42 @@ namespace Application
           m_MapMutex()
     {
 
-        m_ConstsMap.insert({
-            DA_DECL_PARAM_BASIC(ON_ATTACK_MULTIPLIER),
-            DA_DECL_PARAM_BASIC(POP_INCREASE_TAX),
-            DA_DECL_PARAM_BASIC(POP_PER_CONSTRUCTION),
-            DA_DECL_PARAM_BASIC(INIT_POP_VALUE),
-            DA_DECL_PARAM_BASIC(INIT_STAT_VALUE),
-            DA_DECL_PARAM_BASIC(ON_ATTACK_DECAY_TAX),
-            DA_DECL_PARAM_APPLY(NORMAL_DECAY_TAX,divParameters,ON_ATTACK_DECAY_TAX),
-            DA_DECL_PARAM_BASIC(ATTACK_FREQUENCY),
-            DA_DECL_PARAM_BASIC(INIT_RESOURCES_VALUE),
-            DA_DECL_PARAM_BASIC(TAX_REDUCT),
-            DA_DECL_PARAM_APPLY(MIN_LOSS_0,divParameters,MAX_LOSS_0),
-            DA_DECL_PARAM_APPLY(MIN_LOSS_1,divParameters,MAX_LOSS_1),
-            DA_DECL_PARAM_APPLY(MIN_LOSS_2,divParameters,MAX_LOSS_2),
-            DA_DECL_PARAM_APPLY(MIN_LOSS_3,divParameters,MAX_LOSS_3),
-            DA_DECL_PARAM_BASIC(MAX_LOSS_0),
-            DA_DECL_PARAM_BASIC(MAX_LOSS_1),
-            DA_DECL_PARAM_BASIC(MAX_LOSS_2),
-            DA_DECL_PARAM_BASIC(MAX_LOSS_3),
-            DA_DECL_PARAM_BASIC(TOT_ROBOTS_INI),
-            DA_DECL_PARAM_BASIC(FREE_ROBOTS_INI),
-            DA_DECL_PARAM_BASIC(PROD_COST_INI),
-            DA_DECL_PARAM_BASIC(PROD_COST_INCREASE_TAX),
-            DA_DECL_PARAM_BASIC(TIME_STEP),
-            DA_DECL_PARAM_BASIC(INIT_TIME_STEP),
-            DA_DECL_PARAM_BASIC(MAX_TIME_STEPS),
-            DA_DECL_PARAM_BASIC(MIN_REWARD),
-            DA_DECL_PARAM_BASIC(REWARD_RANGE),
-            DA_DECL_PARAM_BASIC(FAILURE_TAX)
-        });
+        m_ConstsMap.insert({DA_DECL_PARAM_BASIC(ON_ATTACK_MULTIPLIER),
+                            DA_DECL_PARAM_BASIC(POP_INCREASE_TAX),
+                            DA_DECL_PARAM_BASIC(POP_PER_CONSTRUCTION),
+                            DA_DECL_PARAM_BASIC(INIT_POP_VALUE),
+                            DA_DECL_PARAM_BASIC(INIT_STAT_VALUE),
+                            DA_DECL_PARAM_BASIC(ON_ATTACK_DECAY_TAX),
+                            DA_DECL_PARAM_APPLY(NORMAL_DECAY_TAX, divParameters, ON_ATTACK_DECAY_TAX),
+                            DA_DECL_PARAM_BASIC(ATTACK_FREQUENCY),
+                            DA_DECL_PARAM_BASIC(INIT_RESOURCES_VALUE),
+                            DA_DECL_PARAM_BASIC(TAX_REDUCT),
+                            DA_DECL_PARAM_APPLY(MIN_LOSS_0, divParameters, MAX_LOSS_0),
+                            DA_DECL_PARAM_APPLY(MIN_LOSS_1, divParameters, MAX_LOSS_1),
+                            DA_DECL_PARAM_APPLY(MIN_LOSS_2, divParameters, MAX_LOSS_2),
+                            DA_DECL_PARAM_APPLY(MIN_LOSS_3, divParameters, MAX_LOSS_3),
+                            DA_DECL_PARAM_BASIC(MAX_LOSS_0),
+                            DA_DECL_PARAM_BASIC(MAX_LOSS_1),
+                            DA_DECL_PARAM_BASIC(MAX_LOSS_2),
+                            DA_DECL_PARAM_BASIC(MAX_LOSS_3),
+                            DA_DECL_PARAM_BASIC(TOT_ROBOTS_INI),
+                            DA_DECL_PARAM_BASIC(FREE_ROBOTS_INI),
+                            DA_DECL_PARAM_BASIC(PROD_COST_INI),
+                            DA_DECL_PARAM_BASIC(PROD_COST_INCREASE_TAX),
+                            DA_DECL_PARAM_BASIC(TIME_STEP),
+                            DA_DECL_PARAM_BASIC(INIT_TIME_STEP),
+                            DA_DECL_PARAM_BASIC(MAX_TIME_STEPS),
+                            DA_DECL_PARAM_BASIC(MIN_REWARD),
+                            DA_DECL_PARAM_BASIC(REWARD_RANGE),
+                            DA_DECL_PARAM_BASIC(FAILURE_TAX)});
     }
 
     GameConsts::~GameConsts() { delete m_EventListener; }
 
     DampEngine::Mutex GameConsts::s_FileMutex;
-    void GameConsts::LoadValuesFromFile(const std::string &srcFile)
+    void GameConsts::LoadFromFile(const std::string &srcFile)
     {
-        DE_DEBUG("GameConsts::LoadValuesFromFile START");
+        DE_DEBUG("GameConsts::LoadFromFile START");
 
         s_FileMutex.Lock();
         m_MapMutex.Lock();
@@ -89,12 +86,11 @@ namespace Application
         }
         m_MapMutex.Unlock();
         s_FileMutex.Unlock();
-        
-        for (auto& pairIt : m_ConstsMap)
+
+        for (auto &pairIt : m_ConstsMap)
             pairIt.second.Apply(this);
 
-        DE_DEBUG("GameConsts::LoadValuesFromFile SUCCESS");
-
+        DE_DEBUG("GameConsts::LoadFromFile SUCCESS");
 
         m_EventListener->On<EH_GameConstsChanged>();
     }
@@ -131,12 +127,10 @@ namespace Application
             SetValue("MIN_REWARD", (float)cromossome.at(i++));
             SetValue("REWARD_RANGE", (float)cromossome.at(i++));
             SetValue("FAILURE_TAX", (float)cromossome.at(i++));
-
-
         }
         m_MapMutex.Unlock();
 
-        for (auto& pairIt : m_ConstsMap)
+        for (auto &pairIt : m_ConstsMap)
             pairIt.second.Apply(this);
 
         m_EventListener->On<EH_GameConstsChanged>();
@@ -159,7 +153,7 @@ namespace Application
         DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
         float val = findIt->second.AppliedValue;
         m_MapMutex.Unlock();
-        
+
         return val;
     }
 
@@ -172,6 +166,12 @@ namespace Application
     void GameConsts::SetOnValueChanged(EH_GameConstsChanged *eHandler)
     {
         m_EventListener->Register(eHandler);
+    }
+
+    void GameConsts::SetTickDelay(uint32_t newTickDelay)
+    {
+        TICK_DELAY_MICRO = newTickDelay;
+        m_EventListener->On<EH_GameConstsChanged>();
     }
 
     GameConstsCache::GameConstsCache(GameConsts &gameConsts)

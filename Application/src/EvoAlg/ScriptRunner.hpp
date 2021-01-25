@@ -20,20 +20,18 @@ using namespace Application;
 namespace EvoAlg
 {
     struct ScriptFunctions {
-        GameRunner &m_GameRunner;
-
         const static int HUMAN_OP_DELAY = 500000;
         const static int OPERATION_TYPE_COUNT = 7;
 
-        void scriptFunct0(const std::vector<std::string> &params);
-        void scriptFunct1(const std::vector<std::string> &params);
-        void scriptFunct2(const std::vector<std::string> &params);
-        void scriptFunct3(const std::vector<std::string> &params);
-        void scriptFunct4(const std::vector<std::string> &params);
-        void scriptFunct5(const std::vector<std::string> &params);
-        void scriptFunct6(const std::vector<std::string> &params);
+        void scriptFunct0(GameRunner&, const std::vector<std::string> &params);
+        void scriptFunct1(GameRunner&, const std::vector<std::string> &params);
+        void scriptFunct2(GameRunner&, const std::vector<std::string> &params);
+        void scriptFunct3(GameRunner&, const std::vector<std::string> &params);
+        void scriptFunct4(GameRunner&, const std::vector<std::string> &params);
+        void scriptFunct5(GameRunner&, const std::vector<std::string> &params);
+        void scriptFunct6(GameRunner&, const std::vector<std::string> &params);
 
-        void (ScriptFunctions::*scriptLoopFuncts[OPERATION_TYPE_COUNT])(const std::vector<std::string> &params) = {
+        void (ScriptFunctions::*scriptLoopFuncts[OPERATION_TYPE_COUNT])(GameRunner&, const std::vector<std::string> &params) = {
             &ScriptFunctions::scriptFunct0,
             &ScriptFunctions::scriptFunct1,
             &ScriptFunctions::scriptFunct2,
@@ -42,11 +40,7 @@ namespace EvoAlg
             &ScriptFunctions::scriptFunct5,
             &ScriptFunctions::scriptFunct6};
 
-        inline void Execute(const std::vector<std::string>& operation) {
-            (this->*(scriptLoopFuncts[stoi(operation.at(0))]))(operation);
-        }
-
-        ScriptFunctions(GameRunner &gameRunner): m_GameRunner(gameRunner) {}
+        void Execute(GameRunner& gameRunner, const std::vector<std::string>& operation);
     };
 
 
@@ -54,8 +48,6 @@ namespace EvoAlg
     {
     private:
         Script &m_Script;
-        GameRunner &m_GameRunner;
-        const Individual& m_Individual;
 
         pthread_t scriptThread;
         std::vector<std::vector<std::vector<std::string>>> m_GameScript;
@@ -67,15 +59,15 @@ namespace EvoAlg
 
 
     public:
-        ScriptRunner(Script& script, GameRunner &gameRunner, const Individual& individual);
+        ScriptRunner(Script& script);
 
         ~ScriptRunner();
 
         void initScriptDirections();
 
         
-        std::vector<TimeResult> *RunAllGameplays();
-        TimeResult RunGameplay(uint64_t gameplayIndex);
+        std::vector<TimeResult> *RunAllGameplays(GameRunner&, Individual&);
+        TimeResult RunGameplay(GameRunner&, Individual&, uint64_t gameplayIndex);
        
 
     };
