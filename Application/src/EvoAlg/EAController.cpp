@@ -58,26 +58,16 @@ namespace EvoAlg
         // usleep(1);
 
         std::vector<void*> pointersPendingDeletion;
+
+        ScriptRunner scriptRunner(*m_Script);
+
         
         for (unsigned int i = 0; i < populationGenes.size(); i++)
         {   
-            GameConsts *currentGameConsts = new GameConsts();
-            currentGameConsts->LoadFromCromossome(populationGenes[i]);
-            currentGameConsts->SetTickDelay(5e2);
-
-
-            Individual *currentIndividual = new Individual{i, populationGenes[i]};
-            GameRunner *currentGameRunner = new GameRunner(currentGameConsts);
-            ScriptRunner *currentScriptRunner = new ScriptRunner(*m_Script);
-
-            threadController.AddIndividualRun(IndividualRun{
-                currentIndividual,
-                currentGameRunner,
-                currentScriptRunner
-            });
+            threadController.AddIndividual(Individual{i, populationGenes[i]});
         }
 
-        std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteRuns();
+        std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteAllIndividuals(scriptRunner);
 
 
         m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;

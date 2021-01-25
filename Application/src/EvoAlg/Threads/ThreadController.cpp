@@ -2,6 +2,13 @@
 
 #include "mypch.hpp"
 
+#include "Application/Game/GameConsts.hpp"
+
+
+//TODO: remove
+#include "DampEngine/Threads/Mutex.hpp"
+
+
 namespace EvoAlg
 {
 
@@ -31,38 +38,48 @@ namespace EvoAlg
         }
     }
 
-    void ThreadController::AddIndividualRun(const IndividualRun &indRun)
+    void ThreadController::AddIndividual(const Individual &indRun)
     {
-        m_QueuedRuns.push(indRun);
+        m_QueuedIndividuals.push(indRun);
     }
 
-    std::vector<IndividualRunResult> ThreadController::ExecuteRuns() {
+    std::vector<IndividualRunResult> ThreadController::ExecuteAllIndividuals(ScriptRunner& scriptRunner) {
         std::vector<std::future<IndividualRunResult*>> futureVec;
 
         std::vector<IndividualRunResult> results;
-        results.reserve(m_QueuedRuns.size());
+        results.reserve(m_QueuedIndividuals.size());
+
+        bool forceSync = true;
         
-        while (!m_QueuedRuns.empty()) {
-            IndividualRun &indvRun = m_QueuedRuns.front();
+        DampEngine::Mutex gambiarra;
+        while (!m_QueuedIndividuals.empty()) {
+            Individual &individual = m_QueuedIndividuals.front();
 
-            GameRunner *gameRunner = indvRun.gameRunner;
-            ScriptRunner *scriptRunner = indvRun.scriptRunner;
-            Individual *individual = indvRun.individual;
+            GameConsts *currentConsts = new GameConsts();
+            currentConsts->LoadFromCromossome(individual.Genes);
+            currentConsts->SetTickDelay(5e2);
+            GameRunner *currentRunner = new GameRunner(currentConsts);
 
-            auto executeAllGameplaysFn = [=]() {
+
+            auto executeAllGameplaysFn = [=, &scriptRunner, &gambiarra, &individual]() {
                 //TODO: support more threads per individual (assuming only one for all gameplays)
                 // indvRun.scriptRunner->RunGameplay(gamplInd, customGameRunner);
 
-                auto *threadRet = scriptRunner->RunAllGameplays(*gameRunner, *individual);
+                auto *threadRet = scriptRunner.RunAllGameplays(*currentRunner, individual);
 
-                delete gameRunner;
-                delete scriptRunner;
-                delete individual;
+                delete currentRunner;
+                delete currentConsts;
+
+                if (forceSync)
+                    gambiarra.Unlock();
 
                 return threadRet;
             };
 
-            m_QueuedRuns.pop();
+            m_QueuedIndividuals.pop();
+
+            if (forceSync)
+                gambiarra.Lock();        
 
             futureVec.push_back(std::async(executeAllGameplaysFn));
             

@@ -57,9 +57,9 @@ namespace Application
     GameConsts::~GameConsts() { delete m_EventListener; }
 
     DampEngine::Mutex GameConsts::s_FileMutex;
-    void GameConsts::LoadValuesFromFile(const std::string &srcFile)
+    void GameConsts::LoadFromFile(const std::string &srcFile)
     {
-        DE_DEBUG("GameConsts::LoadValuesFromFile START");
+        DE_DEBUG("GameConsts::LoadFromFile START");
 
         s_FileMutex.Lock();
         m_MapMutex.Lock();
@@ -90,7 +90,7 @@ namespace Application
         for (auto &pairIt : m_ConstsMap)
             pairIt.second.Apply(this);
 
-        DE_DEBUG("GameConsts::LoadValuesFromFile SUCCESS");
+        DE_DEBUG("GameConsts::LoadFromFile SUCCESS");
 
         m_EventListener->On<EH_GameConstsChanged>();
     }

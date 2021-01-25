@@ -57,7 +57,7 @@ namespace Application
 
             // Simple Game Code:
             // GameConsts *gameConsts = new GameConsts();
-            // gameConsts->LoadValuesFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+            // gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
             // gameConsts->SetTickDelay(500e3);
             // m_GameGuiLayer = new GameGuiLayer();
             // GameRunner *runner = new GameRunner(gameConsts);

@@ -81,7 +81,7 @@ namespace Application
         GameConsts();
         ~GameConsts();
 
-        void LoadValuesFromFile(const std::string &path);
+        void LoadFromFile(const std::string &path);
         void LoadFromCromossome(const std::vector<double> &cromossome);
 
         float GetRawValue(const std::string &key);

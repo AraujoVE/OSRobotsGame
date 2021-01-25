@@ -9,28 +9,21 @@
 
 namespace EvoAlg
 {
-    struct IndividualRun
-    {
-        Individual *individual;
-        Application::GameRunner *gameRunner;
-        ScriptRunner *scriptRunner;
-    };
-
     class ThreadController
     {
     public:
         void SetMaxThreads(uint8_t maxThreads);
         inline uint8_t GetMaxThreads() { return m_MaxIndividualThreads + m_MaxGameplayThreads; }
-        void AddIndividualRun(const IndividualRun& indRun);
+        void AddIndividual(const Individual& indRun);
 
-        std::vector<IndividualRunResult> ExecuteRuns();
+        std::vector<IndividualRunResult> ExecuteAllIndividuals(ScriptRunner& scriptRunner);
 
     private:
 
         void OnMaxThreadsChanged();
 
         
-        std::queue<IndividualRun> m_QueuedRuns;
+        std::queue<Individual> m_QueuedIndividuals;
         uint8_t m_CurrentRunningThreads = 0;
 
         //TODO: get this dinamically
