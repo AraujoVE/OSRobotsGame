@@ -61,7 +61,7 @@ namespace EvoAlg
         m_GuiProps.MainGameRunner = aaa;
 
         //TODO: event EH_GameAttached (wait for UI to be ready (only if ShowGame is true))
-        usleep(1);
+        // usleep(1);
 
         DE_INFO("(EAController) Preparing population to be executed...");
         for (unsigned int i = 0; i < populationGenes.size(); i++)
@@ -117,7 +117,6 @@ namespace EvoAlg
         m_Status.m_EvolutionInfo.CurrentGeneration++;
 
         DE_DEBUG("(RunPopulationInGame) All individuals have been tested! returning results");
-        // usleep(50);
         return gameplayResults;
     }
 

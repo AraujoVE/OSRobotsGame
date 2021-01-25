@@ -76,7 +76,6 @@ namespace EvoAlg
         {
             gameplaysResults->push_back(RunGameplay(curGameplay));
             DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", m_Individual.ID);
-            break;
         }
 
         return gameplaysResults;
