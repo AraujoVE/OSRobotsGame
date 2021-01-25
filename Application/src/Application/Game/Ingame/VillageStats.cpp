@@ -35,7 +35,8 @@ namespace Application
         std::srand(std::time(nullptr)); // use current time as seed for random generator
         
         initializeVSAvenues();
-
+        initializeStats();
+        
         m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::DecayStats, this));
         m_DecayThreadLoop.SetAliveCheckFunction([this] {
             return this->getPopulation() > 0;

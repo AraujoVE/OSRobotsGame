@@ -117,7 +117,12 @@ namespace Application::GameWindows
         m_TaskWindowMapMutex.Lock();
         {
             auto windowIt = m_TaskWindowMap.find(id);
-            DE_ASSERT(windowIt != m_TaskWindowMap.end(), "Trying to end an unknown Task");
+
+            if (windowIt == m_TaskWindowMap.end()) {
+                DE_WARN("(FunctionWindow::OnTaskEnded) Trying to end an unknown Task... Ignoring.\n\t (TODO: Make EAController wait for UI if ShowGame is on)");
+                m_TaskWindowMapMutex.Unlock();
+                return;
+            }
 
             m_TaskWindowMap.erase(windowIt);
 

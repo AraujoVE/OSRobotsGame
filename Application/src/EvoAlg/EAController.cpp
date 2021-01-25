@@ -56,16 +56,18 @@ namespace EvoAlg
         };
 
         GameConsts *gameConsts = new GameConsts();
-        gameConsts->SetTickDelay(5e3);
+        gameConsts->SetTickDelay(5e2);
         auto *aaa = new GameRunner(gameConsts);
         m_GuiProps.MainGameRunner = aaa;
 
-        //TODO: event EH_GameAttached (wait for UI to be ready)
-        usleep(1e6);
+        //TODO: event EH_GameAttached (wait for UI to be ready (only if ShowGame is true))
+        usleep(1);
 
         DE_INFO("(EAController) Preparing population to be executed...");
         for (unsigned int i = 0; i < populationGenes.size(); i++)
         {
+            //TODO: think what to do in async mode (probably vector of GameRunners)
+            m_GuiProps.MainGameRunner = aaa;
             
             DE_INFO("(EAController) Preparing individual #{0}", i);
 
@@ -101,10 +103,12 @@ namespace EvoAlg
             //     usleep(5e6);
             //     m_GuiProps.MainGameRunner = aaa;
             // }
-            break;
+            
+            m_GuiProps.MainGameRunner = nullptr;
         }
 
         //TODO: free all scripts and gameRunners
+        delete aaa;
 
         m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
         m_GuiProps.MainGameRunner = nullptr;
