@@ -68,7 +68,7 @@ namespace EvoAlg
 
             Individual *currentIndividual = new Individual{i, populationGenes[i]};
             GameRunner *currentGameRunner = new GameRunner(currentGameConsts);
-            ScriptRunner *currentScriptRunner = new ScriptRunner(*m_Script, *currentGameRunner, *currentIndividual);
+            ScriptRunner *currentScriptRunner = new ScriptRunner(*m_Script);
 
             threadController.AddIndividualRun(IndividualRun{
                 currentIndividual,

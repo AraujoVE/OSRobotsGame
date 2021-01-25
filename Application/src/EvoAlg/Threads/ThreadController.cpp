@@ -53,7 +53,7 @@ namespace EvoAlg
                 //TODO: support more threads per individual (assuming only one for all gameplays)
                 // indvRun.scriptRunner->RunGameplay(gamplInd, customGameRunner);
 
-                auto *threadRet = scriptRunner->RunAllGameplays();
+                auto *threadRet = scriptRunner->RunAllGameplays(*gameRunner, *individual);
 
                 delete gameRunner;
                 delete scriptRunner;
@@ -61,7 +61,7 @@ namespace EvoAlg
 
                 return threadRet;
             };
-            
+
             m_QueuedRuns.pop();
 
             futureVec.push_back(std::async(executeAllGameplaysFn));
