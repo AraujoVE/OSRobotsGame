@@ -17,16 +17,18 @@ namespace Application
     private:
         EventListener m_EventListener;
         GameConstsCache m_GameConstsCache;
+
     public:
         const static int BASE_STATS_NO = FUNCTION_QTY;
         const static int POPULATION_INDEX = BASE_STATS_NO;
+
     private:
         bool onAttack;
         double statTax;
         double maxPop;
         double population; // if population reaches zero, the game is over -> pop calculated based on other village stats
 
-        double baseStats[BASE_STATS_NO];/*
+        double baseStats[BASE_STATS_NO]; /*
             defenses;
             food;
             health;
@@ -34,11 +36,11 @@ namespace Application
             resources;
         */
 
-        Avenue<double> *avenueVS[BASE_STATS_NO+1];
+        Avenue<double> *avenueVS[BASE_STATS_NO + 1];
 
         ThreadLoop m_DecayThreadLoop;
 
-        void (VillageStats::*decayStatsFuncts[BASE_STATS_NO - 1])(int,float&) = {
+        void (VillageStats::*decayStatsFuncts[BASE_STATS_NO - 1])(int, float &) = {
             &VillageStats::decayFood,
             &VillageStats::decayHealth,
             &VillageStats::decayStructures,
@@ -53,30 +55,26 @@ namespace Application
     private:
         void initializeStats();
 
-
-        float calcReduction(float,float);
+        float calcReduction(float, float);
         float calcRatio(int);
-        float adjustStatsLimits(int,float,float,bool);
+        float adjustStatsLimits(int, float, float, bool);
 
         void decayStat(int);
 
-        void decayDefenses(int,float&);
-        void decayFood(int,float&);
-        void decayHealth(int,float&);
-        void decayStructures(int,float&);
-        void decayResources(int,float&);
+        void decayDefenses(int, float &);
+        void decayFood(int, float &);
+        void decayHealth(int, float &);
+        void decayStructures(int, float &);
+        void decayResources(int, float &);
 
         void decayPopulation();
 
-
     public:
-        VillageStats(GameConsts& gameConsts);
+        VillageStats(GameConsts &gameConsts);
         ~VillageStats();
 
-        
         void onGameStarted();
         void onGameEnded();
-
 
         void setStatsDecaymentPaused(bool paused);
         inline bool isStatusDecaymentPaused() const { return m_DecayThreadLoop.IsPaused(); }
@@ -90,12 +88,9 @@ namespace Application
         void setStat(RobotFunction, float reductionTax);
         void setResources(uint64_t);
 
-
         void DecayStats();
         inline void RegisterOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Register(eventHandler); }
         inline void UnregisterOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Unregister(eventHandler); }
         unsigned int GetElapsedTimeTicks();
     };
-
-    void *runDecay (void *decayFuncObject);
 } // namespace Application

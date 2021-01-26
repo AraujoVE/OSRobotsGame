@@ -33,15 +33,14 @@ namespace Application
         : m_GameConstsCache(gameConsts), m_DecayThreadLoop("VillageStatsDecay")
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
-        
+
         initializeVSAvenues();
         initializeStats();
-        
+
         m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::DecayStats, this));
         m_DecayThreadLoop.SetAliveCheckFunction([this] {
             return this->getPopulation() > 0;
         });
-
 
         auto &eventListener = m_EventListener;
         m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([&eventListener](ThreadEndedReason::ThreadEndedReason_t reason) {
@@ -201,8 +200,10 @@ namespace Application
         m_DecayThreadLoop.Start(&m_GameConstsCache.TICK_DELAY_MICRO);
     }
 
-    void VillageStats::onGameEnded() {
-        if (m_DecayThreadLoop.IsRunning()) {
+    void VillageStats::onGameEnded()
+    {
+        if (m_DecayThreadLoop.IsRunning())
+        {
             m_DecayThreadLoop.Abandon();
         }
     }
