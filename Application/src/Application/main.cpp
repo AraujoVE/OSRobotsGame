@@ -95,12 +95,18 @@ namespace Application
 ///
 
 
-            uint32_t a = 18;
+            uint32_t a = 1e8;
             // Testing GameRunner, GamnSavew and GameConsts. result: has leak, but it's not that big
             while (a-- > 0)
             {
                 GameConsts *gc = new GameConsts();
                 GameRunner *gr = new GameRunner(gc);
+
+                // gr->Start();
+                // usleep(50);
+                // gr->Stop();
+                // usleep(50);
+
                 delete gr;
                 delete gc;
                 usleep(50);

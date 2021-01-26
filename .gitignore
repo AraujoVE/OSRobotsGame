@@ -4,3 +4,5 @@ bin-int
 extras/annotations.txt
 gameScript.cfg
 history*.csv
+vgcore*
+valgrindlog

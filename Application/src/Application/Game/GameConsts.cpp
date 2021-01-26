@@ -191,18 +191,15 @@ namespace Application
     {
         std::function<void()> handler(std::bind(&GameConstsCache::UpdateAll, this));
         
-        m_GCCEventHandler = new EH_GameConstsChanged([handler]() {
+        m_GameConsts.RegisterOnValueChanged(new EH_GameConstsChanged([handler]() {
             handler();
             return false;
-        });
-
-        m_GameConsts.RegisterOnValueChanged(m_GCCEventHandler);
+        }));
 
         UpdateAll();
     }
 
     GameConstsCache::~GameConstsCache() {
-        m_GameConsts.UnregisterOnValueChanged(m_GCCEventHandler);
     }
 
 

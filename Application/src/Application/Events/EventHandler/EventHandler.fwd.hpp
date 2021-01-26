@@ -3,7 +3,7 @@
 #define DA_EVENT(name, R, ...) \
     class name: public EventHandler<R, ## __VA_ARGS__> { \
     public: \
-        name(std::function< R(__VA_ARGS__) > handler): EventHandler::EventHandler(handler) {} \
+        name(std::function< R(__VA_ARGS__) > handler): EventHandler::EventHandler(handler, #name) {} \
         virtual const std::string GetType() override { return #name; } \
         static const std::string GetTypeStatic() { return #name; } \
     };

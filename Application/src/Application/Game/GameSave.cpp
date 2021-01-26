@@ -25,17 +25,19 @@ namespace Application
     {
         delete m_VillageStats;
         delete m_RobotsManagement;
+        m_VillageStats = nullptr;
+        m_RobotsManagement = nullptr;
     }
 
     void GameSave::Reset()
     {
         DE_TRACE("(GameSave) Starting new GameSave");
-        if (m_VillageStats != nullptr) delete m_VillageStats;
-        if (m_RobotsManagement != nullptr) delete m_RobotsManagement;
+        delete m_VillageStats;
+        delete m_RobotsManagement;
 
         m_VillageStats = new VillageStats(*m_GameConsts);
-        // m_RobotsManagement = new RobotsManagement(*m_GameConsts);
-        // m_RobotsManagement->setVillageStats(m_VillageStats);
+        m_RobotsManagement = new RobotsManagement(*m_GameConsts);
+        m_RobotsManagement->setVillageStats(m_VillageStats);
 
 
 

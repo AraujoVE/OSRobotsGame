@@ -9,7 +9,6 @@
 
 namespace Application
 {
-    //TODO: try to remove void specialization
     template <typename R, typename... Args>
     class EventHandler : public IEventHandler
     {
@@ -19,7 +18,7 @@ namespace Application
         typedef R ReturnType;
         using ArgumentsTuple = std::tuple<Args...>;
 
-        EventHandler(std::function<R(Args...)> handler) : m_Handler(handler) {}
+        EventHandler(std::function<R(Args...)> handler, const std::string& type) : IEventHandler(type), m_Handler(handler) {}
         EventHandler(EventHandler &&) = delete;
         EventHandler(const EventHandler&) = delete;
 

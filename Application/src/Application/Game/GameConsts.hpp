@@ -127,7 +127,6 @@ namespace Application
 
     private:
         const GameConsts &m_GameConsts;
-        EH_GameConstsChanged *m_GCCEventHandler;
         void UpdateAll()
         {
             ON_ATTACK_MULTIPLIER = m_GameConsts.GetValue("ON_ATTACK_MULTIPLIER");
