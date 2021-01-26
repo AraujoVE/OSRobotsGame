@@ -18,7 +18,7 @@ namespace Application
         class FunctionWindow final : public Application::IGWindow
         {
         public:
-            FunctionWindow(std::unique_ptr<Application::RobotsManagement> &robotsManagement, RobotFunction function);
+            FunctionWindow(RobotsManagement *robotsManagement, RobotFunction function);
 
             virtual void Render() override;
 
@@ -27,7 +27,7 @@ namespace Application
 
             void ClearTaskWindows();
 
-            virtual void SetEventHandlers(std::unique_ptr<Application::RobotsManagement> &robotManagement);
+            virtual void SetEventHandlers(RobotsManagement *robotManagement);
 
         private:
         private:
@@ -35,7 +35,7 @@ namespace Application
             DampEngine::Mutex m_TaskWindowMapMutex, m_TaskDeletionQueueMutex;
 
             RobotFunction m_Function;
-            std::unique_ptr<Application::RobotsManagement> &m_RobotsManagement;
+            RobotsManagement* m_RobotsManagement;
             std::unordered_map<Task::TaskID, TaskWindow *> m_TaskWindowMap;
             std::queue<Task::TaskID> m_TasksPendingDeletion;
         };

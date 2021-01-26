@@ -79,7 +79,7 @@ namespace Application
 
 
         void setStatsDecaymentPaused(bool paused);
-        inline bool isStatusDecaymentPaused() { return m_DecayThreadLoop.IsPaused(); }
+        inline bool isStatusDecaymentPaused() const { return m_DecayThreadLoop.IsPaused(); }
 
         inline Avenue<double> *getAvenue(RobotFunction robotFunc) { return avenueVS[(uint8_t)robotFunc]; }
         uint64_t getStat(RobotFunction robotFunc) const;

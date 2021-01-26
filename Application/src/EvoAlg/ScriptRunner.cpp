@@ -121,7 +121,7 @@ namespace EvoAlg
         {
             DE_DEBUG("(ScriptRunner -- {0}) Executing operation #{2} of gameplay #{1}", individual.ID, gameplayIndex, i);
 
-            m_OperationFunctions.Execute(gameRunner, operations[i]);
+            // m_OperationFunctions.Execute(gameRunner, operations[i]);
 
             //TODO: check if this is correct
             usleep(gameRunner.GetGameConsts().GetTickDelay());

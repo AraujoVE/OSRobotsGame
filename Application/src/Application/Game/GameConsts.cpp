@@ -99,6 +99,7 @@ namespace Application
     {
         m_MapMutex.Lock();
         {
+            DE_ASSERT(cromossome.size() == 27, "(GameConsts::LoadFromCromossome) WRONG CROMOSSOME INFORMED")
             int i = 0;
             SetValue("ON_ATTACK_MULTIPLIER", (float)cromossome.at(i++));
             SetValue("POP_INCREASE_TAX", (float)cromossome.at(i++));
@@ -134,6 +135,19 @@ namespace Application
             pairIt.second.Apply(this);
 
         m_EventListener->On<EH_GameConstsChanged>();
+    }
+
+    std::vector<double> GameConsts::SaveToCromossome() {
+        const static size_t geneCount = 27;
+        const static std::string cromossomeOrder[] = { "ON_ATTACK_MULTIPLIER", "POP_INCREASE_TAX", "POP_PER_CONSTRUCTION", "INIT_POP_VALUE", "INIT_STAT_VALUE", "ON_ATTACK_DECAY_TAX", "NORMAL_DECAY_TAX", "ATTACK_FREQUENCY", "INIT_RESOURCES_VALUE", "TAX_REDUCT", "MIN_LOSS_0", "MIN_LOSS_1", "MIN_LOSS_2", "MIN_LOSS_3", "MAX_LOSS_0", "MAX_LOSS_1", "MAX_LOSS_2", "MAX_LOSS_3", "TOT_ROBOTS_INI", "PROD_COST_INI", "PROD_COST_INCREASE_TAX", "TIME_STEP", "INIT_TIME_STEP", "MAX_TIME_STEPS", "MIN_REWARD", "REWARD_RANGE", "FAILURE_TAX", };
+        DE_ASSERT(sizeof(cromossomeOrder)/sizeof(std::string) == geneCount)
+
+        std::vector<double> cromossome;
+        for (unsigned int i = 0; i < geneCount; i++) {
+            cromossome.push_back(GetRawValue(cromossomeOrder[i]));
+        }
+
+        return cromossome;
     }
 
     float GameConsts::GetRawValue(const std::string &key)

@@ -24,7 +24,6 @@ namespace Application
     {  
     public:
         GameRunner(GameConsts *gameConsts);
-        GameRunner(const std::shared_ptr<GameSave> &gameSave);
         ~GameRunner();
 
         inline void RegisterOnGameStarted(EH_GameStarted *eventHandler) { m_EventListener->Register(eventHandler); }
@@ -46,7 +45,7 @@ namespace Application
         inline bool IsGameLost() const { return m_GameStatus.GameLost; };
         inline const std::string &GetGameLostReason() const { return m_GameStatus.GameLostReason; };
 
-        inline GameSave &GetSave() { return *m_GameSave.get(); }
+        inline GameSave &GetSave() { return *m_GameSave; }
 
         inline GameConsts &GetGameConsts() { return *m_GameConsts; }
 
@@ -54,7 +53,7 @@ namespace Application
         void SetupGameOverConditions();
 
     private:
-        std::shared_ptr<GameSave> m_GameSave;
+        GameSave *m_GameSave;
         GameConsts *m_GameConsts;
         EventListener *m_EventListener;
 

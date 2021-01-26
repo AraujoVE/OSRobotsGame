@@ -8,7 +8,7 @@
 using namespace Application;
 namespace Application::GameWindows
 {
-    FunctionWindow::FunctionWindow(std::unique_ptr<Application::RobotsManagement> &robotsManagement, RobotFunction function)
+    FunctionWindow::FunctionWindow(RobotsManagement* robotsManagement, RobotFunction function)
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize),
           m_Function(function), m_RobotsManagement(robotsManagement)
     {
@@ -62,7 +62,7 @@ namespace Application::GameWindows
         m_TaskWindowMapMutex.Unlock();
     }
 
-    void FunctionWindow::SetEventHandlers(std::unique_ptr<RobotsManagement> &robotsManagement)
+    void FunctionWindow::SetEventHandlers(RobotsManagement *robotsManagement)
     {
         RobotFunction thisFunction = m_Function;
         robotsManagement->setOnTaskCreated(new EH_TaskCreated([=](Task &createdTask) {
@@ -71,7 +71,7 @@ namespace Application::GameWindows
 
             m_TaskWindowMapMutex.Lock();
             {
-                auto taskCanceledCallback = std::bind(&RobotsManagement::cancelTask, m_RobotsManagement.get(), std::placeholders::_1);
+                auto taskCanceledCallback = std::bind(&RobotsManagement::cancelTask, m_RobotsManagement, std::placeholders::_1);
                 TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};
                 TaskWindow *associatedWindow = new TaskWindow(associatedWindowProps, m_RobotsManagement, createdTask, taskCanceledCallback);
 

@@ -58,6 +58,8 @@ namespace Application
         {
             DE_ASSERT(m_GameRunner != nullptr, "Trying to initialize game windows with no GameRunner attached");
 
+            //TODO: maybe GetSave will produce nullptr exception
+
             m_StatusWindow = new StatusWindow(m_GameRunner->GetSave().GetVillageStats());
 
             m_FunctionWindows[(int)RobotFunction::HUNT] = new FunctionWindow(m_GameRunner->GetSave().GetRobotsManagement(), RobotFunction::HUNT);

@@ -20,6 +20,15 @@
 
 //TODO: stop using optional to avoid cpphack.hpp
 
+//TODO: remove test includes
+#include "EvoAlg/Threads/ThreadController.hpp"
+#include "EvoAlg/ScriptRunner.hpp"
+#include "EvoAlg/ScriptConverter.hpp"
+#include "EvoAlg/Script.hpp"
+#include "EvoAlg/Types.hpp"
+
+
+//TODO: stop using optional to avoid cpphack.hpp
 
 //TODO: TICK_DELAY for Task and VilageStats:;decay
 //TODO: OnGameEnded -> sends VilageStats::decay threadloop tickCount to callback as "gameDurationInTicks"
@@ -43,7 +52,7 @@ namespace Application
         {
             DE_TRACE("MyApplication::~MyApplication()");
         }
-        
+
         //TODO: Jogo versão normal ou calibração
         virtual void OnStart() override
         {
@@ -54,7 +63,6 @@ namespace Application
         {
             DE_TRACE("MyApplication::InitLayers()");
 
-
             // Simple Game Code:
             // GameConsts *gameConsts = new GameConsts();
             // gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
@@ -64,12 +72,12 @@ namespace Application
             // m_GameGuiLayer->SetGameRunner(runner);
             // runner->Start();
             // m_LayerStack.PushOverlay(m_GameGuiLayer);
-           
+
             // EA Code:
             // m_GameGuiLayer = new GameGuiLayer();
-            m_EAGameGuiLayer = new EAGameGuiLayer();
-            m_LayerStack.PushOverlay(m_EAGameGuiLayer);
-            
+            // m_EAGameGuiLayer = new EAGameGuiLayer();
+            // m_LayerStack.PushOverlay(m_EAGameGuiLayer);
+
             // auto *l_LayerStack = &m_LayerStack;
             // auto *l_GameGuiLayer = m_GameGuiLayer;
 
@@ -82,7 +90,69 @@ namespace Application
             //     l_GameGuiLayer->SetGameRunner(newSettings.MainGameRunner);
             //     return false;
 
-            // }));           
+            // }));
+
+///
+
+
+
+            // Testing GameRunner, GamnSavew and GameConsts. result: has leak, but it's not that big
+            while (true)
+            {
+                GameConsts *gc = new GameConsts();
+                for (int i = 0; i < 50; i++)
+                {
+                    GameRunner *gr = new GameRunner(gc);
+                    delete gr;
+                }
+                delete gc;
+                usleep(50e3);
+            }
+
+///
+
+            using namespace EvoAlg;
+
+            // //TODO: these lines insede while to check leaks V
+            // ScriptConverter sc(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
+            // Script *script = sc.Convert();
+
+            // ScriptRunner sr(*script);
+            // ThreadController tc;
+            // //TODO end: ^
+
+            // GameConsts gc;
+            // gc.LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+            // std::vector<double> genes = gc.SaveToCromossome();
+            
+            //TEST ThreadController
+            // while (true) {
+            //     for (unsigned int i = 0; i < 1; i++)
+            //     {
+            //         tc.AddIndividual({i, genes});
+            //     }
+            //     tc.ExecuteAllIndividuals(sr);
+            //     usleep(50e3);                
+            // }
+            
+
+///
+
+
+            // gc.SetTickDelay(5e2);
+            // GameRunner gr(&gc);
+
+            // while (true) {
+            //     for (unsigned int i = 0; i < 50; i++)
+            //     {
+            //         Individual idv{i, genes};
+            //         std::vector<TimeResult> *indvResult = sr.RunAllGameplays(gr, idv); 
+            //         delete indvResult;
+            //     }
+            // }
+            
+
+
         }
 
         virtual void OnUpdate() override
@@ -92,7 +162,6 @@ namespace Application
         virtual void OnStop() override
         {
             DE_INFO("MyApplication::OnStop()");
-
         }
 
     private:

@@ -16,13 +16,10 @@ namespace Application
     {
     }
 
-    GameRunner::GameRunner(const std::shared_ptr<GameSave> &gameSave) : m_GameSave(gameSave), m_GameConsts(&gameSave->GetGameConsts()), m_EventListener(new EventListener())
-    {
-    }
-
     GameRunner::~GameRunner()
     {
         delete m_EventListener;
+        delete m_GameSave;
     }
 
     //TODO: use promises to call EH_GameStarted to assure game is totally started 
@@ -91,8 +88,8 @@ namespace Application
     //PRIVATE:
     void GameRunner::SetupGameOverConditions()
     {
-        auto *robotsManagement = m_GameSave->GetRobotsManagement().get();
-        auto *villageStats = m_GameSave->GetVillageStats().get();
+        auto *robotsManagement = m_GameSave->GetRobotsManagement();
+        auto *villageStats = m_GameSave->GetVillageStats();
 
 
         const static std::string noRobotsReason = "No more robots available!";

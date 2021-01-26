@@ -8,7 +8,7 @@ using namespace Application;
 namespace Application::GameWindows
 {
 
-    TaskWindow::TaskWindow(TaskWindowProps taskWindowProps, std::unique_ptr<Application::RobotsManagement> &robotsManagement, Task &task, OnTaskCancelledFn onTaskCancelledFn)
+    TaskWindow::TaskWindow(TaskWindowProps taskWindowProps, RobotsManagement* robotsManagement, Task &task, OnTaskCancelledFn onTaskCancelledFn)
         : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings),
           m_TaskWindowProps(taskWindowProps),
           m_RobotsManagement(robotsManagement), m_Task(task),

@@ -84,6 +84,9 @@ namespace Application
         void LoadFromFile(const std::string &path);
         void LoadFromCromossome(const std::vector<double> &cromossome);
 
+        std::vector<double> SaveToCromossome();
+        // std::vector<double> SaveToFile();
+
         float GetRawValue(const std::string &key);
         float GetValue(const std::string &key);
 
