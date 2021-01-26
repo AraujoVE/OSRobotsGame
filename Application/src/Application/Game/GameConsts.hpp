@@ -66,16 +66,15 @@ namespace Application
     private:
 
         std::unordered_map<std::string, ParameterData> m_ConstsMap;
-        EventListener *m_EventListener;
+        EventListener * m_EventListener;
         uint32_t TICK_DELAY_MICRO = HUMAN_TICK_DELAY_MICRO;
 
         //Static to force all instances to open file synchronously
         static DampEngine::Mutex s_FileMutex;
-        DampEngine::Mutex m_MapMutex;
+        mutable DampEngine::Mutex m_MapMutex;
 
         void SetValue(const std::string &key, float newValue);
 
-        
 
     public:
         GameConsts();
@@ -87,15 +86,16 @@ namespace Application
         std::vector<double> SaveToCromossome();
         // std::vector<double> SaveToFile();
 
-        float GetRawValue(const std::string &key);
-        float GetValue(const std::string &key);
+        float GetRawValue(const std::string &key) const;
+        float GetValue(const std::string &key) const;
 
-        void SetOnValueChanged(EH_GameConstsChanged *eHandler);
+        void RegisterOnValueChanged(EH_GameConstsChanged *eHandler) const;
+        void UnregisterOnValueChanged(EH_GameConstsChanged *eHandler) const;
 
 
         //Gets/sets the current tick delay in microsseconds
         void SetTickDelay(uint32_t newTickDelay);
-        inline uint32_t GetTickDelay() { return TICK_DELAY_MICRO; }
+        inline uint32_t GetTickDelay() const { return TICK_DELAY_MICRO; }
         
     };
 
@@ -126,8 +126,8 @@ namespace Application
         uint32_t TICK_DELAY_MICRO;
 
     private:
-        GameConsts &m_GameConsts;
-        std::vector<std::function<void()>> m_AditionalUpdates;
+        const GameConsts &m_GameConsts;
+        EH_GameConstsChanged *m_GCCEventHandler;
         void UpdateAll()
         {
             ON_ATTACK_MULTIPLIER = m_GameConsts.GetValue("ON_ATTACK_MULTIPLIER");
@@ -161,19 +161,11 @@ namespace Application
             AVG_REWARD = (int)(((float)TIME_STEP) * ((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0) / 2.0) * ((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0) / 2.0));
 
             TICK_DELAY_MICRO = m_GameConsts.GetTickDelay();
-
-
-            for (auto updateFn : m_AditionalUpdates)
-                updateFn();
         }
 
     public:
         GameConstsCache(GameConsts &gameConsts);
-
-        void AddAditionalUpdateFn(const std::function<void()> &function)
-        {
-            m_AditionalUpdates.push_back(function);
-        }
+        ~GameConstsCache();
     };
 
 } // namespace Application

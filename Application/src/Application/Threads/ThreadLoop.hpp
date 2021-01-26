@@ -42,7 +42,7 @@ namespace Application
         void InnerLoop();
         friend void *threadRountine(void *threadLoopV);
 
-        DampEngine::Mutex m_FunctsMutex;
+        DampEngine::Mutex m_FunctsMutex, m_InnerLoopMutex;
 
         State m_State;
         bool m_Paused;

@@ -34,12 +34,20 @@ namespace Application
         
     ThreadLoop::~ThreadLoop()
     {
-        m_EventListener->Clear();
-        delete m_EventListener;
+        Abandon();
+        DE_DEBUG("(~ThreadLoop) m_InnerLoopMutex.Lock(); ");
+        m_InnerLoopMutex.Lock(); //Waits for innerloop to end
+        {
+            m_TickDelay = nullptr;
+            delete m_EventListener;
+        }
+        DE_DEBUG("(~ThreadLoop) m_InnerLoopMutex.Unlock(); ");
+        m_InnerLoopMutex.Unlock();
     }
 
     void ThreadLoop::InnerLoop()
     {
+        m_InnerLoopMutex.Lock();
         DE_ASSERT(m_State == State::INACTIVE, "(ThreadLoop::InnerLoop) Trying to start a ThreadLoop while it's already running!!!");
 
         m_State = State::RUNNING;
@@ -83,7 +91,11 @@ namespace Application
 
             TLL(DE_DEBUG, "(ThreadLoop[{0}] inner) Repeating loop...", m_DebugName);
 
-            //TODO: may cause segfault (check if m_TickDelay is a valid pointer (how?))
+            DE_ASSERT(m_TickDelay != nullptr);
+            //TODO: remove if break if no problems
+            if (m_TickDelay == nullptr) {
+                break;
+            }
             usleep(*m_TickDelay);
         }
 
@@ -99,6 +111,7 @@ namespace Application
         }
 
         m_State = State::INACTIVE;
+        m_InnerLoopMutex.Unlock();
     }
 
     void ThreadLoop::Pause(bool paused)
@@ -127,7 +140,6 @@ namespace Application
 
     void ThreadLoop::Abandon()
     {
-        DE_ASSERT(m_State == State::RUNNING, "(ThreadLoop::Abandon) Trying to abandon a ThreadLoop while it's NOT running!!!")
         m_FunctsMutex.Lock();
         {
             m_EventListener->Clear();

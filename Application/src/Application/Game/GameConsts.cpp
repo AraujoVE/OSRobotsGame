@@ -150,7 +150,7 @@ namespace Application
         return cromossome;
     }
 
-    float GameConsts::GetRawValue(const std::string &key)
+    float GameConsts::GetRawValue(const std::string &key) const
     {
         m_MapMutex.Lock();
         auto findIt = m_ConstsMap.find(key);
@@ -160,7 +160,7 @@ namespace Application
         return val;
     }
 
-    float GameConsts::GetValue(const std::string &key)
+    float GameConsts::GetValue(const std::string &key) const
     {
         m_MapMutex.Lock();
         auto findIt = m_ConstsMap.find(key);
@@ -177,10 +177,8 @@ namespace Application
         m_ConstsMap[key].Capture(newValue);
     }
 
-    void GameConsts::SetOnValueChanged(EH_GameConstsChanged *eHandler)
-    {
-        m_EventListener->Register(eHandler);
-    }
+    void GameConsts::RegisterOnValueChanged(EH_GameConstsChanged *eHandler) const { m_EventListener->Register(eHandler);}
+    void GameConsts::UnregisterOnValueChanged(EH_GameConstsChanged *eHandler) const { m_EventListener->Unregister(eHandler);}
 
     void GameConsts::SetTickDelay(uint32_t newTickDelay)
     {
@@ -192,13 +190,21 @@ namespace Application
         : m_GameConsts(gameConsts)
     {
         std::function<void()> handler(std::bind(&GameConstsCache::UpdateAll, this));
-
-        gameConsts.SetOnValueChanged(new EH_GameConstsChanged([handler]() {
+        
+        m_GCCEventHandler = new EH_GameConstsChanged([handler]() {
             handler();
             return false;
-        }));
+        });
+
+        m_GameConsts.RegisterOnValueChanged(m_GCCEventHandler);
 
         UpdateAll();
     }
+
+    GameConstsCache::~GameConstsCache() {
+        m_GameConsts.UnregisterOnValueChanged(m_GCCEventHandler);
+        delete m_GCCEventHandler;
+    }
+
 
 } // namespace Application
