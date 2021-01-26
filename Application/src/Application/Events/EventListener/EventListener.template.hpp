@@ -5,6 +5,7 @@
 #include "DampEngine/Threads/Mutex.hpp"
 
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
+#include "Application/Events/EventHandler/IEventHandler.hpp"
 
 #include <unordered_map>
 #include <string>
@@ -15,14 +16,16 @@
 
 namespace Application
 {
-    //TODO: fix ml
-    typedef std::vector<void*> HandlerQueue;
+    //TODO: make some methods const
     class EventListener final
     {
-        DampEngine::Mutex m_MapMutex;
+        mutable DampEngine::Mutex m_MapMutex;
+        using HandlerQueue = std::vector<IEventHandler*>;
         std::unordered_map<std::string, HandlerQueue> handlerQueueMap = {};
 
     public:
+        ~EventListener() { Clear(); }
+
         template <class EventHandlerType>
         void On();
 
@@ -35,15 +38,18 @@ namespace Application
         template <class EventHandlerType>
         void OnAsync(typename EventHandlerType::ArgumentsTuple argTuple);
 
-        template <class EventHandlerType>
-        void Register(EventHandlerType *eventHandler);
+        void Register(IEventHandler *eventHandler);
 
-        template <class EventHandlerType>
-        void Unregister(EventHandlerType *eventHandler);
+        void Unregister(IEventHandler *eventHandler);
 
         void Clear()
         {
             m_MapMutex.Lock();
+            for (auto &queuePair: handlerQueueMap) {
+                for (IEventHandler *eHandler : queuePair.second) {
+                    delete eHandler;
+                }
+            }
             handlerQueueMap.clear();
             m_MapMutex.Unlock();
         }

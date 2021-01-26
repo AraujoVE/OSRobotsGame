@@ -42,10 +42,6 @@ namespace Application
             return this->getPopulation() > 0;
         });
 
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadStarted([] {
-            DE_TRACE("(VillageStats) m_DecayThreadLoop started successfully.");
-            return false;
-        }));
 
         auto &eventListener = m_EventListener;
         m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([&eventListener](ThreadEndedReason::ThreadEndedReason_t reason) {
@@ -57,9 +53,6 @@ namespace Application
 
     VillageStats::~VillageStats()
     {
-        if (m_DecayThreadLoop.IsRunning())
-            m_DecayThreadLoop.Abandon();
-
         for (int i = 0; i < BASE_STATS_NO + 1; i++)
         {
             avenueVS[i]->stopConsumer();

@@ -1,8 +1,8 @@
 #pragma once
 
-// #include "Application/Events/Events.fwd.hpp"
 #include "Application/Game/GameSave.hpp"
 #include "Application/Events/EventListener/EventListener.template.hpp"
+#include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
 namespace Application
 {

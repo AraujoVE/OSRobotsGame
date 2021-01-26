@@ -203,7 +203,6 @@ namespace Application
 
     GameConstsCache::~GameConstsCache() {
         m_GameConsts.UnregisterOnValueChanged(m_GCCEventHandler);
-        delete m_GCCEventHandler;
     }
 
 

@@ -95,9 +95,9 @@ namespace Application
 ///
 
 
-
+            uint32_t a = 5e8;
             // Testing GameRunner, GamnSavew and GameConsts. result: has leak, but it's not that big
-            while (true)
+            while (a-- > 0)
             {
                 GameConsts *gc = new GameConsts();
                 for (int i = 0; i < 50; i++)
@@ -106,12 +106,12 @@ namespace Application
                     delete gr;
                 }
                 delete gc;
-                usleep(50e3);
+                usleep(50);
             }
 
 ///
-
-            using namespace EvoAlg;
+            Stop();
+            // using namespace EvoAlg;
 
             // //TODO: these lines insede while to check leaks V
             // ScriptConverter sc(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));

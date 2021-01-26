@@ -1,11 +1,10 @@
 #pragma once
 
-#define DA_EVAL(x) x
-#define DA_EXPAND_ARGS(...) __VA_ARGS__
-#define DA_EVENT(name, R, Arglist) \
-    class name: public EventHandler<R, DA_EVAL( DA_EXPAND_ARGS Arglist) > { \
+#define DA_EVENT(name, R, ...) \
+    class name: public EventHandler<R, ## __VA_ARGS__> { \
     public: \
-        name(std::function< R Arglist > handler): EventHandler::EventHandler(handler, #name ) {} \
+        name(std::function< R(__VA_ARGS__) > handler): EventHandler::EventHandler(handler) {} \
+        virtual const std::string GetType() override { return #name; } \
         static const std::string GetTypeStatic() { return #name; } \
     };
 

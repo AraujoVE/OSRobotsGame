@@ -35,11 +35,6 @@ namespace Application
 
         do
         {
-            // auto findIt = handlerQueueMap.find(eventType);
-            // if (findIt == handlerQueueMap.end()) {
-            //     handlerQueueMap[eventType] = {};
-            // }
-
             const HandlerQueue &queue = handlerQueueMap[eventType];
 
             if (queue.empty())
@@ -87,36 +82,5 @@ namespace Application
 
         Action<typename EventHandlerType::ArgumentsTuple> action(actionLambda);
         action.Invoke(argTuple);
-    }
-
-    template <class EventHandlerType>
-    void EventListener::Register(EventHandlerType *eventHandler)
-    {
-        // static_assert(std::is_base_of<EventHandler, EventHandlerType>::value, "EventHandlerType must be derived from EventHandler class");
-        std::string eventType = eventHandler->GetType();
-        m_MapMutex.Lock();
-        {
-            handlerQueueMap[eventType].push_back((void *)eventHandler);
-        }
-        m_MapMutex.Unlock();
-    }
-
-    template <class EventHandlerType>
-    void EventListener::Unregister(EventHandlerType *eventHandlerAddress)
-    {
-        // static_assert(std::is_base_of<EventHandler, EventHandlerType>::value, "EventHandlerType must be derived from EventHandler class");
-
-        std::string eventType = eventHandlerAddress->GetType();
-        m_MapMutex.Lock();
-        {
-            auto& queue = handlerQueueMap[eventType];
-            auto it = std::find(queue.begin(), queue.end(), eventHandlerAddress);
-            if (it == queue.end()) {
-                DE_ERROR("Trying to unregister a non-registered event of type '{0}'", eventType);
-            } else {
-                queue.erase(it);
-            }
-        }
-        m_MapMutex.Unlock();
     }
 } // namespace Application
