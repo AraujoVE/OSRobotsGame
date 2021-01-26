@@ -18,7 +18,7 @@ namespace Application
     {
         m_VillageStats = nullptr;
         m_RobotsManagement = nullptr;
-        // Reset();
+        Reset();
     }
 
     GameSave::~GameSave()
@@ -34,8 +34,8 @@ namespace Application
         if (m_RobotsManagement != nullptr) delete m_RobotsManagement;
 
         m_VillageStats = new VillageStats(*m_GameConsts);
-        m_RobotsManagement = new RobotsManagement(*m_GameConsts);
-        m_RobotsManagement->setVillageStats(m_VillageStats);
+        // m_RobotsManagement = new RobotsManagement(*m_GameConsts);
+        // m_RobotsManagement->setVillageStats(m_VillageStats);
 
 
 
