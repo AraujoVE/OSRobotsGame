@@ -7,9 +7,9 @@
 
 #define TLL_ENABLED 0
 #if TLL_ENABLED == 1
-    #define TLL(MACRO, ...) MACRO(__VA_ARGS__)
+#define TLL(MACRO, ...) MACRO(__VA_ARGS__)
 #else
-    #define TLL(MACRO, ...) 
+#define TLL(MACRO, ...)
 #endif
 
 namespace Application
@@ -31,17 +31,15 @@ namespace Application
           m_DebugName(debugName)
     {
     }
-        
+
     ThreadLoop::~ThreadLoop()
     {
         Abandon();
-        DE_DEBUG("(~ThreadLoop) m_InnerLoopMutex.Lock(); ");
         m_InnerLoopMutex.Lock(); //Waits for innerloop to end
         {
             m_TickDelay = nullptr;
             delete m_EventListener;
         }
-        DE_DEBUG("(~ThreadLoop) m_InnerLoopMutex.Unlock(); ");
         m_InnerLoopMutex.Unlock();
     }
 
@@ -93,7 +91,8 @@ namespace Application
 
             DE_ASSERT(m_TickDelay != nullptr);
             //TODO: remove if break if no problems
-            if (m_TickDelay == nullptr) {
+            if (m_TickDelay == nullptr)
+            {
                 break;
             }
             usleep(*m_TickDelay);
@@ -106,7 +105,8 @@ namespace Application
             m_EventListener->On<EH_ThreadEnded>(ThreadEndedReason::FORCED_STOP);
         else if (m_State == State::FINISHED)
             m_EventListener->On<EH_ThreadEnded>(ThreadEndedReason::FINISHED);
-        else if (m_State == State::ABANDONED) {
+        else if (m_State == State::ABANDONED)
+        {
             DE_DEBUG("(ThreadLoop[{0}] inner) Ignoring abandoned thread", m_DebugName);
         }
 
@@ -129,6 +129,8 @@ namespace Application
         m_TickDelay = tickDelay;
 
         m_Paused = false;
+
+        //TODO: change to std::thread
         pthread_create(&m_Thread, NULL, &threadRountine, this);
     }
 

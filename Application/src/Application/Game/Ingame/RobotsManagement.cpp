@@ -101,6 +101,8 @@ namespace Application
         return canAdd;
     }
 
+    void RobotsManagement::clearEvents() { m_EventListener.Clear(); }
+
     void RobotsManagement::setOnTaskCreated(EH_TaskCreated* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnTaskEnded(EH_TaskFinished* eHandler) { m_EventListener.Register(eHandler); }
     void RobotsManagement::setOnTaskCancelled(EH_TaskCancelled* eHandler) { m_EventListener.Register(eHandler); }

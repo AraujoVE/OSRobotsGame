@@ -22,6 +22,8 @@ namespace Application
         EventHandler(EventHandler &&) = delete;
         EventHandler(const EventHandler&) = delete;
 
-        virtual ~EventHandler() = default;
+        virtual ~EventHandler() {
+            DE_TRACE("EventHandler ({0}) destroyed", m_Type);
+        };
     };
 } // namespace Application

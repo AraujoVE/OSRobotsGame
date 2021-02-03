@@ -89,6 +89,8 @@ namespace Application
         void setResources(uint64_t);
 
         void DecayStats();
+
+        inline void ClearEvents() { m_EventListener.Clear(); }
         inline void RegisterOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Register(eventHandler); }
         inline void UnregisterOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Unregister(eventHandler); }
         unsigned int GetElapsedTimeTicks();

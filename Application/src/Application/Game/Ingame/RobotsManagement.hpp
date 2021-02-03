@@ -57,6 +57,8 @@ namespace Application
         bool canRemoveRobots() const;
         bool canAddRobots();
 
+
+        void clearEvents();
         void setOnTaskCreated(EH_TaskCreated*);
         void setOnTaskEnded(EH_TaskFinished*);
         void setOnTaskCancelled(EH_TaskCancelled*);

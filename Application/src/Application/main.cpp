@@ -102,9 +102,8 @@ namespace Application
                 GameConsts *gc = new GameConsts();
                 GameRunner *gr = new GameRunner(gc);
 
-                // gr->Start();
+                gr->Start();
                 // usleep(50);
-                // gr->Stop();
                 // usleep(50);
 
                 delete gr;
