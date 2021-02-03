@@ -30,7 +30,7 @@ namespace EvoAlg
         void selectionAndMutation();
         void createCSV(std::string);
         std::string formatParamsString(int);
-        void saveGenerationData(int);
+        void saveGenerationData(int, const std::string&);
         void increaseMutation();
         void predationOfOne();
         void partIncrease();
@@ -39,7 +39,7 @@ namespace EvoAlg
         bool eventHappens(int);
         void checkEvents();
         void startEventTriggerList();
-        void evoAlg(int,std::string);
+        void evoAlg(int,const std::string&);
         void fillInitialsWithBests(int);
         void semiFinalsTournment(int);
         void finalTournment();

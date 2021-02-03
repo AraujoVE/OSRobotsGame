@@ -348,11 +348,11 @@ namespace EvoAlg
 
     // Saves information about a generation in a .csv file
     // Information: generation, paramsIndv1, fitnessIndv1 ..., paramsIndvN, fitnessIndvN, bestParams, bestFitness
-    void EvolutionaryAlgorithm::saveGenerationData(int generation)
+    void EvolutionaryAlgorithm::saveGenerationData(int generation, const std::string& pathPos)
     {
         std::ofstream csvFileWriter;
 
-        csvFileWriter.open("historyEA.csv", std::ios_base::app); // append instead of overwrite
+        csvFileWriter.open("historyEA-" + pathPos + ".csv", std::ios_base::app); // append instead of overwrite
         if (!csvFileWriter.good())
         {
             std::cout << "[!] Error occurred while trying to open historyEA.csv!\n";
@@ -365,6 +365,7 @@ namespace EvoAlg
             csvFileWriter << formatParamsString(i) << "," << fitness[i] << ",";
         }
         csvFileWriter << formatParamsString(bestFitIndex) << "," << bestFitness << "\n";
+        csvFileWriter.close();
     }
 
     void EvolutionaryAlgorithm::increaseMutation()
@@ -462,7 +463,7 @@ namespace EvoAlg
             eventTriggerModule[i] *= eventTriggerModule[i - 1];
     }
 
-    void EvolutionaryAlgorithm::evoAlg(int createPopType,std::string csvStr)
+    void EvolutionaryAlgorithm::evoAlg(int createPopType, const std::string& csvStr)
     {
         initializePop(createPopType);
         nbNoImprovementGens = 0;
@@ -479,7 +480,7 @@ namespace EvoAlg
             selectionAndMutation();
 
             //TODO: solve exception
-            // saveGenerationData(generationIndex);
+            // saveGenerationData(generationIndex, csvStr);
 
             checkEvents(); // checks if mutation should increase, predation or population reset should occur etc.
             // if fullPopReset() is called, continueEA = false

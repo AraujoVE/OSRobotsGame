@@ -47,9 +47,8 @@ namespace EvoAlg
 
         DE_DEBUG("EAController::RunPopulationInGame()");
         //Index of array corresponds to IndividualID
-        
 
-        ThreadController threadController;
+        // ThreadController threadController;
 
         //TODO: change
         m_GuiProps.MainGameRunner = nullptr;
@@ -57,18 +56,32 @@ namespace EvoAlg
         //TODO: event EH_GGuiGameAttached (wait for UI to be ready (only if ShowGame is true))
         // usleep(1);
 
-        std::vector<void*> pointersPendingDeletion;
+        std::vector<void *> pointersPendingDeletion;
 
         ScriptRunner scriptRunner(*m_Script);
 
-        
+        // for (unsigned int i = 0; i < populationGenes.size(); i++)
+        // {
+        //     threadController.AddIndividual(Individual{i, populationGenes[i]});
+        // }
+
+        // std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteAllIndividuals(scriptRunner);
+
+        //TODO: REMOVE TEMP TEST AFTER PRESENTATION
+        static GameConsts *gameConsts = new GameConsts();
+        static GameRunner *singleThreadGR = new GameRunner(gameConsts);
+        gameConsts->SetTickDelay(5e2);
+
+        std::vector<IndividualRunResult> gameplayResults;
+        gameplayResults.reserve(populationGenes.size());
+
         for (unsigned int i = 0; i < populationGenes.size(); i++)
-        {   
-            threadController.AddIndividual(Individual{i, populationGenes[i]});
+        {
+            Individual indv{i, populationGenes[i]};
+            gameConsts->LoadFromCromossome(populationGenes[i]);
+            gameplayResults.push_back(*scriptRunner.RunAllGameplays(*singleThreadGR, indv));
+            DE_TRACE("Indo pro próximo individuo.");
         }
-
-        std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteAllIndividuals(scriptRunner);
-
 
         m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
         m_GuiProps.MainGameRunner = nullptr;
@@ -76,8 +89,10 @@ namespace EvoAlg
         //TODO: send m_EvolutionInfo to EvolutionaryAlgorithm.cpp to get more info, such as best and worst fitness, etc...
         m_Status.m_EvolutionInfo.CurrentGeneration++;
 
-
         usleep(5e2);
+
+
+        exit(0);
 
         return gameplayResults;
     }
