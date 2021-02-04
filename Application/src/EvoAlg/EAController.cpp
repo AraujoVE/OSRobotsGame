@@ -68,9 +68,12 @@ namespace EvoAlg
         // std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteAllIndividuals(scriptRunner);
 
         //TODO: REMOVE TEMP TEST AFTER PRESENTATION
+        static bool first = true;
         static GameConsts *gameConsts = new GameConsts();
         static GameRunner *singleThreadGR = new GameRunner(gameConsts);
-        gameConsts->SetTickDelay(5e2);
+        if (first) { gameConsts->SetTickDelay(50e3); first = false; } 
+        m_GuiProps.MainGameRunner = singleThreadGR;
+
 
         std::vector<IndividualRunResult> gameplayResults;
         gameplayResults.reserve(populationGenes.size());
@@ -84,15 +87,11 @@ namespace EvoAlg
         }
 
         m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
-        m_GuiProps.MainGameRunner = nullptr;
 
         //TODO: send m_EvolutionInfo to EvolutionaryAlgorithm.cpp to get more info, such as best and worst fitness, etc...
         m_Status.m_EvolutionInfo.CurrentGeneration++;
 
         usleep(5e2);
-
-
-        exit(0);
 
         return gameplayResults;
     }

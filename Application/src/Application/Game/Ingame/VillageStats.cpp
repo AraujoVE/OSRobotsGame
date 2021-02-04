@@ -75,6 +75,7 @@ namespace Application
         baseStats[(int)RobotFunction::RESOURCE_GATHERING] = m_GameConstsCache.INIT_RESOURCES_VALUE;
 
         population = m_GameConstsCache.INIT_POP_VALUE;
+        m_ElapsedTicks = 0;
     }
 
     void VillageStats::initializeVSAvenues()
