@@ -403,7 +403,7 @@ namespace EvoAlg
     // A sequence of selections will run, this method will indicate the selection method that will be used by the next batch of generations
     void EvolutionaryAlgorithm::partIncrease()
     {
-        const static size_t selectionMethodCount = sizeof(partsSelectionMethods)/sizeof(selectionMethods);
+        const static int selectionMethodCount = sizeof(partsSelectionMethods)/sizeof(selectionMethods);
         partPos++;
         if (partPos > selectionMethodCount)
             partPos = selectionMethodCount;

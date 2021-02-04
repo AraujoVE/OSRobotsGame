@@ -91,9 +91,7 @@ namespace EvoAlg
         //TODO: send m_EvolutionInfo to EvolutionaryAlgorithm.cpp to get more info, such as best and worst fitness, etc...
         m_Status.m_EvolutionInfo.CurrentGeneration++;
 
-        usleep(5e2);
-
-        exit(0);
+        // usleep(5e2);
 
         return gameplayResults;
     }
