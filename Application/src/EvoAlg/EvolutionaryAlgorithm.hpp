@@ -87,7 +87,7 @@ namespace EvoAlg
 
         int eventTriggerModule[6] = {1, 10, 5, 10, 2, 10};
 
-       
+
         struct GeneValueBound {
             std::string name;
             double min = 0,max = 1;

@@ -84,6 +84,8 @@ namespace EvoAlg
 
         population.print("Population matrix initialized:");
 
+        
+
         return;
     }
 
@@ -128,17 +130,13 @@ namespace EvoAlg
         DE_TRACE("Calculating fitness of population after gameplay results received");
         calcFitness(gameplayResults);
 
-        worstFitness = bestFitness = fitness[0];
-        worstFitIndex = bestFitIndex = 0;
+        
 
-        for (int i = 1; i < POPULATION_SIZE; i++)
+        for (int i = 0; i < POPULATION_SIZE; i++)
         {
-            // example of fitness calculation -> CHANGE!!!!
-            // fitness[i] = abs(terminoReal - terminoEsperado)/terminoEsperado
-
             DE_ASSERT(fitness[i] >= 0);
             if (fitness[i] < bestFitness)
-            { // searching for the  max fitnnes from new generation
+            { // searching for the  max fitness from new generation
                 bestFitness = fitness[i];
                 bestFitIndex = i;
                 nbNoImprovementGens = 0; // this generation shows improvement -> reset counter
@@ -370,7 +368,7 @@ namespace EvoAlg
 
     void EvolutionaryAlgorithm::increaseMutation()
     {
-        if (!mutationRate)
+        if (mutationRate < 1e-3 && mutationRate > -1e-3)
         {
             mutationRate = INITIAL_MUTATION;
         }
@@ -385,7 +383,7 @@ namespace EvoAlg
         return;
     }
 
-    // Function that will kill the worst individual each "APPLY_PREDATION_INTERVAL" number of generations
+    // Function that will kill the worst individual every "APPLY_PREDATION_INTERVAL" number of generations
     void EvolutionaryAlgorithm::predationOfOne()
     {
         arma::rowvec newInd(NB_PARAMETERS, arma::fill::randu); // creating totally new individual
@@ -395,7 +393,7 @@ namespace EvoAlg
         int index = 0;
         //TODO: find a better way to pass a non-variable to lambda
         auto &_attributesValues = attributesValues;
-        newInd.for_each([&_attributesValues, &index](double paramNewInd) { paramNewInd = _attributesValues[index].min + paramNewInd * (_attributesValues[index].max - _attributesValues[index].min); index++; } );
+        newInd.for_each([&_attributesValues, &index](double &paramNewInd) { paramNewInd = _attributesValues[index].min + paramNewInd * (_attributesValues[index].max - _attributesValues[index].min); index++; } );
 
         population.row(worstFitIndex) = newInd;
 
@@ -405,7 +403,11 @@ namespace EvoAlg
     // A sequence of selections will run, this method will indicate the selection method that will be used by the next batch of generations
     void EvolutionaryAlgorithm::partIncrease()
     {
-        selectionMethod = partsSelectionMethods[++partPos];
+        const static size_t selectionMethodCount = sizeof(partsSelectionMethods)/sizeof(selectionMethods);
+        partPos++;
+        if (partPos > selectionMethodCount)
+            partPos = selectionMethodCount;
+        selectionMethod = partsSelectionMethods[partPos];
 
         return;
     }
@@ -479,7 +481,6 @@ namespace EvoAlg
             evaluatePop();
             selectionAndMutation();
 
-            //TODO: solve exception
             saveGenerationData(generationIndex, csvStr);
 
             checkEvents(); // checks if mutation should increase, predation or population reset should occur etc.
@@ -514,9 +515,9 @@ namespace EvoAlg
         for (int i = 0; i < TOURNMENT_RATE; i++)
             semiFinalsTournment(i);
 
-        evoAlg(FINALS,"Main"); // this EA will use the best individuals from each semifinal
+        evoAlg(FINALS,"FINAL"); // this EA will use the best individuals from each semifinal
 
-        bestIndividual = population.row(bestFitIndex);
+        // bestIndividual = population.row(bestFitIndex); not used, but I'm too afraid to delete
         std::cout << "EVOLUTIONARY ALGORITHM FINISHED!" << std::endl;
         //eaFinished = true;
         return;

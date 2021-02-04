@@ -93,6 +93,8 @@ namespace EvoAlg
 
         usleep(5e2);
 
+        exit(0);
+
         return gameplayResults;
     }
 
