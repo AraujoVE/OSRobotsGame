@@ -1,0 +1,5 @@
+task++(hun)
+move++(hun, 0)
+wait(30)
+move--(hun,0)
+end(70)
