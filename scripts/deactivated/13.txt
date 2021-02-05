@@ -11,7 +11,7 @@ move--(hun,1)
 move++(res,2)
 robots++
 move++(hun,1)
-robots++()
+robots++
 task++(pro)
 move++(pro,3)
 task++(con)

@@ -48,7 +48,7 @@ namespace Application
         unsigned int oldTickDelay = 0;
         if (m_EAGuiProps.MainGameRunner != nullptr)
             oldTickDelay = m_EAGuiProps.MainGameRunner->GetGameConsts().GetTickDelay();
-        unsigned int gameSpeed = oldTickDelay, min = 5e2, max = 1e6;
+        unsigned int gameSpeed = oldTickDelay, min = 5, max = 1e6;
 
         bool startPressed = false, abortPressed = false;
         ImGui::Begin("EAStatus");
