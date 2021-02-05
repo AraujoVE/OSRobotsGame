@@ -45,6 +45,11 @@ namespace Application
             "FINISHED",
             "ABORTED"};
 
+        unsigned int oldTickDelay = 0;
+        if (m_EAGuiProps.MainGameRunner != nullptr)
+            oldTickDelay = m_EAGuiProps.MainGameRunner->GetGameConsts().GetTickDelay();
+        unsigned int gameSpeed = oldTickDelay, min = 5, max = 1e6;
+
         bool startPressed = false, abortPressed = false;
         ImGui::Begin("EAStatus");
         {
@@ -54,8 +59,7 @@ namespace Application
             abortPressed = ImGui::Button("Abort EA");
             ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.Pause);
 
-            // if (gameSpeed > 0)
-            //     ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
+            ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
 
             ImGui::Text("Current Generation: %lu", eaStatus.m_EvolutionInfo.CurrentGeneration);
 
@@ -74,6 +78,11 @@ namespace Application
             }
         }
         ImGui::End();
+
+        if (oldTickDelay != gameSpeed)
+        {
+            m_EAGuiProps.MainGameRunner->GetGameConsts().SetTickDelay(gameSpeed);
+        }
 
         if (settingsChanged)
         {

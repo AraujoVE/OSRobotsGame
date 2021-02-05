@@ -6,6 +6,8 @@
 
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 
+#include "Application/Events/EventHandler/IEventHandler.hpp"
+
 #include <unordered_map>
 #include <string>
 #include <memory>
@@ -16,7 +18,7 @@
 namespace Application
 {
     //TODO: fix ml
-    typedef std::vector<void*> HandlerQueue;
+    typedef std::vector<IEventHandler*> HandlerQueue;
     class EventListener final
     {
         DampEngine::Mutex m_MapMutex;
@@ -44,8 +46,15 @@ namespace Application
         void Clear()
         {
             m_MapMutex.Lock();
+            for (auto &queuePair: handlerQueueMap) {
+                for (IEventHandler *eHandler : queuePair.second) {
+                    delete eHandler;
+                }
+            }
             handlerQueueMap.clear();
             m_MapMutex.Unlock();
         }
+
+        ~EventListener() { Clear(); }
     };
 } // namespace Application

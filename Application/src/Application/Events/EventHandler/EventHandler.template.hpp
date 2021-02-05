@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EventHandler.fwd.hpp"
+#include "IEventHandler.hpp"
 
 #include <functional>
 #include <tuple>
@@ -9,7 +10,7 @@
 namespace Application
 {
     template <typename R, typename... Args>
-    class EventHandler
+    class EventHandler : public IEventHandler
     {
     public:
         std::function<R(Args...)> m_Handler;
@@ -25,10 +26,11 @@ namespace Application
         static const std::string GetTypeStatic() { return "EventHandler"; }
         EventHandler(std::function<R(Args...)> handler, std::string type) : m_Handler(handler), m_Type(type) {}
         EventHandler(EventHandler &&) = default;
+        virtual ~EventHandler() = default;
     };
 
     template <typename R>
-    class EventHandler<R, void>
+    class EventHandler<R, void> : public IEventHandler
     {
     public:
         std::function<R()> m_Handler;

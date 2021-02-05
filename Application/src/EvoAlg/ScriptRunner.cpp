@@ -208,8 +208,11 @@ namespace EvoAlg
         if (waitCount > 0)
             waitCount--;
 
-        while (waitCount-- > 0)
+        while (waitCount-- > 0) {
+            if (gameRunner.IsGameLost()) return;
+            
             usleep(gameRunner.GetGameConsts().GetTickDelay());
+        }
     }
 
     void ScriptFunctions::Execute(GameRunner &gameRunner, const std::vector<std::string> &operation)

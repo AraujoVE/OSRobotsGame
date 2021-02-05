@@ -12,6 +12,7 @@
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Threads/Action.hpp"
 
+
 #include <pthread.h>
 
 namespace Application
@@ -96,7 +97,7 @@ namespace Application
         std::string eventType = eventHandler->GetType();
         m_MapMutex.Lock();
         {
-            handlerQueueMap[eventType].push_back((void *)eventHandler);
+            handlerQueueMap[eventType].push_back(eventHandler);
         }
         m_MapMutex.Unlock();
     }
@@ -118,5 +119,6 @@ namespace Application
             }
         }
         m_MapMutex.Unlock();
+        //TODO: delete eventHandlerAddress
     }
 } // namespace Application
