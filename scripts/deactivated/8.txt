@@ -1,0 +1,16 @@
+task++(res)
+task++(res)
+move++(res,0)
+move++(res,1)
+robots++
+robots++
+move++(res,0)
+move++(res,1)
+robots++
+move++(res,0)
+task--(res,0)
+wait(10)
+task--(res,1)
+robots++
+robots++
+end(200)

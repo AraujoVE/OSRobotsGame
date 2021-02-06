@@ -2,7 +2,6 @@
 
 #include "DampEngine/Core/Macros/Log.hpp"
 #include <string>
-
 namespace Application
 {
     class IEventHandler
@@ -16,7 +15,7 @@ namespace Application
         static const std::string GetTypeStatic()
         {
             DE_CRITICAL("(IEventHandler) Some event forgot to override 'static GetTypeStatic()' ");
-            return "UNINPLEMENTED";
+            return "(IEventHandler) UNINPLEMENTED";
         }
         virtual ~IEventHandler() = default;
     };

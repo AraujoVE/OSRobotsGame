@@ -1,0 +1,7 @@
+task++(hun)
+move++(hun, 0)
+move++(hun, 0)
+wait(20)
+task--(hun, 0)
+robots--
+end(140)

@@ -129,6 +129,8 @@ namespace Application
         const GameConsts &m_GameConsts;
         void UpdateAll()
         {
+            int a = 3;
+            a ++;
             ON_ATTACK_MULTIPLIER = m_GameConsts.GetValue("ON_ATTACK_MULTIPLIER");
             POP_INCREASE_TAX = m_GameConsts.GetValue("POP_INCREASE_TAX");
             POP_PER_CONSTRUCTION = m_GameConsts.GetValue("POP_PER_CONSTRUCTION");

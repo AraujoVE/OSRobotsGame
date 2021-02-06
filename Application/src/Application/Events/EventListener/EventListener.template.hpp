@@ -7,6 +7,8 @@
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 #include "Application/Events/EventHandler/IEventHandler.hpp"
 
+#include "Application/Events/EventHandler/IEventHandler.hpp"
+
 #include <unordered_map>
 #include <string>
 #include <memory>
@@ -53,5 +55,7 @@ namespace Application
             handlerQueueMap.clear();
             m_MapMutex.Unlock();
         }
+
+        ~EventListener() { Clear(); }
     };
 } // namespace Application

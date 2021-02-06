@@ -25,5 +25,4 @@ namespace Application
         virtual ~EventHandler() {
             DE_TRACE("EventHandler ({0}) destroyed", m_Type);
         };
-    };
 } // namespace Application

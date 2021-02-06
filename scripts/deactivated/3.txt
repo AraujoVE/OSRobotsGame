@@ -1,0 +1,14 @@
+task++(med)
+move++(med,0)
+task++(hun)
+move++(hun,1)
+robots++
+task++(con)
+move++(con,2)
+robots++
+task--(hun,1)
+task--(med,0)
+robots--
+robots--
+robots--
+end(240)
