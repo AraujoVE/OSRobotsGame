@@ -18,11 +18,13 @@ namespace Application
         typedef R ReturnType;
         using ArgumentsTuple = std::tuple<Args...>;
 
-        EventHandler(std::function<R(Args...)> handler, const std::string& type) : IEventHandler(type), m_Handler(handler) {}
+        EventHandler(std::function<R(Args...)> handler, const std::string &type) : IEventHandler(type), m_Handler(handler) {}
         EventHandler(EventHandler &&) = delete;
-        EventHandler(const EventHandler&) = delete;
+        EventHandler(const EventHandler &) = delete;
 
-        virtual ~EventHandler() {
+        virtual ~EventHandler()
+        {
             DE_TRACE("EventHandler ({0}) destroyed", m_Type);
-        };
+        }
+    };
 } // namespace Application

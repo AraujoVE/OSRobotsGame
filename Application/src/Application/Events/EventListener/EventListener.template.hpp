@@ -55,7 +55,5 @@ namespace Application
             handlerQueueMap.clear();
             m_MapMutex.Unlock();
         }
-
-        ~EventListener() { Clear(); }
     };
 } // namespace Application
