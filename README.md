@@ -25,7 +25,7 @@ All other depencencies, such as `GLFW, Glad, ImGui, spdlog and premake5` are alr
 We are using premake5 to generate makefiles and solution files.
 To generate those makefiles and execute the Application, one can use our custom script with: `./dev.bash`, located at the repository root
 
-Alternatively, one can do mannually all gthe steps:
+Alternatively, one can do mannually all the steps:
 1. Generating Makefiles for linux (gmake2): `premake5 gmake2`
 2. Compiling project: `make all -j <NUMBER_OF_THREADS>` (You will want to use more than one thread)
 3. Executing project: `./bin/Debug-linux-x86_64/Application/Application`
