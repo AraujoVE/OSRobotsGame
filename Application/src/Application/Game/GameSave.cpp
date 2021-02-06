@@ -18,7 +18,6 @@ namespace Application
     {
         m_VillageStats = nullptr;
         m_RobotsManagement = nullptr;
-        Reset();
     }
 
     GameSave::~GameSave()

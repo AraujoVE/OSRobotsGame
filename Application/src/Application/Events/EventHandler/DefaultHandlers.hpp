@@ -21,6 +21,7 @@ namespace Application
     DA_EVENT(EH_RobotsMoved, bool, Task &, int);
 
     /* VILLAGE STATS EVENT HANDLERS */
+    DA_EVENT(EH_DecaymentStarted, bool);
     DA_EVENT(EH_DecaymentStopped, bool);
 
     /* GAME RUNNER EVENT HANDLERS */

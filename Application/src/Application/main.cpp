@@ -91,73 +91,11 @@ namespace Application
             //     return false;
 
             // }));
-
-/// Testing ml below
-
-            uint32_t a = 1e8;
-            // Testing GameRunner, GamnSavew and GameConsts. result: has leak, but it's not that big
-            while (a-- > 0)
-            {
-                GameConsts *gc = new GameConsts();
-                GameRunner *gr = new GameRunner(gc);
-
-                gr->Start();
-                // usleep(50);
-                // usleep(50);
-
-                delete gr;
-                delete gc;
-                usleep(50);
-            }
-
-///
-            Stop();
-            // using namespace EvoAlg;
-
-            // //TODO: these lines insede while to check leaks V
-            // ScriptConverter sc(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
-            // Script *script = sc.Convert();
-
-            // ScriptRunner sr(*script);
-            // ThreadController tc;
-            // //TODO end: ^
-
-            // GameConsts gc;
-            // gc.LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
-            // std::vector<double> genes = gc.SaveToCromossome();
-            
-            //TEST ThreadController
-            // while (true) {
-            //     for (unsigned int i = 0; i < 1; i++)
-            //     {
-            //         tc.AddIndividual({i, genes});
-            //     }
-            //     tc.ExecuteAllIndividuals(sr);
-            //     usleep(50e3);                
-            // }
-            
-
-///
-
-
-            // gc.SetTickDelay(5e2);
-            // GameRunner gr(&gc);
-
-            // while (true) {
-            //     for (unsigned int i = 0; i < 50; i++)
-            //     {
-            //         Individual idv{i, genes};
-            //         std::vector<TimeResult> *indvResult = sr.RunAllGameplays(gr, idv); 
-            //         delete indvResult;
-            //     }
-            // }
-            
-
-
         }
 
         virtual void OnUpdate() override
         {
+            Stop();
         }
 
         virtual void OnStop() override
@@ -174,5 +112,24 @@ namespace Application
 
 DampEngine::Application *CreateApplication()
 {
+
+
+    //Memory leak testing, with no GUI
+
+    GameConsts *gameConsts = new GameConsts();
+    gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+    GameRunner *gameRunner = new GameRunner(gameConsts);
+
+    gameRunner->Start();
+
+;
+    DE_INFO(">>> Issuing game end!");
+
+    delete gameRunner;
+    delete gameConsts;
+    
+
+    exit(0);
+    return nullptr;
     return new Application::MyApplication();
 }

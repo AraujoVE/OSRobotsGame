@@ -5,7 +5,8 @@
 
 #include <functional>
 #include <memory>
-#include <pthread.h>
+#include <thread>
+#include <mutex>
 
 namespace Application
 {
@@ -26,7 +27,7 @@ namespace Application
     public:
 
         enum class State {
-            INACTIVE, RUNNING, FORCED_STOP, FINISHED, ABANDONED
+            INACTIVE, STARTING, RUNNING, FORCED_STOP, FINISHED, ABANDONED
         };
 
         using TickFunction = std::function<void()>;
@@ -34,7 +35,7 @@ namespace Application
 
 
     private:
-        pthread_t m_Thread;
+        std::thread *m_Thread = nullptr;
 
         std::function<void()> m_TickFunction;
         std::function<bool()> m_AliveCheckFunction;
@@ -42,7 +43,7 @@ namespace Application
         void InnerLoop();
         friend void *threadRountine(void *threadLoopV);
 
-        DampEngine::Mutex m_FunctsMutex, m_InnerLoopMutex;
+        std::mutex m_StateMutex;
 
         State m_State;
         bool m_Paused;

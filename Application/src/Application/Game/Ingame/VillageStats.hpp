@@ -38,7 +38,7 @@ namespace Application
 
         Avenue<double> *avenueVS[BASE_STATS_NO + 1];
 
-        ThreadLoop m_DecayThreadLoop;
+        ThreadLoop *m_DecayThreadLoop;
 
         void (VillageStats::*decayStatsFuncts[BASE_STATS_NO - 1])(int, float &) = {
             &VillageStats::decayFood,
@@ -75,9 +75,10 @@ namespace Application
 
         void onGameStarted();
         void onGameEnded();
+        inline ThreadLoop &getThreadLoop() { return *m_DecayThreadLoop; }
 
         void setStatsDecaymentPaused(bool paused);
-        inline bool isStatusDecaymentPaused() const { return m_DecayThreadLoop.IsPaused(); }
+        inline bool isStatusDecaymentPaused() const { return m_DecayThreadLoop->IsPaused(); }
 
         inline Avenue<double> *getAvenue(RobotFunction robotFunc) { return avenueVS[(uint8_t)robotFunc]; }
         uint64_t getStat(RobotFunction robotFunc) const;
@@ -91,8 +92,13 @@ namespace Application
         void DecayStats();
 
         inline void ClearEvents() { m_EventListener.Clear(); }
-        inline void RegisterOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Register(eventHandler); }
-        inline void UnregisterOnPopReachZero(EH_DecaymentStopped *eventHandler) { m_EventListener.Unregister(eventHandler); }
+        
+        inline void RegisterOnStatsDecaymentStarted(EH_DecaymentStarted *eventHandler) { m_EventListener.Register(eventHandler); }
+        inline void RegisterOnStatsDecaymentStopped(EH_DecaymentStopped *eventHandler) { m_EventListener.Register(eventHandler); }
+
+        inline void UnregisterOnStatsDecaymentStopped(EH_DecaymentStopped *eventHandler) { m_EventListener.Unregister(eventHandler); }
+        inline void UnregisterOnStatsDecaymentStarted(EH_DecaymentStarted *eventHandler) { m_EventListener.Unregister(eventHandler); }
+        
         unsigned int GetElapsedTimeTicks();
     };
 } // namespace Application
