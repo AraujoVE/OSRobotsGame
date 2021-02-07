@@ -18,7 +18,6 @@
 #error "Boost needs to be installed on the system (tested with version 1.75)"
 #endif //!BOOST_VERSION
 
-//TODO: stop using optional to avoid cpphack.hpp
 
 //TODO: remove test includes
 #include "EvoAlg/Threads/ThreadController.hpp"
@@ -29,9 +28,6 @@
 
 
 //TODO: stop using optional to avoid cpphack.hpp
-
-//TODO: TICK_DELAY for Task and VilageStats:;decay
-//TODO: OnGameEnded -> sends VilageStats::decay threadloop tickCount to callback as "gameDurationInTicks"
 
 //TODO: unregister events
 
@@ -112,24 +108,46 @@ namespace Application
 
 DampEngine::Application *CreateApplication()
 {
-
-
-    //Memory leak testing, with no GUI
-
     GameConsts *gameConsts = new GameConsts();
     gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+    
     GameRunner *gameRunner = new GameRunner(gameConsts);
+
+    EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
+    EvoAlg::Script *script = scriptConverter.Convert();
+    EvoAlg::ScriptRunner scriptRunner(*script);
     
 
-    //TODO: find next step to fix game hanging (prob in ~VillageStats() )
-    gameRunner->Start();
+    EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
+    EvoAlg::Individual indv{0, genes};    
 
-    DE_INFO(">>> Issuing game end!");
+    int test = 1;
 
+    if (test == 1) {
+        gameRunner->Start();
+
+        // usleep(10e6);
+    }
+
+
+    // scriptRunner.RunAllGameplays(*gameRunner, indv);
+
+    DE_TRACE("Deleting script");
+    delete script;
+
+    DE_TRACE("Deleting gameRunner");
     delete gameRunner;
+    DE_TRACE("Deleting gameConsts");
     delete gameConsts;
-    
 
+
+
+
+
+
+
+
+    DE_TRACE("Ending script");
     exit(0);
     return nullptr;
     return new Application::MyApplication();

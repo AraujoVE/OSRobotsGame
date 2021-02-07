@@ -4,7 +4,7 @@
 #include "Application/Events/EventListener/EventListener.template.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
-#include "DampEngine/Threads/Mutex.hpp"
+#include <mutex>
 
 namespace Application
 {
@@ -59,7 +59,7 @@ namespace Application
         GameConsts *m_GameConsts;
         EventListener *m_EventListener;
 
-        DampEngine::Mutex m_GSMutex;
+        std::mutex m_GSMutex;
         GameStatus m_GameStatus;
     };
 } // namespace Application

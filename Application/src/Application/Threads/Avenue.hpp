@@ -5,6 +5,7 @@
 #include <thread>
 #include <semaphore.h>
 #include <queue>
+#include <mutex>
 
 #define FULL_N 1000
 
@@ -12,96 +13,55 @@ template <typename T>
 class Avenue
 {
 private:
-    bool m_ConsumerRunning = false;
-    sem_t empty, full;
-    DampEngine::Mutex mutex, threadMutex;
-    T &attr;
-    std::queue<T> items;
-
-    std::thread *consumer_thread = nullptr;
+    std::mutex m_ItemsMutex;
+    T &m_ReferenceVariable;
 
     static void runConsumer(Avenue *consumerObject)
     {
-        consumerObject->consumer();
     }
 
 public:
-    Avenue(T &attr) : attr(attr)
+    Avenue(T &m_ReferenceVariable) : m_ReferenceVariable(m_ReferenceVariable)
     {
-        sem_init(&empty, 1, FULL_N);
-        sem_init(&full, 1, 0);
     }
 
     ~Avenue()
     {
-        sem_destroy(&empty);
-        sem_destroy(&full);
     }
 
     //Method called every time an absolute increment/decrement is desired
     void producer(T value)
     {
-        sem_wait(&empty);
-        mutex.Lock();
-        //Queues an absolute increment/decrement
-        items.push(value);
+        m_ItemsMutex.lock();
 
-        mutex.Unlock();
-        sem_post(&full);
+        m_ReferenceVariable += value;
+
+        m_ItemsMutex.unlock();
     }
 
     //Method called once, (in a separate thread)
     void consumer()
     {
-        while (m_ConsumerRunning)
-        {
-            sem_wait(&full);
-        mutex.Lock();
 
-            //Eval one absolute increment/decrement (delta)
-            attr += items.front();
-
-            items.pop();
-
-            if (attr < 0)
-                attr = 0;
-
-        mutex.Unlock();
-            sem_post(&empty);
-        }
     }
 
     void startConsumer()
     {
-        threadMutex.Lock();
-        m_ConsumerRunning = true;
-        consumer_thread = new std::thread(runConsumer, this);
-        threadMutex.Unlock();
 
     }
 
     void stopConsumer()
     {
-        threadMutex.Lock();
-        DE_ASSERT(consumer_thread != nullptr, "Trying to stop consumer twice (or never started)");
-        m_ConsumerRunning = false;
-        producer(1);
-        // DE_DEBUG("IN: join @stopConsumer");
-        consumer_thread->join();
-        // DE_DEBUG("OUT: join @stopConsumer");
-        delete consumer_thread;
-        consumer_thread = nullptr;
-        threadMutex.Unlock();
 
     }
 
     void up()
     {
-        mutex.Lock();
+        m_ItemsMutex.lock();
     }
 
     void down()
     {
-        mutex.Unlock();
+        m_ItemsMutex.unlock();
     }
 };
