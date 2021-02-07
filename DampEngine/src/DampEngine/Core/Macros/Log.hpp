@@ -9,6 +9,13 @@
 #define DE_ENGINE_ERROR(...) DampEngine::Logger::GetEngineLogger()->error(__VA_ARGS__) 
 #define DE_ENGINE_CRITICAL(...) DampEngine::Logger::GetEngineLogger()->critical(__VA_ARGS__) 
 
+// #define DE_DEBUG(...) 
+// #define DE_TRACE(...) 
+// #define DE_INFO(...) 
+// #define DE_WARN(...) 
+// #define DE_ERROR(...) 
+// #define DE_CRITICAL(...) 
+
 #define DE_DEBUG(...) DampEngine::Logger::GetClientLogger()->debug(__VA_ARGS__) 
 #define DE_TRACE(...) DampEngine::Logger::GetClientLogger()->trace(__VA_ARGS__) 
 #define DE_INFO(...) DampEngine::Logger::GetClientLogger()->info(__VA_ARGS__) 

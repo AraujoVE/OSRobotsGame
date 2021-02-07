@@ -1,29 +1,31 @@
 #include "Application/Game/GameSave.hpp"
 
-#include "Application/header/VillageStats.hpp"
-#include "Application/header/RobotsManagement.hpp"
-#include "Application/header/ConstsMap.hpp"
+#include "Application/Game/Ingame/VillageStats.hpp"
+#include "Application/Game/Ingame/RobotsManagement.hpp"
+#include "Application/Game/GameConsts.hpp"
 
 #include "mypch.hpp"
 
 namespace Application
 {
 
+    //TODO: fix ml
+    //PRIVATE:
     GameSave::GameSave(): m_GameConsts(new GameConsts()) {}
 
-    GameSave::GameSave(const std::string &gameConstsPath) : GameSave()
+    //PUBLIC:
+    GameSave::GameSave(GameConsts *gameConsts) : m_GameConsts(gameConsts)
     {
-        m_GameConsts->LoadValuesFromFile(gameConstsPath);
         Reset();
     }
 
     GameSave::~GameSave()
     {
-        delete m_GameConsts;
     }
 
     void GameSave::Reset()
     {
+        DE_TRACE("(GameSave) Starting new GameSave");
         m_VillageStats.reset(new VillageStats(*m_GameConsts));
         m_RobotsManagement.reset(new RobotsManagement(*m_GameConsts));
         m_RobotsManagement->setVillageStats(m_VillageStats.get());

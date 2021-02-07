@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Application/ImGui/IGWindow.hpp"
-#include "Application/header/Task.hpp"
+#include "Application/Game/Ingame/Task.hpp"
+
+#include "DampEngine/Threads/Mutex.hpp"
+
 #include <queue>
 
 namespace Application
@@ -23,17 +26,18 @@ namespace Application
             void OnTaskEnded(int id);
 
             void ClearTaskWindows();
-            TaskWindow *GetTaskWindow(Task::TaskID id);
 
             virtual void SetEventHandlers(std::unique_ptr<Application::RobotsManagement> &robotManagement);
 
         private:
         private:
+
+            DampEngine::Mutex m_TaskWindowMapMutex, m_TaskDeletionQueueMutex;
+
             RobotFunction m_Function;
             std::unique_ptr<Application::RobotsManagement> &m_RobotsManagement;
             std::unordered_map<Task::TaskID, TaskWindow *> m_TaskWindowMap;
             std::queue<Task::TaskID> m_TasksPendingDeletion;
-            pthread_mutex_t m_MutexMapRemoval;
         };
     } // namespace GameWindows
 

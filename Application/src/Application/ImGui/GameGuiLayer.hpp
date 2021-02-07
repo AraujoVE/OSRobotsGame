@@ -1,8 +1,11 @@
 #pragma once
 
+#include "DampEngine/Threads/Mutex.hpp"
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
 #include "Application/Game/GameRunner.hpp"
-#include "Application/header/RobotFunctions.hpp"
+#include "Application/Game/Ingame/RobotFunctions.hpp"
+
+#include "Application/Events/EventHandler/DefaultHandlers.fwd.hpp"
 
 using namespace DampEngine;
 namespace Application
@@ -20,19 +23,32 @@ namespace Application
     class GameGuiLayer final : public ImGuiLayer
     {
     public:
-        GameGuiLayer(GameRunner&);
+        GameGuiLayer();
+        void SetGameRunner(GameRunner*);
+        
+    private:
+        void InitializeGameWindows();
+        void DeinitializeGameWindows();
 
     private:
         virtual void ImGuiDescription() override;
 
+        void NoGameAttachedGuiDescription();
+        void MainGameGuiDescription();
+        void GameLostGuiDescription();
+
     private:
-        void LostScreenDescription();
+        DampEngine::Mutex m_GameRunnerMutex, m_GameWindowsMutex;
+        
+        
         const static int SCRIPT_FUNCT_SIZEE = 7;
 
-        GameRunner &m_GameRunner;
+        //It is not this class' responsibility to free game runner
+        GameRunner *m_GameRunner;
+        EH_GameStarted *m_GameStartedEventHandler;
 
         GameWindows::StatusWindow *m_StatusWindow;
-        GameWindows::FunctionWindow *m_FunctionWindows[FUNCTION_QTY];
+        GameWindows::FunctionWindow *m_FunctionWindows[FUNCTION_QTY];  
         GameWindows::RobotCreationWindow *m_RobotCreationWindow;
     };
 } // namespace Application

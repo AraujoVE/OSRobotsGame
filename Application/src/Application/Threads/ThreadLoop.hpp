@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Application/Game/GameConsts.hpp"
+#include "DampEngine/Threads/Mutex.hpp"
+
 #include <functional>
 #include <memory>
 #include <pthread.h>
@@ -11,33 +14,60 @@ namespace Application
     {
         enum ThreadEndedReason_t
         {
-            STOP,
+            FORCED_STOP,
             FINISHED
         };
     }
 
-    class ThreadLoop
+    
+
+    class ThreadLoop final
     {
+    public:
+
+        enum class State {
+            INACTIVE, RUNNING, FORCED_STOP, FINISHED, ABANDONED
+        };
+
+        using TickFunction = std::function<void()>;
+        using AliveCheckFunction = std::function<bool()>;
+
+
     private:
         pthread_t m_Thread;
 
         std::function<void()> m_TickFunction;
         std::function<bool()> m_AliveCheckFunction;
-        bool m_Running;
-
+        
         void InnerLoop();
         friend void *threadRountine(void *threadLoopV);
-        const static std::function<bool()> s_DefaultAliveCheckFunction;
 
+        DampEngine::Mutex m_FunctsMutex;
+
+        State m_State;
+        bool m_Paused;
+
+        const static uint32_t s_HumanTickDelay;
+        const uint32_t *m_TickDelay;
     public:
-        std::unique_ptr<EventListener> m_EventListener;
+        EventListener *m_EventListener;
 
-        ThreadLoop(
-            std::function<void()> loopFunction,
-            std::function<bool()> aliveCheckFunction = s_DefaultAliveCheckFunction);
+        std::string m_DebugName;
+        ThreadLoop(const std::string& debugName);
+        ~ThreadLoop();
 
-        void Start();
+        inline void SetTickFunction(TickFunction &&func) { m_TickFunction = func; }
+        inline void SetAliveCheckFunction(AliveCheckFunction &&func) { m_AliveCheckFunction = func; }
+
+        inline ThreadLoop::State GetState() { return m_State; }
+
+        void Pause(bool paused = true);
+        inline void Unpause() { Pause(false); }
+        inline bool IsPaused() { return m_Paused; }
+        inline bool IsRunning() { return m_State == State::RUNNING; }
+        void Start(const uint32_t *tickDelay);
         void Stop();
+        void Abandon();
     };
 
 } // namespace Application

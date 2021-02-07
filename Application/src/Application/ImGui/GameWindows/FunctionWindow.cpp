@@ -3,7 +3,7 @@
 #include "mypch.hpp"
 
 #include "Application/ImGui/GameWindows/TaskWindow.hpp"
-#include "Application/header/RobotsManagement.hpp"
+#include "Application/Game/Ingame/RobotsManagement.hpp"
 
 using namespace Application;
 namespace Application::GameWindows
@@ -18,7 +18,6 @@ namespace Application::GameWindows
         m_WindowProps = {
             {40, 80 + (ySize + ySpacing) * (int)function},
             {200, ySize}};
-        pthread_mutex_init(&m_MutexMapRemoval, NULL);
     }
 
     void FunctionWindow::Render()
@@ -55,27 +54,37 @@ namespace Application::GameWindows
             m_RobotsManagement->createTask(m_Function);
 
         //Render children
-        for (auto taskWindowPairIt = m_TaskWindowMap.begin(); taskWindowPairIt != m_TaskWindowMap.end(); taskWindowPairIt++)
-            taskWindowPairIt->second->Render();
+        m_TaskWindowMapMutex.Lock();
+        {
+            for (auto taskWindowPairIt = m_TaskWindowMap.begin(); taskWindowPairIt != m_TaskWindowMap.end(); taskWindowPairIt++)
+                taskWindowPairIt->second->Render();
+        }
+        m_TaskWindowMapMutex.Unlock();
     }
 
-    void FunctionWindow::SetEventHandlers(std::unique_ptr<RobotsManagement>& robotsManagement) {
+    void FunctionWindow::SetEventHandlers(std::unique_ptr<RobotsManagement> &robotsManagement)
+    {
         RobotFunction thisFunction = m_Function;
-        robotsManagement->setOnTaskCreated(new EH_TaskCreated([=](Task& createdTask) {
-            if (createdTask.GetRobotFunction() != thisFunction) return false;
+        robotsManagement->setOnTaskCreated(new EH_TaskCreated([=](Task &createdTask) {
+            if (createdTask.GetRobotFunction() != thisFunction)
+                return false;
 
-            auto taskCanceledCallback = std::bind(&RobotsManagement::cancelTask, m_RobotsManagement.get(), std::placeholders::_1);
-            TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};
-            TaskWindow *associatedWindow = new TaskWindow(associatedWindowProps, m_RobotsManagement, createdTask, taskCanceledCallback);
+            m_TaskWindowMapMutex.Lock();
+            {
+                auto taskCanceledCallback = std::bind(&RobotsManagement::cancelTask, m_RobotsManagement.get(), std::placeholders::_1);
+                TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};
+                TaskWindow *associatedWindow = new TaskWindow(associatedWindowProps, m_RobotsManagement, createdTask, taskCanceledCallback);
 
-            m_TaskWindowMap.insert({createdTask.GetID(), associatedWindow});
+                m_TaskWindowMap.insert({createdTask.GetID(), associatedWindow});
+            }
+            m_TaskWindowMapMutex.Unlock();
 
             return true;
         }));
 
-
-        auto removeTaskFromGUI = [=](Task& endedTask) {
-            if (endedTask.GetRobotFunction() != thisFunction) return false;
+        auto removeTaskFromGUI = [=](Task &endedTask) {
+            if (endedTask.GetRobotFunction() != thisFunction)
+                return false;
 
             this->OnTaskEnded(endedTask);
             return true;
@@ -85,18 +94,17 @@ namespace Application::GameWindows
         robotsManagement->setOnTaskCancelled(new EH_TaskCancelled(removeTaskFromGUI));
     }
 
-
-    void FunctionWindow::ClearTaskWindows() {
-        pthread_mutex_lock(&m_MutexMapRemoval);
-        
-        for (auto deletePair : m_TaskWindowMap)
+    void FunctionWindow::ClearTaskWindows()
+    {
+        m_TaskWindowMapMutex.Lock();
         {
-            m_RobotsManagement->cancelTask(deletePair.second->GetTask());
-            DE_DEBUG("Deleting TaskWindow ID={0}, Index={1}, Function={2}", deletePair.first, deletePair.second->GetIndex(), getRobotFunctionString(deletePair.second->GetTask().GetRobotFunction()));
-            delete deletePair.second;
+            for (auto deletePair : m_TaskWindowMap)
+            {
+                delete deletePair.second;
+            }
+            m_TaskWindowMap.clear();
         }
-        m_TaskWindowMap.clear();
-        pthread_mutex_unlock(&m_MutexMapRemoval);
+        m_TaskWindowMapMutex.Unlock();
     }
 
     void FunctionWindow::OnTaskEnded(Task &endedTask)
@@ -106,31 +114,25 @@ namespace Application::GameWindows
 
     void FunctionWindow::OnTaskEnded(int id)
     {
-        // DE_DEBUG("(FunctionWindow) onTaskEnded()");
-
-        auto windowIt = m_TaskWindowMap.find(id);
-
-        DE_ASSERT(windowIt != m_TaskWindowMap.end(), "Trying to end an unknown Task");
-
-        pthread_mutex_lock(&m_MutexMapRemoval);
-
-        m_TaskWindowMap.erase(windowIt);
-        
-        int i = m_TaskWindowMap.size()-1;
-        for (windowIt = m_TaskWindowMap.begin() ; windowIt != m_TaskWindowMap.end() ; windowIt++)
+        m_TaskWindowMapMutex.Lock();
         {
-            (windowIt->second)->SetIndex(i--); 
+            auto windowIt = m_TaskWindowMap.find(id);
+
+            if (windowIt == m_TaskWindowMap.end()) {
+                DE_WARN("(FunctionWindow::OnTaskEnded) Trying to end an unknown Task... Ignoring.\n\t (TODO: Make EAController wait for UI if ShowGame is on)");
+                m_TaskWindowMapMutex.Unlock();
+                return;
+            }
+
+            m_TaskWindowMap.erase(windowIt);
+
+            int i = m_TaskWindowMap.size() - 1;
+            for (windowIt = m_TaskWindowMap.begin(); windowIt != m_TaskWindowMap.end(); windowIt++)
+            {
+                (windowIt->second)->SetIndex(i--);
+            }
         }
-
-        pthread_mutex_unlock(&m_MutexMapRemoval);
+        m_TaskWindowMapMutex.Unlock();
     }
 
-
-    TaskWindow *FunctionWindow::GetTaskWindow(Task::TaskID id){
-        return m_TaskWindowMap[id];
-    }
-
-
-
-
-} // namespace Application
+} // namespace Application::GameWindows

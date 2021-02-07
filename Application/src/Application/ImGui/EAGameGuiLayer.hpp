@@ -5,28 +5,15 @@
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
-#include "EAAlgorithm/EAScript.hpp"
+#include "Application/Game/GameRunner.hpp"
+
+#include "EvoAlg/EAController.hpp"
+#include "EvoAlg/Types.hpp"
 
 #include <memory>
 
 namespace Application
 {
-    struct EAGameSettings
-    {
-        bool
-            ShowGame = false,
-            PauseGame = false,
-            ManualMode = false;
-    };
-
-    struct EAState
-    {
-        bool
-            Started = false, 
-            Running = false; 
-    };
-
-
     class GameSave;
     class GameRunner;
     class StatusWindow;
@@ -36,22 +23,21 @@ namespace Application
     class EAGameGuiLayer final : public DampEngine::ImGuiLayer
     {
     public:
-        EAGameGuiLayer(GameRunner &gameRunner);
+        EAGameGuiLayer();
 
-        inline void SetOnSettingsChanged(EH_EAGameSettingsChanged* eventHandler) { m_EventListener.Register(eventHandler); }
+        inline void SetOnSettingsChanged(EH_EAGuiPropsChanged* eventHandler) { m_EventListener.Register(eventHandler); }
     private:
         virtual void ImGuiDescription() override;
 
 
     private:
+        //TODO: move to a better place
         const static int SCRIPT_FUNCT_SIZE = 7;
 
-        GameRunner &m_GameRunner;
-        EAAlgorithm::EAScript *m_EAScript;
+        EvoAlg::EAController *m_EAController;
         EventListener m_EventListener;
 
 
-        EAGameSettings m_Settings;
-        EAState m_EAState;
+        EvoAlg::EAGuiProps m_EAGuiProps;
     };
 } // namespace Application

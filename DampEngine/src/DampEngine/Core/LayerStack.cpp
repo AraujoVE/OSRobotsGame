@@ -64,19 +64,15 @@ namespace DampEngine
         // DE_ENGINE_INFO("LayerStack received event {0}", event);
         for (auto layer : Util::reverse<std::vector<ImGuiLayer *>>(m_LayerStack))
         {
-            m_LayerStackMutex.Lock();
-
             if (event.IsHandled())
                 break;
             layer->OnEvent(event);
 
-            m_LayerStackMutex.Unlock();
         }
     }
 
     void LayerStack::PushOverlay(ImGuiLayer *overlay)
     {
-        DE_TRACE("MUTEX LOCK: LayerStack::PushOverlay");
         m_LayerStackMutex.Lock();
 
         DE_ASSERT(overlay != nullptr);
@@ -90,7 +86,6 @@ namespace DampEngine
             overlay->OnAttach();
         }
 
-        DE_TRACE("MUTEX UNLOCK: LayerStack::PushOverlay");
         m_LayerStackMutex.Unlock();
     }
 
@@ -110,7 +105,7 @@ namespace DampEngine
 
     void LayerStack::PushLayer(ImGuiLayer *layer)
     {
-        DE_TRACE("MUTEX LOCK: LayerStack::PushLayer");
+        DE_DEBUG("MUTEX LOCK: LayerStack::PushLayer");
         m_LayerStackMutex.Lock();
 
         DE_ASSERT(layer != nullptr);
@@ -124,7 +119,7 @@ namespace DampEngine
             m_OverlayStartIndex++;
         }
 
-        DE_TRACE("MUTEX UNLOCK: LayerStack::PushLayer");
+        DE_DEBUG("MUTEX UNLOCK: LayerStack::PushLayer");
         m_LayerStackMutex.Unlock();
     }
 

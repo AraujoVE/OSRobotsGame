@@ -41,3 +41,4 @@ gameScript.cfg
 
 # CSV
 .csv
+history*.csv

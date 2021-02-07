@@ -19,7 +19,7 @@ namespace Application
         GameSave();
 
     public:
-        GameSave(const std::string &gameConstsPath);
+        GameSave(GameConsts *gameConsts);
         ~GameSave();
 
         static void Load();

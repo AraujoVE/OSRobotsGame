@@ -30,7 +30,9 @@ project "Application"
 		"DampEngine",
 		"GLFW",
 		"Glad",
-		"ImGui"
+		"ImGui",
+		"armadillo",
+		-- "lmpack"
 	}
 
 	filter "system:linux"
@@ -42,13 +44,17 @@ project "Application"
 			"dl",
 			"pthread"
 		}
+		
+		buildoptions {
+			"-Wl,--stack,524288000"
+        }
 
 
 	filter "system:windows"
 		systemversion "latest"
 
 		defines {
-			OS_SYSTEM_WINDOWS
+			DE_SYSTEM_WINDOWS
 		}
 
 	-- filter "system:"

@@ -1,6 +1,6 @@
 #include "RobotCreationWindow.hpp"
 
-#include "Application/header/RobotsManagement.hpp"
+#include "Application/Game/Ingame/RobotsManagement.hpp"
 
 #include "mypch.hpp"
 
@@ -21,13 +21,13 @@ namespace Application::GameWindows
         ImGui::Begin("Robot management", NULL, m_WindowFlags);
         {  
             //First line
-            ImGui::Text("Total Robot count: %d", m_RobotsManagement->getTotRobots());
-            ImGui::Text("Free Robots: %d/%d", m_RobotsManagement->getFreeRobots() , m_RobotsManagement->getTotRobots());
+            ImGui::Text("Total Robot count: %lu", m_RobotsManagement->getTotRobots());
+            ImGui::Text("Free Robots: %lu/%lu", m_RobotsManagement->getFreeRobots() , m_RobotsManagement->getTotRobots());
 
             //Third line
 
             //TODO: remove robs and diable if cant
-            ImGui::Text("Production cost: %d", m_RobotsManagement->getProdCost());
+            ImGui::Text("Production cost: %lu", m_RobotsManagement->getProdCost());
 
             if (!canCreateRobot) {
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);

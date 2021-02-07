@@ -5,7 +5,7 @@
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 
 #include "Application/Game/GameRunner.hpp"
-#include "Application/header/Task.hpp"
+#include "Application/Game/Ingame/Task.hpp"
 #include <string>
 
 namespace Application
@@ -20,11 +20,11 @@ namespace Application
     DA_EVENT(EH_RobotsMoved, bool, (Task&, int));
 
     /* VILLAGE STATS EVENT HANDLERS */
-    DA_EVENT(EH_StatsDecayed, bool, (void));
+    DA_EVENT(EH_DecaymentStopped, bool, (void));
 
     /* GAME RUNNER EVENT HANDLERS */
     DA_EVENT(EH_GameStarted, bool, (GameRunner&));
-    DA_EVENT(EH_GameEnded, bool, (GameRunner&));
+    DA_EVENT(EH_GameEnded, bool, (GameRunner&,int));
     
 
     /* THREADLOOP EVENTS */
@@ -32,10 +32,13 @@ namespace Application
     DA_EVENT(EH_ThreadEnded, bool, (ThreadEndedReason::ThreadEndedReason_t));
 
     /* EAGAME GUI LAYER EVENTS */
-    DA_EVENT(EH_EAGameSettingsChanged, bool, (EAGameSettings));
+    DA_EVENT(EH_EAGuiPropsChanged, bool, (const EvoAlg::EAGuiProps&));
 
     /* GAME CONSTS EVENTS */
-    DA_EVENT(EH_GCValueChanged, bool, (const std::string& /* changed value key */, float /* changed value */));
+    DA_EVENT(EH_GameConstsChanged, bool, (void));
+
+    /* EA HANDLERS */
+    DA_EVENT(EH_EAScriptEnded, bool, (int /* individualIndex */,  std::vector<std::pair<double, double>> /* gameplayResults */));
 
     
 } // namespace Application
