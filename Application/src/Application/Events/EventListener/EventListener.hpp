@@ -45,13 +45,11 @@ namespace Application
 
             for (auto handlerIt = queue.begin(); handlerIt != queue.end(); handlerIt++)
             {
-
-                void *genericEventHandler = *handlerIt;
-                EventHandlerType *eventHandler = (EventHandlerType *)genericEventHandler;
+                IEventHandler *eventHandler = *handlerIt;
                 if (eventHandler->GetType() == "")
                     continue;
 
-                std::apply(eventHandler->m_Handler, argTuple);
+                std::apply(((EventHandlerType *)eventHandler)->m_Handler, argTuple);
             }
         } while (false);
 

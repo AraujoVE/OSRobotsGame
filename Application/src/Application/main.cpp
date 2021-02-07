@@ -147,7 +147,7 @@ DampEngine::Application *CreateApplication()
 
 
 
-    DE_TRACE("Ending script");
+    DE_TRACE("Ending Application");
     exit(0);
     return nullptr;
     return new Application::MyApplication();

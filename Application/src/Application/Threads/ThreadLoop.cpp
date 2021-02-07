@@ -32,6 +32,7 @@ namespace Application
         Abandon();
         m_TickDelay = nullptr;
         delete m_EventListener;
+        delete m_Thread;
     }
 
     void ThreadLoop::InnerLoop()
