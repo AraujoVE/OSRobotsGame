@@ -73,10 +73,10 @@ namespace Application
 
         m_GameStatus.GameStarted = false;
 
-        m_GameSave->GetVillageStats()->onGameEnded();
-
         m_GameSave->GetRobotsManagement()->clearEvents();
         m_GameSave->GetVillageStats()->ClearEvents();
+        m_GameSave->GetVillageStats()->onGameEnded();
+
 
         m_GSMutex.unlock();
         m_EventListener->OnAsync<EH_GameEnded>({*this, elapsedTicks});

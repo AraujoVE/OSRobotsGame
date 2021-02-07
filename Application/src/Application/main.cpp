@@ -18,14 +18,12 @@
 #error "Boost needs to be installed on the system (tested with version 1.75)"
 #endif //!BOOST_VERSION
 
-
 //TODO: remove test includes
 #include "EvoAlg/Threads/ThreadController.hpp"
 #include "EvoAlg/ScriptRunner.hpp"
 #include "EvoAlg/ScriptConverter.hpp"
 #include "EvoAlg/Script.hpp"
 #include "EvoAlg/Types.hpp"
-
 
 //TODO: stop using optional to avoid cpphack.hpp
 
@@ -108,44 +106,43 @@ namespace Application
 
 DampEngine::Application *CreateApplication()
 {
-    GameConsts *gameConsts = new GameConsts();
-    gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
-    
-    GameRunner *gameRunner = new GameRunner(gameConsts);
 
-    EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
-    EvoAlg::Script *script = scriptConverter.Convert();
-    EvoAlg::ScriptRunner scriptRunner(*script);
-    
+    int tests = 3e2;
 
-    EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
-    EvoAlg::Individual indv{0, genes};    
+    while (tests-- > 0)
+    {
 
-    int test = 1;
+        GameConsts *gameConsts = new GameConsts();
+        gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
 
-    if (test == 1) {
-        gameRunner->Start();
+        GameRunner *gameRunner = new GameRunner(gameConsts);
 
-        // usleep(10e6);
+        EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
+        EvoAlg::Script *script = scriptConverter.Convert();
+        EvoAlg::ScriptRunner scriptRunner(*script);
+
+        EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
+        EvoAlg::Individual indv{0, genes};
+
+        int test = 1;
+
+        if (test == 1)
+        {
+            gameRunner->Start();
+            gameRunner->Stop();
+            // usleep(10e6);
+        }
+
+        // scriptRunner.RunAllGameplays(*gameRunner, indv);
+
+        DE_TRACE("Deleting script");
+        delete script;
+
+        DE_TRACE("Deleting gameRunner");
+        delete gameRunner;
+        DE_TRACE("Deleting gameConsts");
+        delete gameConsts;
     }
-
-
-    // scriptRunner.RunAllGameplays(*gameRunner, indv);
-
-    DE_TRACE("Deleting script");
-    delete script;
-
-    DE_TRACE("Deleting gameRunner");
-    delete gameRunner;
-    DE_TRACE("Deleting gameConsts");
-    delete gameConsts;
-
-
-
-
-
-
-
 
     DE_TRACE("Ending Application");
     exit(0);
