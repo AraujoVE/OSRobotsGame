@@ -1,0 +1,49 @@
+@startuml
+
+class Task{
+    RobotFunction type
+    int robotsNo
+    time_t initTime
+    int remainingTime
+
+    updateRemainingTime()
+    calcThreadTime()
+    createThread()
+    deleteThread()
+    updateValues()
+}
+class VillageStats{
+    int defenses
+    int resources
+    int food     
+    int health
+    int structures
+    int population
+
+    calcNewPop()
+}
+class randomEvents{
+
+}
+enum eventTypes{
+
+}
+class RobotsManagment{
+    int totRobots
+    int freeRobots
+    int efficiency
+    int prodCost
+
+    sendRobot()
+    retrieveRobot()
+    createRobot()
+    destroyRobot()
+}
+enum RobotFunction{
+    PROTECTION
+    RESOURCE_GATHERING
+    HUNT
+    MEDICINE
+    CONSTRUCTION
+}
+@enduml

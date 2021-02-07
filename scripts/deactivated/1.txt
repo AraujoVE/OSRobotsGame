@@ -1,0 +1,20 @@
+task++(pro)
+task++(pro)
+task++(pro)
+task++(pro)
+robots++
+robots++
+robots++
+robots++
+move++(pro,0)
+move++(pro,0)
+move++(pro,1)
+move++(pro,2)
+move++(pro,3)
+wait(1)
+task--(pro, 0)
+move++(pro, 3)
+task--(pro, 1)
+robots--
+wait(3)
+end(240)
