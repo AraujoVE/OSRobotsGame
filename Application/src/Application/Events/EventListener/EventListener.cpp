@@ -6,11 +6,11 @@ namespace Application
     {
         // static_assert(std::is_base_of<EventHandler, EventHandlerType>::value, "EventHandlerType must be derived from EventHandler class");
         std::string eventType = eventHandler->GetType();
-        m_MapMutex.Lock();
+        m_MapMutex.lock();
         {
             handlerQueueMap[eventType].push_back(eventHandler);
         }
-        m_MapMutex.Unlock();
+        m_MapMutex.unlock();
     }
 
     void EventListener::Unregister(IEventHandler *eventHandlerAddress)
@@ -18,7 +18,7 @@ namespace Application
         // static_assert(std::is_base_of<EventHandler, EventHandlerType>::value, "EventHandlerType must be derived from EventHandler class");
 
         std::string eventType = eventHandlerAddress->GetType();
-        m_MapMutex.Lock();
+        m_MapMutex.lock();
         {
             HandlerQueue &queue = handlerQueueMap[eventType];
             HandlerQueue::iterator it = std::find(queue.begin(), queue.end(), eventHandlerAddress);
@@ -35,6 +35,6 @@ namespace Application
                 delete eHandler;
             }
         }
-        m_MapMutex.Unlock();
+        m_MapMutex.unlock();
     }
 } // namespace Application

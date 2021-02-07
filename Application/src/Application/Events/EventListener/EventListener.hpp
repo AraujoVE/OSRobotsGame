@@ -32,7 +32,7 @@ namespace Application
 
         static unsigned long count = 0;
         count++;
-        m_MapMutex.Lock();
+        m_MapMutex.lock();
 
         do
         {
@@ -54,7 +54,7 @@ namespace Application
             }
         } while (false);
 
-        m_MapMutex.Unlock();
+        m_MapMutex.unlock();
     }
 
     template <class EventHandlerType>

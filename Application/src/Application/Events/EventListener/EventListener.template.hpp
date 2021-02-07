@@ -14,14 +14,14 @@
 #include <memory>
 #include <vector>
 #include <utility>
-#include <pthread.h>
+#include <mutex>
 
 namespace Application
 {
     //TODO: make some methods const
     class EventListener final
     {
-        mutable DampEngine::Mutex m_MapMutex;
+        mutable std::mutex m_MapMutex;
         using HandlerQueue = std::vector<IEventHandler*>;
         std::unordered_map<std::string, HandlerQueue> handlerQueueMap = {};
 
@@ -46,14 +46,16 @@ namespace Application
 
         void Clear()
         {
-            m_MapMutex.Lock();
+            DE_DEBUG("Mutex lock: EventListener::Clear()");
+            m_MapMutex.lock();
             for (auto &queuePair: handlerQueueMap) {
                 for (IEventHandler *eHandler : queuePair.second) {
                     delete eHandler;
                 }
             }
             handlerQueueMap.clear();
-            m_MapMutex.Unlock();
+            m_MapMutex.unlock();
+            DE_DEBUG("Mutex unlock: EventListener::Clear()");
         }
     };
 } // namespace Application

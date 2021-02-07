@@ -63,6 +63,7 @@ namespace Application
 
     void GameRunner::Stop()
     {
+        DE_TRACE("GameRunner::Stop()");
         if (!m_GameStatus.GameStarted) return;
         
         m_GSMutex.lock();
@@ -73,12 +74,18 @@ namespace Application
 
         m_GameStatus.GameStarted = false;
 
+        DE_TRACE("Stopping game: 0/3 @GameRunner::Stop()");
         m_GameSave->GetRobotsManagement()->clearEvents();
+        DE_TRACE("Stopping game: 1/3 @GameRunner::Stop()");
         m_GameSave->GetVillageStats()->ClearEvents();
+        DE_TRACE("Stopping game: 2/3 @GameRunner::Stop()");
         m_GameSave->GetVillageStats()->onGameEnded();
+        DE_TRACE("Stopping game: 3/3 @GameRunner::Stop()");
 
 
         m_GSMutex.unlock();
+
+        DE_TRACE("Emmiting EH_GameEnded @GameRunner::Stop()");
         m_EventListener->OnAsync<EH_GameEnded>({*this, elapsedTicks});
         //TODO: promise to join TASK + VS ended callbacks
     }
