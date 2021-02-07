@@ -1,0 +1,5 @@
+Makefile
+bin
+bin-int
+extras/annotations.txt
+gameScript.cfg

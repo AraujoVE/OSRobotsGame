@@ -1,0 +1,12 @@
+task++(med)
+move++(med,0)
+move++(med,0)
+move++(med,0)
+move--(med,0)
+move--(med,0)
+task--(med,0)
+robots++
+robots++
+robots--
+wait(3)
+end(182)
