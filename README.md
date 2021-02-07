@@ -1,7 +1,19 @@
 # OSRobotsGame
 
-This project is an application of concepts from Operating Systems and Evolutive Systems disciplines at USP - São Carlos.
-It consists of a multi-threaded game that can be run with and *evolutionary algorithm* to balance it's constants.
+This project is divided in two development stages, each one for a different discipline at **USP - São Carlos**. The developer team is also slightly different between the stages.
+
+The first stage introduces a resource management game which uses various *threads* to operate it's mechanics, developed for **Operating Systems I - SSC0140** by:
+- [Marcus Vinicius C. B. Martins](https://github.com/marcuscastelo);
+- [Vinícius Eduardo de Araújo](https://github.com/AraujoVE);
+- [Lucas de Medeiros França Romero](https://github.com/LMFRomero);
+- [Pedro Guerra Lourenço](https://github.com/Haltz01).
+
+The second stage adds, on top of the game, an *Evolutionary Algorithm* that aims to solve *game design* problems we had at the first stage of this project: the game always ended up being either too hard or too easy. So, our idea is to use an EA (*Evolutionary Algorithm*) to tune game constants in a way that we are satisfied with the difficulty of the game. This second stage was developed for **Evolutionary systems applied to robotics - SCC0713** by:
+
+- [Marcus Vinicius C. B. Martins](https://github.com/marcuscastelo);
+- [Vinícius Eduardo de Araújo](https://github.com/AraujoVE);
+- [Pedro Guerra Lourenço](https://github.com/Haltz01);
+- [Lucas Yuji Matubara](https://github.com/YujiMatubara).
 
 # Installation
 
