@@ -18,7 +18,6 @@
 #error "Boost needs to be installed on the system (tested with version 1.75)"
 #endif //!BOOST_VERSION
 
-//TODO: stop using optional to avoid cpphack.hpp
 
 //TODO: remove test includes
 #include "EvoAlg/Threads/ThreadController.hpp"
@@ -29,9 +28,6 @@
 
 
 //TODO: stop using optional to avoid cpphack.hpp
-
-//TODO: TICK_DELAY for Task and VilageStats:;decay
-//TODO: OnGameEnded -> sends VilageStats::decay threadloop tickCount to callback as "gameDurationInTicks"
 
 //TODO: unregister events
 
@@ -92,68 +88,6 @@ namespace Application
 
             // }));
 
-/// Testing ml below
-
-            uint32_t a = 1e8;
-            // Testing GameRunner, GamnSavew and GameConsts. result: has leak, but it's not that big
-            while (a-- > 0)
-            {
-                GameConsts *gc = new GameConsts();
-                GameRunner *gr = new GameRunner(gc);
-
-                gr->Start();
-                // usleep(50);
-                // usleep(50);
-
-                delete gr;
-                delete gc;
-                usleep(50);
-            }
-
-///
-            Stop();
-            // using namespace EvoAlg;
-
-            // //TODO: these lines insede while to check leaks V
-            // ScriptConverter sc(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
-            // Script *script = sc.Convert();
-
-            // ScriptRunner sr(*script);
-            // ThreadController tc;
-            // //TODO end: ^
-
-            // GameConsts gc;
-            // gc.LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
-            // std::vector<double> genes = gc.SaveToCromossome();
-            
-            //TEST ThreadController
-            // while (true) {
-            //     for (unsigned int i = 0; i < 1; i++)
-            //     {
-            //         tc.AddIndividual({i, genes});
-            //     }
-            //     tc.ExecuteAllIndividuals(sr);
-            //     usleep(50e3);                
-            // }
-            
-
-///
-
-
-            // gc.SetTickDelay(5e2);
-            // GameRunner gr(&gc);
-
-            // while (true) {
-            //     for (unsigned int i = 0; i < 50; i++)
-            //     {
-            //         Individual idv{i, genes};
-            //         std::vector<TimeResult> *indvResult = sr.RunAllGameplays(gr, idv); 
-            //         delete indvResult;
-            //     }
-            // }
-            
-
-
         }
 
         virtual void OnUpdate() override
@@ -174,5 +108,47 @@ namespace Application
 
 DampEngine::Application *CreateApplication()
 {
+    GameConsts *gameConsts = new GameConsts();
+    gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+    
+    GameRunner *gameRunner = new GameRunner(gameConsts);
+
+    EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
+    EvoAlg::Script *script = scriptConverter.Convert();
+    EvoAlg::ScriptRunner scriptRunner(*script);
+    
+
+    EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
+    EvoAlg::Individual indv{0, genes};    
+
+    int test = 1;
+
+    if (test == 1) {
+        gameRunner->Start();
+
+        // usleep(10e6);
+    }
+
+
+    // scriptRunner.RunAllGameplays(*gameRunner, indv);
+
+    DE_TRACE("Deleting script");
+    delete script;
+
+    DE_TRACE("Deleting gameRunner");
+    delete gameRunner;
+    DE_TRACE("Deleting gameConsts");
+    delete gameConsts;
+
+
+
+
+
+
+
+
+    DE_TRACE("Ending script");
+    exit(0);
+    return nullptr;
     return new Application::MyApplication();
 }

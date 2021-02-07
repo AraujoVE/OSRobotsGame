@@ -5,7 +5,7 @@
 
 #include <functional>
 #include <memory>
-#include <pthread.h>
+#include <thread>
 
 namespace Application
 {
@@ -34,7 +34,7 @@ namespace Application
 
 
     private:
-        pthread_t m_Thread;
+        std::thread *m_Thread = nullptr;
 
         std::function<void()> m_TickFunction;
         std::function<bool()> m_AliveCheckFunction;

@@ -54,7 +54,9 @@ namespace Application
     {
         for (int i = 0; i < BASE_STATS_NO + 1; i++)
         {
+            DE_DEBUG("Stoping avenue consumer {0} @VillageStats::~VillageStats()");
             avenueVS[i]->stopConsumer();
+            DE_DEBUG("Deleting avenue {0} @VillageStats::~VillageStats()");
             delete avenueVS[i];
         }
     }

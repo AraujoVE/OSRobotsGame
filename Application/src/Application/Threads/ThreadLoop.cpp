@@ -41,6 +41,7 @@ namespace Application
             delete m_EventListener;
         }
         m_InnerLoopMutex.Unlock();
+        delete m_Thread;
     }
 
     void ThreadLoop::InnerLoop()
@@ -130,8 +131,7 @@ namespace Application
 
         m_Paused = false;
 
-        //TODO: change to std::thread
-        pthread_create(&m_Thread, NULL, &threadRountine, this);
+        m_Thread = new std::thread(std::bind(&threadRountine, this));
     }
 
     void ThreadLoop::Stop()
