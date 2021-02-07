@@ -119,10 +119,11 @@ DampEngine::Application *CreateApplication()
     GameConsts *gameConsts = new GameConsts();
     gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
     GameRunner *gameRunner = new GameRunner(gameConsts);
+    
 
+    //TODO: find next step to fix game hanging (prob in ~VillageStats() )
     gameRunner->Start();
 
-;
     DE_INFO(">>> Issuing game end!");
 
     delete gameRunner;
