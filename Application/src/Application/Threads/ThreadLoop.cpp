@@ -135,11 +135,8 @@ namespace Application
 
     void ThreadLoop::Abandon()
     {
-        bool isRunning = false;
-
         {
             std::lock_guard<std::mutex> guard(m_StateMutex);
-            isRunning = m_State == State::RUNNING;
             m_EventListener->Clear();
 
             m_State = State::ABANDONED;
@@ -148,7 +145,7 @@ namespace Application
             TLL(DE_DEBUG, "(ThreadLoop[{0}] Abandon) Marking as ABANDONED", m_DebugName);
         }
 
-        if (JOIN_ABANDONED_THREADS && m_Thread != nullptr && m_Thread->joinable() && isRunning)
+        if (JOIN_ABANDONED_THREADS && m_Thread != nullptr && m_Thread->joinable())
         {
             DE_DEBUG("Joining threadloop..... @ThreadLoop::Abandon");
             m_Thread->join();

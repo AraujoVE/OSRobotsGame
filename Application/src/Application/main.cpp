@@ -114,6 +114,7 @@ DampEngine::Application *CreateApplication()
 
         GameConsts *gameConsts = new GameConsts();
         gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+        gameConsts->SetTickDelay(1);
 
         GameRunner *gameRunner = new GameRunner(gameConsts);
 

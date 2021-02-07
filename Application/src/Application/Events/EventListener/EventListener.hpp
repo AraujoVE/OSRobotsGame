@@ -36,6 +36,7 @@ namespace Application
 
         do
         {
+            if (handlerQueueMap.find(eventType) == handlerQueueMap.end()) break;
             const HandlerQueue &queue = handlerQueueMap[eventType];
 
             if (queue.empty())
