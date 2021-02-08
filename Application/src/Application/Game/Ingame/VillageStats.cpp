@@ -37,17 +37,7 @@ namespace Application
         initializeVSAvenues();
         initializeStats();
 
-        m_DecayThreadLoop->SetTickFunction(std::bind(&VillageStats::DecayStats, this));
-        m_DecayThreadLoop->SetAliveCheckFunction([this] {
-            return this->getPopulation() > 0;
-        });
-
-        auto &eventListener = m_EventListener;
-        m_DecayThreadLoop->m_EventListener->Register(new EH_ThreadEnded([&eventListener](ThreadEndedReason::ThreadEndedReason_t reason) {
-            DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
-            eventListener.OnAsync<EH_DecaymentStopped>();
-            return false;
-        }));
+        
     }
 
     VillageStats::~VillageStats()
@@ -201,11 +191,24 @@ namespace Application
     {
         DE_TRACE("VillageStats::onGameStarted()");
         initializeStats();
+
+        //TODO: update tickDelay
+        auto tickFn = std::bind(&VillageStats::DecayStats, this);
+        auto aliveFn = [this] { return this->getPopulation() > 0; };
+        ThreadLoopParams *threadLoopParams = new ThreadLoopParams(tickFn, aliveFn);
+
+        m_DecayThreadLoop->m_EventListener->Register(new EH_ThreadEnded([=](ThreadEndedReason::ThreadEndedReason_t reason) {
+            DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
+            m_EventListener.On<EH_DecaymentStopped>();
+            return false;
+        }));
+
         m_DecayThreadLoop->m_EventListener->Register(new EH_ThreadStarted([=]{
             m_EventListener.On<EH_DecaymentStarted>();
             return false;
         }));
-        m_DecayThreadLoop->Start(&m_GameConstsCache.TICK_DELAY_MICRO);
+
+        m_DecayThreadLoop->Start(threadLoopParams);
     }
 
     void VillageStats::onGameEnded()

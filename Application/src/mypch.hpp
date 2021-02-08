@@ -28,6 +28,7 @@
 #include <optional>
 
 #include <future>
+#include <condition_variable>
 
 
 #include <boost/algorithm/string.hpp>

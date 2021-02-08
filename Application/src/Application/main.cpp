@@ -108,7 +108,7 @@ namespace Application
 DampEngine::Application *CreateApplication()
 {
 
-    int tests = 12e4;
+    int tests = 10e4;
 
     while (tests-- > 0)
     {
@@ -136,8 +136,10 @@ DampEngine::Application *CreateApplication()
             // usleep(10e6);
         }
         else if (test == 2) {
+            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return true;}, 5000e3); 
             ThreadLoop *threadLoop = new ThreadLoop("Testing");
-            threadLoop->Start(&tickDelay);
+            threadLoop->Start(tlp);
+            threadLoop->Stop();
             delete threadLoop;
         }
 

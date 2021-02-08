@@ -17,11 +17,8 @@ static const bool JOIN_ABANDONED_THREADS = true;
 
 namespace Application
 {
-    const uint32_t ThreadLoop::s_HumanTickDelay = HUMAN_TICK_DELAY_MICRO;
     ThreadLoop::ThreadLoop(const std::string &debugName)
-        : m_TickFunction(nullptr), m_AliveCheckFunction(nullptr),
-          m_State(State::INACTIVE), m_Paused(false),
-          m_TickDelay(&s_HumanTickDelay),
+        : m_State(State::INACTIVE), m_Paused(false),
           m_EventListener(new EventListener()),
           m_DebugName(debugName)
     {
@@ -29,132 +26,93 @@ namespace Application
 
     ThreadLoop::~ThreadLoop()
     {
-        Abandon();
-        m_TickDelay = nullptr;
-        delete m_EventListener;
         delete m_Thread;
+        delete m_ExecutionParams;
     }
 
-    void ThreadLoop::InnerLoop()
+    void ThreadLoop::Loop()
     {
-        //Assuming m_StateMutex is locked from Start() function
-
         {
-            std::lock_guard<std::mutex> guard(m_StateMutex);
-
-            DE_ASSERT(m_State == State::INACTIVE, "(ThreadLoop::InnerLoop) Trying to start a ThreadLoop while it's in an invalid state");
-
-            if (m_State != State::INACTIVE)
-                return;
-
+            std::lock_guard<std::mutex> stateGuard(m_StateMutex);
+            DE_ASSERT(m_State == State::STARTING);
             m_State = State::RUNNING;
-
-            m_EventListener->On<EH_ThreadStarted>();
         }
 
+        m_cvFullyStarted.notify_one();
 
-        uint32_t currTickDelay = 1;
-        while (true)
+        bool finished = false;
+        while (m_State == State::RUNNING)
         {
-            //Allow state to be changed by other threads...
+            if (!m_Paused)
             {
-                std::lock_guard<std::mutex> guard(m_StateMutex);
-
-                if (m_State != State::RUNNING)
-                    break;
-
-                if (m_TickDelay != nullptr)
-                    currTickDelay = *m_TickDelay;
-
-                DE_ASSERT(m_AliveCheckFunction != nullptr, "(ThreadLoop::InnerLoop) m_AliveCheckFunction is nullptr!!");
-                DE_ASSERT(m_TickFunction != nullptr, "(ThreadLoop::InnerLoop) m_TickFunction is nullptr!!");
-
-                if (!m_Paused)
+                std::lock_guard<std::mutex> stateGuard(m_StateMutex);
+                m_ExecutionParams->m_TickFunction();
+                if (!m_ExecutionParams->m_AliveCheckFunction())
                 {
-                    if (true || !m_AliveCheckFunction()) //If finished naturally (neither force nor abortion)
-                        m_State = State::FINISHED;
-                    else
-                        m_TickFunction();
+                    finished = true;
+                    break;
                 }
             }
 
-            usleep(currTickDelay);
+            usleep(m_ExecutionParams->TickDelay);
         }
+        State endState = m_State;
+        m_State = State::INACTIVE;
 
-        {
-            std::lock_guard<std::mutex> guard(m_StateMutex);
+        if (endState == State::STOPPING_ABANDONED)
+            return;
 
-            DE_ASSERT(m_State != State::RUNNING, "(ThreadLoop::InnerLoop) Invalid Running state after while m_State == State::RUNNING");
-            DE_ASSERT(m_State != State::INACTIVE, "(ThreadLoop::InnerLoop) Invalid Inactive state after while m_State == State::RUNNING");
-
-            if (m_State == State::FORCED_STOP)
-                m_EventListener->OnAsync<EH_ThreadEnded>(ThreadEndedReason::FORCED_STOP);
-            else if (m_State == State::FINISHED)
-                m_EventListener->OnAsync<EH_ThreadEnded>(ThreadEndedReason::FINISHED);
-            else if (m_State == State::ABANDONED)
-            {
-                DE_DEBUG("(ThreadLoop[{0}] inner) Ignoring abandoned thread", m_DebugName);
-            }
-
-            m_State = State::INACTIVE;
-        }
+        if (finished)
+            m_EventListener->OnAsync<EH_ThreadEnded>(ThreadEndedReason::FINISHED);
+        else
+            m_EventListener->OnAsync<EH_ThreadEnded>(ThreadEndedReason::FORCED_STOP);
     }
 
     void ThreadLoop::Pause(bool paused)
     {
-        DE_ASSERT(m_Paused != paused, "(ThreadLoop) Invalid Pause/Unpause");
         m_Paused = paused;
     }
 
-    void ThreadLoop::Start(const uint32_t *tickDelay)
+    void ThreadLoop::Start(ThreadLoopParams *params)
     {
-        DE_ASSERT(m_Thread == nullptr, "This is a temporary assert, maybe you really want to start a ThreadLoop twice");
-
-        DE_ASSERT(m_AliveCheckFunction != nullptr, "(ThreadLoop::Start) Trying to start a ThreadLoop with m_AliveCheckFunction == nullptr!!");
-        DE_ASSERT(m_TickFunction != nullptr, "(ThreadLoop::Start) Trying to start a ThreadLoop with m_TickFunction == nullptr!!");
-        DE_ASSERT(m_State == State::INACTIVE, "(ThreadLoop::Start) Trying to start a ThreadLoop while it's already running!!!")
-
         {
-            std::lock_guard<std::mutex> guard(m_StateMutex);
-            m_TickDelay = tickDelay;
-            m_Paused = false;
+            std::lock_guard<std::mutex> stateGuard(m_StateMutex);
+
+            DE_ASSERT(params != nullptr);
+            DE_ASSERT(m_ExecutionParams == nullptr);
+            DE_ASSERT(m_State == State::INACTIVE);
+            m_State = State::STARTING;
         }
 
-        if (m_Thread != nullptr)
-            delete m_Thread;
-        m_Thread = new std::thread(std::bind(&ThreadLoop::InnerLoop, this));
+        m_ExecutionParams = params;
+        m_Thread = new std::thread(std::bind(&ThreadLoop::Loop, this));
 
-
+        {
+            std::unique_lock<std::mutex> stateGuard(m_StateMutex);
+            m_cvFullyStarted.wait(stateGuard, [this]{ return m_State == State::RUNNING; });
+        }
     }
 
     void ThreadLoop::Stop()
     {
+
         {
-            std::lock_guard<std::mutex> guard(m_StateMutex);
-            DE_ASSERT(m_State == State::RUNNING, "(ThreadLoop::Stop) Trying to stop a ThreadLoop while it's NOT running!!!")
-            m_State = State::FORCED_STOP;
-            if (m_Thread->joinable())
-                m_Thread->join();
+            std::lock_guard<std::mutex> stateGuard(m_StateMutex);
+            DE_ASSERT(m_State <= State::RUNNING);
+            m_State = State::STOPPING_ABANDONED;
         }
+        if (m_Thread != nullptr && m_Thread->joinable())
+            m_Thread->join();
     }
 
     void ThreadLoop::Abandon()
     {
         {
-            std::lock_guard<std::mutex> guard(m_StateMutex);
-            m_EventListener->Clear();
-
-            m_State = State::ABANDONED;
-            m_AliveCheckFunction = nullptr;
-            m_TickFunction = nullptr;
-            TLL(DE_DEBUG, "(ThreadLoop[{0}] Abandon) Marking as ABANDONED", m_DebugName);
-        }
-
-        if (JOIN_ABANDONED_THREADS && m_Thread != nullptr && m_Thread->joinable())
-        {
-            DE_DEBUG("Joining threadloop..... @ThreadLoop::Abandon");
-            m_Thread->join();
-            DE_DEBUG("Thread ended normally @ThreadLoop::Abandon");
+            std::lock_guard<std::mutex> stateGuard(m_StateMutex);
+            DE_ASSERT(m_State <= State::RUNNING);
+            m_State = State::STOPPING_ABANDONED;
+            if (m_Thread != nullptr && m_Thread->joinable())
+                m_Thread->detach();
         }
     }
 
