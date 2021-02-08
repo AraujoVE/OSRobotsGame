@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 namespace Application
 {
     //Forward declaration to boost compilation time
@@ -11,9 +9,12 @@ namespace Application
     class GameSave final
     {
     private:
+        //Not this class' resposibility to free
         GameConsts *m_GameConsts;
-        std::unique_ptr<VillageStats> m_VillageStats;
-        std::unique_ptr<RobotsManagement> m_RobotsManagement;
+
+        
+        VillageStats* m_VillageStats;
+        RobotsManagement* m_RobotsManagement;
 
         //Exclusive for Loading gamesaves
         GameSave();
@@ -24,10 +25,10 @@ namespace Application
 
         static void Load();
         static void Save();
-        void Reset();
+        void NewSave();
 
-        std::unique_ptr<VillageStats> &GetVillageStats();
-        std::unique_ptr<RobotsManagement> &GetRobotsManagement();
+        inline VillageStats *GetVillageStats() { return m_VillageStats; }
+        inline RobotsManagement *GetRobotsManagement() { return m_RobotsManagement; }
         inline GameConsts &GetGameConsts() { return *m_GameConsts; }
     };
 } // namespace Application

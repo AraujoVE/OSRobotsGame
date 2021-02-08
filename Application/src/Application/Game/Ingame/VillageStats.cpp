@@ -30,41 +30,21 @@ namespace Application
 
     // ======================== CONSTRUCTOR / INITIALIZE VILLAGES STATS ========================
     VillageStats::VillageStats(GameConsts &gameConsts)
-        : m_GameConstsCache(gameConsts), m_DecayThreadLoop("VillageStatsDecay")
+        : m_GameConstsCache(gameConsts), m_DecayThreadLoop(new ThreadLoop("VillageStatsDecay"))
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
-        
-        initializeVSAvenues();
+
         initializeStats();
+
         
-        m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::DecayStats, this));
-        m_DecayThreadLoop.SetAliveCheckFunction([this] {
-            return this->getPopulation() > 0;
-        });
-
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadStarted([] {
-            DE_TRACE("(VillageStats) m_DecayThreadLoop started successfully.");
-            return false;
-        }));
-
-        auto &eventListener = m_EventListener;
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([&eventListener](ThreadEndedReason::ThreadEndedReason_t reason) {
-            DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
-            eventListener.OnAsync<EH_DecaymentStopped>();
-            return false;
-        }));
     }
 
     VillageStats::~VillageStats()
     {
-        if (m_DecayThreadLoop.IsRunning())
-            m_DecayThreadLoop.Abandon();
-
-        for (int i = 0; i < BASE_STATS_NO + 1; i++)
-        {
-            avenueVS[i]->stopConsumer();
-            delete avenueVS[i];
-        }
+        m_DecayThreadLoop->m_EventListener->Clear();
+        if (m_DecayThreadLoop->IsRunning())
+            m_DecayThreadLoop->Stop();
+        delete m_DecayThreadLoop;
     }
 
     void VillageStats::initializeStats()
@@ -78,25 +58,7 @@ namespace Application
         m_ElapsedTicks = 0;
     }
 
-    void VillageStats::initializeVSAvenues()
-    {
-        for (int i = 0; i < BASE_STATS_NO; i++)
-        {
-            avenueVS[i] = new Avenue<double>(baseStats[i]);
-            avenueVS[i]->startConsumer();
-        }
-
-        avenueVS[POPULATION_INDEX] = new Avenue<double>(population);
-        avenueVS[POPULATION_INDEX]->startConsumer();
-    }
-
     // ======================== ADD/REMOVE FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
-
-    //Increase in stats due to a task completion
-    void VillageStats::changeStat(int type, int increase)
-    {
-        avenueVS[type]->producer(increase);
-    }
 
     float VillageStats::calcRatio(int statType)
     {
@@ -126,9 +88,14 @@ namespace Application
         return reductionTax;
     }
 
-    void VillageStats::setStat(RobotFunction statType, float reductionTax)
+    void VillageStats::applyGainedGoods(RobotFunction statType, float gainedGoods) {
+        std::lock_guard<std::mutex> statGuard(statsMutexes[(int)statType]);
+        baseStats[(int)statType] += gainedGoods;
+    }
+
+    void VillageStats::applyReductionToStat(RobotFunction statType, float reductionTax)
     {
-        DE_ASSERT(statType != RobotFunction::RESOURCE_GATHERING, "You should call setResources instead of setStat(RobotFunction::RESOURCE, ...)");
+        DE_ASSERT(statType != RobotFunction::RESOURCE_GATHERING, "You should call setResources instead of applyReductionToStat(RobotFunction::RESOURCE, ...)");
 
         baseStats[(int)statType] = (uint64_t)((double)baseStats[(int)statType] * (1.0 - reductionTax));
     }
@@ -206,39 +173,60 @@ namespace Application
     {
         DE_TRACE("VillageStats::onGameStarted()");
         initializeStats();
-        m_DecayThreadLoop.Start(&m_GameConstsCache.TICK_DELAY_MICRO);
+
+        //TODO: update tickDelay
+        auto tickFn = std::bind(&VillageStats::DecayStats, this);
+        auto aliveFn = [this] { return this->getPopulation() > 0; };
+        ThreadLoopParams *threadLoopParams = new ThreadLoopParams(tickFn, aliveFn, m_GameConstsCache.TICK_DELAY_MICRO);
+
+        m_DecayThreadLoop->m_EventListener->Register(new EH_ThreadEnded([=](ThreadEndedReason::ThreadEndedReason_t reason) {
+            DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
+            m_EventListener.On<EH_DecaymentStopped>();
+            return false;
+        }));
+
+        m_DecayThreadLoop->m_EventListener->Register(new EH_ThreadStarted([=]{
+            m_EventListener.On<EH_DecaymentStarted>();
+            return false;
+        }));
+
+        DE_DEBUG("[VillageStats] Starting DecayThreadLoop...");
+        m_DecayThreadLoop->Start(threadLoopParams);
+        DE_DEBUG("[VillageStats] DecayThreadLoop Started!");
     }
 
-    void VillageStats::onGameEnded() {
-        if (m_DecayThreadLoop.IsRunning()) {
-            m_DecayThreadLoop.Abandon();
+    void VillageStats::onGameEnded()
+    {
+        if (m_DecayThreadLoop->IsRunning())
+        {
+            m_DecayThreadLoop->Stop();
         }
     }
 
     void VillageStats::setStatsDecaymentPaused(bool paused)
     {
         DE_TRACE("VillageStats::setStatsDecaymentPaused({0})", paused);
-        m_DecayThreadLoop.Pause(paused);
+        m_DecayThreadLoop->Pause(paused);
     }
 
     void VillageStats::decayStat(int pos)
     {
-        avenueVS[pos]->down();
+        statsMutexes[pos].lock();
 
         float ratio = calcRatio(pos);
         float reduction = m_GameConstsCache.MIN_LOSS[pos];
 
         (this->*(decayStatsFuncts[pos]))(ratio, reduction);
 
-        setStat((RobotFunction)pos, reduction);
+        applyReductionToStat((RobotFunction)pos, reduction);
 
-        avenueVS[pos]->up();
+        statsMutexes[pos].unlock();
     }
 
     //The stats are decreased
     void VillageStats::DecayStats()
     {
-        avenueVS[POPULATION_INDEX]->down();
+        statsMutexes[POPULATION_INDEX].lock();
 
         onAttack = false;
         for (int i = 0; i < BASE_STATS_NO - 1; i++)
@@ -248,7 +236,7 @@ namespace Application
 
         decayPopulation();
 
-        avenueVS[POPULATION_INDEX]->up();
+        statsMutexes[POPULATION_INDEX].unlock();
 
         m_ElapsedTicks += 1;
     }
@@ -310,7 +298,7 @@ PROTECTION{
 
 /*
             for (int i = 0; i < BASE_STATS_NO - 1; i++) {
-                avenueVS[i]->down();
+                statsMutexes[i].lock();
 
                 minMaxFact = (float)currPopValue / (float)baseStats[i];
                 //The population per current stat ratio afects how much product will be lost
@@ -321,6 +309,6 @@ PROTECTION{
                 //set new absolut value 
                 (this->*(setStatsFuncts[i]))((int)(baseStats[i] * ((float)randVal / 100.0)));
 
-                avenueVS[i]->up();
+                statsMutexes[i].unlock();
             }
             */

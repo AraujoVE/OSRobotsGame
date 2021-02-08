@@ -538,12 +538,15 @@ namespace EvoAlg
 
     void EvolutionaryAlgorithm::startAlgorithm()
     {
-        pthread_create(&scriptThread, NULL, runScript, this);
+        DE_ASSERT(scriptThread == nullptr);
+        scriptThread = new std::thread(runScript, this);
     }
 
     EvolutionaryAlgorithm::~EvolutionaryAlgorithm()
     {
-        pthread_join(scriptThread, NULL);
+        if (scriptThread != nullptr && scriptThread->joinable())
+            scriptThread->join();
+        delete scriptThread;
     }
 
     

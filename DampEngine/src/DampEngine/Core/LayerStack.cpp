@@ -26,7 +26,7 @@ namespace DampEngine
     LayerStack::~LayerStack()
     {
         DE_TRACE("MUTEX LOCK: LayerStack::~LayerStack");
-        m_LayerStackMutex.Lock();
+        m_LayerStackMutex.lock();
 
         for (auto layer : m_LayerStack)
         {
@@ -35,7 +35,7 @@ namespace DampEngine
         }
 
         DE_TRACE("MUTEX UNLOCK: LayerStack::~LayerStack");
-        m_LayerStackMutex.Unlock();
+        m_LayerStackMutex.unlock();
     }
 
     void LayerStack::OnUpdate()
@@ -46,12 +46,12 @@ namespace DampEngine
 
         for (Layer *layer : m_LayerStack)
         {
-            m_LayerStackMutex.Lock();
+            m_LayerStackMutex.lock();
 
             if (layer->IsEnabled())
                 layer->OnUpdate();
 
-            m_LayerStackMutex.Unlock();
+            m_LayerStackMutex.unlock();
         }
 
         ImGuiLayer::EndFrame();
@@ -73,7 +73,7 @@ namespace DampEngine
 
     void LayerStack::PushOverlay(ImGuiLayer *overlay)
     {
-        m_LayerStackMutex.Lock();
+        m_LayerStackMutex.lock();
 
         DE_ASSERT(overlay != nullptr);
         if (std::find(m_LayerStack.begin(), m_LayerStack.end(), overlay) != m_LayerStack.end())
@@ -86,27 +86,27 @@ namespace DampEngine
             overlay->OnAttach();
         }
 
-        m_LayerStackMutex.Unlock();
+        m_LayerStackMutex.unlock();
     }
 
     void LayerStack::PopOverlay(ImGuiLayer *overlay)
     {
 
         DE_TRACE("MUTEX LOCK: LayerStack::PopOverlay");
-        m_LayerStackMutex.Lock();
+        m_LayerStackMutex.lock();
 
         //TODO: find remove
         overlay->Disable();
         // overlay->OnDetach();
 
         DE_TRACE("MUTEX UNLOCK: LayerStack::PopOverlay");
-        m_LayerStackMutex.Unlock();
+        m_LayerStackMutex.unlock();
     }
 
     void LayerStack::PushLayer(ImGuiLayer *layer)
     {
         DE_DEBUG("MUTEX LOCK: LayerStack::PushLayer");
-        m_LayerStackMutex.Lock();
+        m_LayerStackMutex.lock();
 
         DE_ASSERT(layer != nullptr);
         if (std::find(m_LayerStack.begin(), m_LayerStack.end(), layer) != m_LayerStack.end())
@@ -120,13 +120,13 @@ namespace DampEngine
         }
 
         DE_DEBUG("MUTEX UNLOCK: LayerStack::PushLayer");
-        m_LayerStackMutex.Unlock();
+        m_LayerStackMutex.unlock();
     }
 
     void LayerStack::PopLayer(ImGuiLayer *layer)
     {
         DE_TRACE("MUTEX LOCK: LayerStack::PopLayer");
-        m_LayerStackMutex.Lock();
+        m_LayerStackMutex.lock();
 
         //TODO: find remove
         //m_OverlayStartIndex--;
@@ -134,7 +134,7 @@ namespace DampEngine
         // layer->OnDetach();
 
         DE_TRACE("MUTEX UNLOCK: LayerStack::PopLayer");
-        m_LayerStackMutex.Unlock();
+        m_LayerStackMutex.unlock();
     }
 
 } // namespace DampEngine

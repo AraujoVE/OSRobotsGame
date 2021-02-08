@@ -8,12 +8,14 @@
 
 #include <GLFW/glfw3.h>
 
+#include <mutex>
+
 namespace DampEngine
 {
 #pragma region Layer implementations
 
-    Mutex ImGuiLayer::s_FrameControlMutex;
-    Mutex ImGuiLayer::s_AttachDetachMutex;
+    std::mutex ImGuiLayer::s_FrameControlMutex;
+    std::mutex ImGuiLayer::s_AttachDetachMutex;
 
     ImGuiLayer::ImGuiLayer()
     {
@@ -24,12 +26,12 @@ namespace DampEngine
     void ImGuiLayer::OnAttach()
     {
 
-        s_AttachDetachMutex.Lock();
+        s_AttachDetachMutex.lock();
         {
 
             if (s_InstanceCount > 0)
             {
-                s_AttachDetachMutex.Unlock();
+                s_AttachDetachMutex.unlock();
                 return;
             }
 
@@ -64,7 +66,7 @@ namespace DampEngine
 
             s_InstanceCount++;
         }
-        s_AttachDetachMutex.Unlock();
+        s_AttachDetachMutex.unlock();
     }
 
     void ImGuiLayer::OnUpdate()
@@ -74,14 +76,14 @@ namespace DampEngine
 
     void ImGuiLayer::OnDetach()
     {
-        s_AttachDetachMutex.Lock();
+        s_AttachDetachMutex.lock();
         {
             DE_ASSERT(s_InstanceCount > 0, "Detaching more times than Attaching");
             s_InstanceCount--;
 
             if (s_InstanceCount > 0)
             {
-                s_AttachDetachMutex.Unlock();
+                s_AttachDetachMutex.unlock();
                 return;
             }
 
@@ -89,12 +91,12 @@ namespace DampEngine
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
         }
-        s_AttachDetachMutex.Unlock();
+        s_AttachDetachMutex.unlock();
     }
 
     void ImGuiLayer::BeginFrame()
     {
-        s_FrameControlMutex.Lock();
+        s_FrameControlMutex.lock();
         {
             DE_ASSERT(!s_FrameBegun, "Wrong Begin/End frame order");
             ImGui_ImplOpenGL3_NewFrame();
@@ -102,12 +104,12 @@ namespace DampEngine
             ImGui::NewFrame();
             s_FrameBegun = true;
         }
-        s_FrameControlMutex.Unlock();
+        s_FrameControlMutex.unlock();
     }
 
     void ImGuiLayer::EndFrame()
     {
-        s_FrameControlMutex.Lock();
+        s_FrameControlMutex.lock();
         {
             DE_ASSERT(s_FrameBegun, "Wrong Begin/End frame order");
             ImGuiIO &io = ImGui::GetIO();
@@ -126,7 +128,7 @@ namespace DampEngine
             }
             s_FrameBegun = false;
         }
-        s_FrameControlMutex.Unlock();
+        s_FrameControlMutex.unlock();
     }
 
     void ImGuiLayer::ImGuiDescription()

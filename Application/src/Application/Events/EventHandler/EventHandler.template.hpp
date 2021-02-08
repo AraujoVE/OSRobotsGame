@@ -18,33 +18,13 @@ namespace Application
         typedef R ReturnType;
         using ArgumentsTuple = std::tuple<Args...>;
 
-    private:
-        const std::string m_Type;
+        EventHandler(std::function<R(Args...)> handler, const std::string &type) : IEventHandler(type), m_Handler(handler) {}
+        EventHandler(EventHandler &&) = delete;
+        EventHandler(const EventHandler &) = delete;
 
-    public:
-        const std::string GetType() { return m_Type; }
-        static const std::string GetTypeStatic() { return "EventHandler"; }
-        EventHandler(std::function<R(Args...)> handler, std::string type) : m_Handler(handler), m_Type(type) {}
-        EventHandler(EventHandler &&) = default;
-        virtual ~EventHandler() = default;
-    };
-
-    template <typename R>
-    class EventHandler<R, void> : public IEventHandler
-    {
-    public:
-        std::function<R()> m_Handler;
-        typedef R ReturnType;
-        using ArgumentsTuple = std::tuple<>;
-
-    private:
-        const std::string m_Type;
-        friend class Dispatcher;
-
-    public:
-        const std::string GetType() { return m_Type; }
-        static const std::string GetTypeStatic() { return "EventHandler"; }
-        EventHandler(std::function<R()> handler, std::string type) : m_Handler(handler), m_Type(type) {}
-        EventHandler(EventHandler &&) = default;
+        virtual ~EventHandler()
+        {
+            DE_TRACE("EventHandler ({0}) destroyed", m_Type);
+        }
     };
 } // namespace Application

@@ -48,30 +48,30 @@ namespace EvoAlg
     void ScriptConverter::commandFunct0(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
-        for (int i = 0; i < (int)splittedStr.size(); i++)
-            std::cout << "$" << splittedStr[i] << std::endl;
+        // for (int i = 0; i < (int)splittedStr.size(); i++)
+            // std::cout << "$" << splittedStr[i] << std::endl;
         m_Gameplay.push_back("0," + functToIntMap[splittedStr[0]]);
     }
     void ScriptConverter::commandFunct1(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
-        for (int i = 0; i < (int)splittedStr.size(); i++)
-            std::cout << "$" << splittedStr[i] << std::endl;
+        // for (int i = 0; i < (int)splittedStr.size(); i++)
+        //     std::cout << "$" << splittedStr[i] << std::endl;
         m_Gameplay.push_back("1," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
     }
 
     void ScriptConverter::commandFunct2(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
-        for (int i = 0; i < (int)splittedStr.size(); i++)
-            std::cout << "$" << splittedStr[i] << std::endl;
+        // for (int i = 0; i < (int)splittedStr.size(); i++)
+        //     std::cout << "$" << splittedStr[i] << std::endl;
         m_Gameplay.push_back("2," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
     }
     void ScriptConverter::commandFunct3(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
-        for (int i = 0; i < (int)splittedStr.size(); i++)
-            std::cout << "$" << splittedStr[i] << std::endl;
+        // for (int i = 0; i < (int)splittedStr.size(); i++)
+        //     std::cout << "$" << splittedStr[i] << std::endl;
         m_Gameplay.push_back("3," + functToIntMap[splittedStr[0]] + "," + splittedStr[1]);
     }
 
@@ -87,8 +87,8 @@ namespace EvoAlg
     void ScriptConverter::commandFunct6(std::string command, int pos)
     {
         std::vector<std::string> splittedStr = splitText(command);
-        for (int i = 0; i < (int)splittedStr.size(); i++)
-            std::cout << "$" << splittedStr[i] << std::endl;
+        // for (int i = 0; i < (int)splittedStr.size(); i++)
+        //     std::cout << "$" << splittedStr[i] << std::endl;
         m_Gameplay.push_back("6," + splittedStr[0]);
     }
     void ScriptConverter::commandFunct7(std::string command, int pos)
@@ -123,7 +123,7 @@ namespace EvoAlg
         {
             while (std::getline(inputFile, line))
             {
-                std::cout << line << std::endl;
+                // std::cout << line << std::endl;
                 for (int j = 0; j < 8; j++)
                 {
                     if (line.find(commands[j]) != std::string::npos)

@@ -4,11 +4,6 @@
 
 #include "Application/Game/GameConsts.hpp"
 
-
-//TODO: remove
-#include "DampEngine/Threads/Mutex.hpp"
-
-
 namespace EvoAlg
 {
 
@@ -51,7 +46,7 @@ namespace EvoAlg
 
         bool forceSync = true;
         
-        DampEngine::Mutex gambiarra;
+        std::mutex gambiarra;
         while (!m_QueuedIndividuals.empty()) {
             Individual &individual = m_QueuedIndividuals.front();
 
@@ -71,7 +66,7 @@ namespace EvoAlg
                 delete currentConsts;
 
                 if (forceSync)
-                    gambiarra.Unlock();
+                    gambiarra.unlock();
 
                 return threadRet;
             };
@@ -79,7 +74,7 @@ namespace EvoAlg
             m_QueuedIndividuals.pop();
 
             if (forceSync)
-                gambiarra.Lock();        
+                gambiarra.lock();        
 
             futureVec.push_back(std::async(executeAllGameplaysFn));
             

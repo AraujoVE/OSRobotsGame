@@ -7,6 +7,8 @@
 #include <armadillo> // http://arma.sourceforge.net/docs.html v10.2.0
 #include <vector>
 #include <thread> /* std::this_thread::sleep_for */
+#include <mutex>
+
 namespace EvoAlg
 {
 
@@ -47,9 +49,9 @@ namespace EvoAlg
         void calcFitness(const std::vector<IndividualRunResult> &);
 
     private:
-        pthread_t scriptThread;
-        pthread_mutex_t mutex;
-        pthread_mutex_t mutex2;
+        std::thread *scriptThread = nullptr;
+        std::mutex mutex;
+        std::mutex mutex2;
 
         arma::rowvec bestIndividual;
         EAController &m_EAController;
