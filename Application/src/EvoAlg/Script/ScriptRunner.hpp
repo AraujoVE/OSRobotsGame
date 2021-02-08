@@ -5,7 +5,7 @@
 #include "DampEngine/Core/Macros/Log.hpp"
 #include "DampEngine/Core/Macros/Assert.hpp"
 
-#include "EvoAlg/Script.hpp"
+#include "EvoAlg/Script/Script.hpp"
 #include "EvoAlg/Types.hpp"
 
 #include <vector>

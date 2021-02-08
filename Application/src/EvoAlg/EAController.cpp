@@ -2,8 +2,8 @@
 
 #include "EvoAlg/EAController.hpp"
 
-#include "EvoAlg/ScriptConverter.hpp"
-#include "EvoAlg/ScriptRunner.hpp"
+#include "EvoAlg/Script/ScriptConverter.hpp"
+#include "EvoAlg/Script/ScriptRunner.hpp"
 
 #include "Application/Util/path.hpp"
 
@@ -33,7 +33,8 @@ namespace EvoAlg
         });
         rpig.Invoke();
     }
-
+    
+    //TODO: implement
     void EAController::Cancel()
     {
         DE_ASSERT(m_Status.m_ExecutionInfo.Stage != EAStage::INACTIVE, "(EAController) Trying to cancel a inactive controller");

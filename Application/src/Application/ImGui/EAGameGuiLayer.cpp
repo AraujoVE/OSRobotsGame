@@ -4,7 +4,7 @@
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Game/Ingame/VillageStats.hpp"
 
-#include "EvoAlg/ScriptRunner.hpp"
+#include "EvoAlg/Script/ScriptRunner.hpp"
 
 #include "Application/Game/GameConsts.hpp"
 

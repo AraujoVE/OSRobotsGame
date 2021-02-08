@@ -5,7 +5,7 @@
 #include "Application/ImGui/EAGameGuiLayer.hpp"
 #include "Application/Game/GameConsts.hpp"
 
-#include "EvoAlg/ScriptConverter.hpp"
+#include "EvoAlg/Script/ScriptConverter.hpp"
 
 #include "Application/Game/Ingame/RobotsManagement.hpp"
 #include "Application/Game/Ingame/VillageStats.hpp"
@@ -22,14 +22,14 @@
 #include "Application/Threads/ThreadLoop.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 #include "EvoAlg/Threads/ThreadController.hpp"
-#include "EvoAlg/ScriptRunner.hpp"
-#include "EvoAlg/ScriptConverter.hpp"
-#include "EvoAlg/Script.hpp"
+#include "EvoAlg/Script/ScriptRunner.hpp"
+#include "EvoAlg/Script/ScriptConverter.hpp"
+#include "EvoAlg/Script/Script.hpp"
 #include "EvoAlg/Types.hpp"
 
 //TODO: stop using optional to avoid cpphack.hpp
 
-//TODO: unregister events
+//TODO: unregister events. done?
 
 namespace Application
 {
