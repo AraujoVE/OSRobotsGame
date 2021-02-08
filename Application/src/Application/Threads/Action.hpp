@@ -14,7 +14,7 @@ namespace Application
         Action(const std::function<void(Args...)> &actionFn) : m_ActionFn(actionFn) {}
         void Invoke(Args... args)
         {
-            new std::thread(m_ActionFn, args...);
+            std::thread(m_ActionFn, args...).detach();
         }
     };
 } // namespace Application

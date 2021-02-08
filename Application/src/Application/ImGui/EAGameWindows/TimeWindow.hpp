@@ -37,7 +37,7 @@ namespace Application::EAGameWindows
         }
 
     private:
-        const std::unique_ptr<VillageStats> &m_VillageStatus;
+        const VillageStats* m_VillageStatus;
     };
 
     

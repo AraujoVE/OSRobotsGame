@@ -8,7 +8,7 @@
 #include "Application/Events/EventHandler/DefaultHandlers.fwd.hpp"
 #include "Application/Events/EventListener/EventListener.fwd.hpp"
 
-#define HUMAN_TICK_DELAY_MICRO 500e3
+#define DEFAULT_GAME_TICK_DELAY 500e3
 
 namespace Application
 {
@@ -26,7 +26,7 @@ namespace Application
     {
 
     private:
-        DampEngine::Mutex m_ValuesMutex;
+        std::mutex m_ValuesMutex;
         ParameterApplier valueApplierFn;
         std::vector<std::string> applierParameters;
 
@@ -45,37 +45,36 @@ namespace Application
 
         void Capture(float capturedValue)
         {
-            m_ValuesMutex.Lock();
+            m_ValuesMutex.lock();
             CapturedValue = capturedValue;
-            m_ValuesMutex.Unlock();
+            m_ValuesMutex.unlock();
         }
 
         void Apply(GameConsts *gameConsts)
         {
-            m_ValuesMutex.Lock();
+            m_ValuesMutex.lock();
             AppliedValue = valueApplierFn(gameConsts, CapturedValue, applierParameters);
-            m_ValuesMutex.Unlock();
+            m_ValuesMutex.unlock();
         }
     };
 
-#define DA_DECL_PARAM_BASIC(name) { #name, ParameterData() }
-#define DA_DECL_PARAM_APPLY(name, func, ...) { #name, ParameterData(PredefinedAppliers::func, {#__VA_ARGS__}) }
+#define DA_DECL_PARAM_BASIC(name) { #name, new ParameterData() }
+#define DA_DECL_PARAM_APPLY(name, func, ...) { #name, new ParameterData(PredefinedAppliers::func, {#__VA_ARGS__}) }
 
     class GameConsts final
     {
     private:
 
-        std::unordered_map<std::string, ParameterData> m_ConstsMap;
-        EventListener *m_EventListener;
-        uint32_t TICK_DELAY_MICRO = HUMAN_TICK_DELAY_MICRO;
+        std::unordered_map<std::string, ParameterData*> m_ConstsMap;
+        EventListener * m_EventListener;
+        uint32_t TICK_DELAY_MICRO = DEFAULT_GAME_TICK_DELAY;
 
         //Static to force all instances to open file synchronously
-        static DampEngine::Mutex s_FileMutex;
-        DampEngine::Mutex m_MapMutex;
+        static std::mutex s_FileMutex;
+        mutable std::mutex m_MapMutex;
 
         void SetValue(const std::string &key, float newValue);
 
-        
 
     public:
         GameConsts();
@@ -84,15 +83,19 @@ namespace Application
         void LoadFromFile(const std::string &path);
         void LoadFromCromossome(const std::vector<double> &cromossome);
 
-        float GetRawValue(const std::string &key);
-        float GetValue(const std::string &key);
+        std::vector<double> SaveToCromossome();
+        // std::vector<double> SaveToFile();
 
-        void SetOnValueChanged(EH_GameConstsChanged *eHandler);
+        float GetRawValue(const std::string &key) const;
+        float GetValue(const std::string &key) const;
+
+        void RegisterOnValueChanged(EH_GameConstsChanged *eHandler) const;
+        void UnregisterOnValueChanged(EH_GameConstsChanged *eHandler) const;
 
 
         //Gets/sets the current tick delay in microsseconds
         void SetTickDelay(uint32_t newTickDelay);
-        inline uint32_t GetTickDelay() { return TICK_DELAY_MICRO; }
+        inline uint32_t GetTickDelay() const { return TICK_DELAY_MICRO; }
         
     };
 
@@ -123,10 +126,11 @@ namespace Application
         uint32_t TICK_DELAY_MICRO;
 
     private:
-        GameConsts &m_GameConsts;
-        std::vector<std::function<void()>> m_AditionalUpdates;
+        const GameConsts &m_GameConsts;
         void UpdateAll()
         {
+            int a = 3;
+            a ++;
             ON_ATTACK_MULTIPLIER = m_GameConsts.GetValue("ON_ATTACK_MULTIPLIER");
             POP_INCREASE_TAX = m_GameConsts.GetValue("POP_INCREASE_TAX");
             POP_PER_CONSTRUCTION = m_GameConsts.GetValue("POP_PER_CONSTRUCTION");
@@ -158,19 +162,11 @@ namespace Application
             AVG_REWARD = (int)(((float)TIME_STEP) * ((float)INIT_TIME_STEP + ((float)MAX_TIME_STEPS - 1.0) / 2.0) * ((float)MIN_REWARD + ((float)REWARD_RANGE - 1.0) / 2.0));
 
             TICK_DELAY_MICRO = m_GameConsts.GetTickDelay();
-
-
-            for (auto updateFn : m_AditionalUpdates)
-                updateFn();
         }
 
     public:
         GameConstsCache(GameConsts &gameConsts);
-
-        void AddAditionalUpdateFn(const std::function<void()> &function)
-        {
-            m_AditionalUpdates.push_back(function);
-        }
+        ~GameConstsCache();
     };
 
 } // namespace Application

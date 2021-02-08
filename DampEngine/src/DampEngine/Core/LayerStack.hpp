@@ -1,8 +1,7 @@
 #pragma once
 
 #include "DampEngine/ImGui/ImGuiLayer.hpp"
-#include "DampEngine/Threads/Mutex.hpp"
-
+#include <mutex>
 #include <vector>
 
 namespace DampEngine
@@ -29,6 +28,6 @@ namespace DampEngine
         unsigned int m_OverlayStartIndex = 0;
 
         //Avoid layer changes while rendering
-        Mutex m_LayerStackMutex;
+        std::mutex m_LayerStackMutex;
     };
 } // namespace DampEngine

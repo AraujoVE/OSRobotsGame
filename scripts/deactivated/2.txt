@@ -1,0 +1,14 @@
+task++(med)
+task++(res)
+move++(med,0)
+move++(res,1)
+robots++
+robots++
+move++(med,0)
+move++(med,0)
+task--(res, 1)
+robots++
+task(pro)
+move++(pro, 2)
+move++(pro, 2)
+end(360)

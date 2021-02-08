@@ -7,6 +7,8 @@
 #include <armadillo> // http://arma.sourceforge.net/docs.html v10.2.0
 #include <vector>
 #include <thread> /* std::this_thread::sleep_for */
+#include <mutex>
+
 namespace EvoAlg
 {
 
@@ -30,7 +32,7 @@ namespace EvoAlg
         void selectionAndMutation();
         void createCSV(std::string);
         std::string formatParamsString(int);
-        void saveGenerationData(int);
+        void saveGenerationData(int, const std::string&);
         void increaseMutation();
         void predationOfOne();
         void partIncrease();
@@ -39,7 +41,7 @@ namespace EvoAlg
         bool eventHappens(int);
         void checkEvents();
         void startEventTriggerList();
-        void evoAlg(int,std::string);
+        void evoAlg(int,const std::string&);
         void fillInitialsWithBests(int);
         void semiFinalsTournment(int);
         void finalTournment();
@@ -47,9 +49,9 @@ namespace EvoAlg
         void calcFitness(const std::vector<IndividualRunResult> &);
 
     private:
-        pthread_t scriptThread;
-        pthread_mutex_t mutex;
-        pthread_mutex_t mutex2;
+        std::thread *scriptThread = nullptr;
+        std::mutex mutex;
+        std::mutex mutex2;
 
         arma::rowvec bestIndividual;
         EAController &m_EAController;
@@ -87,7 +89,7 @@ namespace EvoAlg
 
         int eventTriggerModule[6] = {1, 10, 5, 10, 2, 10};
 
-       
+
         struct GeneValueBound {
             std::string name;
             double min = 0,max = 1;

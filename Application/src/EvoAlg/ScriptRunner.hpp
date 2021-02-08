@@ -9,7 +9,6 @@
 #include "EvoAlg/Types.hpp"
 
 #include <vector>
-#include <pthread.h>
 
 namespace Application{
     class GameSave;

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Application/Game/GameConsts.hpp"
-#include "DampEngine/Threads/Mutex.hpp"
 
 #include <functional>
 #include <memory>
-#include <pthread.h>
+#include <thread>
+#include <mutex>
 
 namespace Application
 {
@@ -19,53 +19,62 @@ namespace Application
         };
     }
 
-    
+    using TickFunction = std::function<void()>;
+    using AliveCheckFunction = std::function<bool()>;
+    struct ThreadLoopParams
+    {
+    private:
+        TickFunction m_TickFunction;
+        AliveCheckFunction m_AliveCheckFunction;
+
+    public:
+        uint32_t TickDelay;
+
+        ThreadLoopParams(TickFunction tickFn, AliveCheckFunction aliveFn, uint32_t tickDelay = DEFAULT_GAME_TICK_DELAY)
+            : m_TickFunction(tickFn), m_AliveCheckFunction(aliveFn), TickDelay(tickDelay) {}
+
+        friend class ThreadLoop;
+    };
 
     class ThreadLoop final
     {
     public:
-
-        enum class State {
-            INACTIVE, RUNNING, FORCED_STOP, FINISHED, ABANDONED
+        enum class State
+        {
+            INACTIVE,
+            STARTING,
+            RUNNING,
+            STOPPING_FORCED,
+            STOPPING_ABANDONED,
         };
 
-        using TickFunction = std::function<void()>;
-        using AliveCheckFunction = std::function<bool()>;
-
-
     private:
-        pthread_t m_Thread;
+        std::condition_variable m_cvFullyStarted;
+        std::thread *m_Thread = nullptr;
+        std::mutex m_StateMutex;
 
-        std::function<void()> m_TickFunction;
-        std::function<bool()> m_AliveCheckFunction;
-        
-        void InnerLoop();
-        friend void *threadRountine(void *threadLoopV);
-
-        DampEngine::Mutex m_FunctsMutex;
+        ThreadLoopParams *m_ExecutionParams = nullptr;
 
         State m_State;
         bool m_Paused;
 
-        const static uint32_t s_HumanTickDelay;
-        const uint32_t *m_TickDelay;
+        void Loop();
     public:
         EventListener *m_EventListener;
-
         std::string m_DebugName;
-        ThreadLoop(const std::string& debugName);
-        ~ThreadLoop();
 
-        inline void SetTickFunction(TickFunction &&func) { m_TickFunction = func; }
-        inline void SetAliveCheckFunction(AliveCheckFunction &&func) { m_AliveCheckFunction = func; }
+        ThreadLoop(const std::string &debugName);
+        ~ThreadLoop();
 
         inline ThreadLoop::State GetState() { return m_State; }
 
+        void Start(ThreadLoopParams* params);
+
         void Pause(bool paused = true);
         inline void Unpause() { Pause(false); }
-        inline bool IsPaused() { return m_Paused; }
-        inline bool IsRunning() { return m_State == State::RUNNING; }
-        void Start(const uint32_t *tickDelay);
+        inline bool IsPaused() const { return m_Paused; }
+        inline bool IsRunning() const { return m_State == State::RUNNING; }
+
         void Stop();
         void Abandon();
     };

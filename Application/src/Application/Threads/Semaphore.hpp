@@ -2,8 +2,6 @@
 
 #include <semaphore.h>
 
-#include "DampEngine/Threads/Mutex.hpp"
-
 namespace Application
 {
 

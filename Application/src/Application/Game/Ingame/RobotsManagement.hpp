@@ -3,13 +3,10 @@
 #include "RobotFunctions.hpp"
 #include "Task.hpp"
 #include "VillageStats.hpp"
-#include "Application/Threads/Avenue.hpp"
 #include <vector>
 #include "Application/ImGui/GameWindows/FunctionWindow.hpp"
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
-
-#include "DampEngine/Threads/Mutex.hpp"
 
 #include <optional>
 
@@ -30,17 +27,16 @@ namespace Application
         uint64_t totRobots;
         uint64_t freeRobots;
         uint64_t prodCost; //TODO: Implementation to change this value
+        uint64_t *robotVars[3] = {&totRobots, &freeRobots, &prodCost};
 
         GameConstsCache m_GameConstsCache;
 
-        DampEngine::Mutex m_VillageStatsMutex;
+        mutable std::mutex m_VillageStatsMutex;
         VillageStats *villageStats;
         std::unordered_map<Task::TaskID, Task*> tasks[FUNCTION_QTY];
-        Avenue<uint64_t> *robotsAvenues[3];
-        pthread_t consumers[3];
-        pthread_mutex_t tasksMutex;
+        mutable std::mutex robotsMutexes[3];
+        mutable std::mutex tasksMutex;
 
-        void initializeAvenues();
         void changeRobotsNum (int type, int increase);
         EventListener m_EventListener;
 
@@ -57,6 +53,8 @@ namespace Application
         bool canRemoveRobots() const;
         bool canAddRobots();
 
+
+        void clearEvents();
         void setOnTaskCreated(EH_TaskCreated*);
         void setOnTaskEnded(EH_TaskFinished*);
         void setOnTaskCancelled(EH_TaskCancelled*);
