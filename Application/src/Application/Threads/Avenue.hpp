@@ -1,8 +1,5 @@
 #pragma once
 
-#include <thread>
-#include <semaphore.h>
-#include <queue>
 #include <mutex>
 
 #define FULL_N 1000

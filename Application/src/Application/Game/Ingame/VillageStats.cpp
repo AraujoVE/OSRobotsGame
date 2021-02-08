@@ -208,7 +208,9 @@ namespace Application
             return false;
         }));
 
+        DE_DEBUG("[VillageStats] Starting DecayThreadLoop...");
         m_DecayThreadLoop->Start(threadLoopParams);
+        DE_DEBUG("[VillageStats] DecayThreadLoop Started!");
     }
 
     void VillageStats::onGameEnded()

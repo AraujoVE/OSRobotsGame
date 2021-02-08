@@ -50,7 +50,11 @@ namespace Application
 
         villageStats.RegisterOnStatsDecaymentStarted(eventHandler);
         villageStats.onGameStarted();
+        
+        DE_DEBUG("[GameRunner] Waiting for VillageStats to start decaymen...");
         gameStartedFut.get();
+        DE_DEBUG("[GameRunner] VillageStats decayment started!");
+        
 
         m_GameStatus.GameStarted = true;
         m_GameStatus.GamePaused = false;

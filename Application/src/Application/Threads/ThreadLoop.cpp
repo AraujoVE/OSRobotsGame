@@ -35,7 +35,7 @@ namespace Application
     {
         {
             std::lock_guard<std::mutex> stateGuard(m_StateMutex);
-            DE_ASSERT(m_State == State::STARTING);
+            DE_ASSERT(m_State != State::INACTIVE);
             m_State = State::RUNNING;
         }
 
@@ -47,6 +47,8 @@ namespace Application
             if (!m_Paused)
             {
                 std::lock_guard<std::mutex> stateGuard(m_StateMutex);
+                DE_ASSERT(m_State != State::INACTIVE);
+
                 m_ExecutionParams->m_TickFunction();
                 if (!m_ExecutionParams->m_AliveCheckFunction())
                 {
@@ -64,9 +66,9 @@ namespace Application
             return;
 
         if (finished)
-            m_EventListener->OnAsync<EH_ThreadEnded>(ThreadEndedReason::FINISHED);
+            m_EventListener->On<EH_ThreadEnded>(ThreadEndedReason::FINISHED);
         else
-            m_EventListener->OnAsync<EH_ThreadEnded>(ThreadEndedReason::FORCED_STOP);
+            m_EventListener->On<EH_ThreadEnded>(ThreadEndedReason::FORCED_STOP);
     }
 
     void ThreadLoop::Pause(bool paused)
@@ -90,8 +92,12 @@ namespace Application
 
         {
             std::unique_lock<std::mutex> stateGuard(m_StateMutex);
-            m_cvFullyStarted.wait(stateGuard, [this]{ return m_State == State::RUNNING; });
+            DE_DEBUG("[ThreadLoop ({0})] Waiting for state fully started...", m_DebugName);
+            m_cvFullyStarted.wait(stateGuard, [this]{ return m_State != State::STARTING; });
+            DE_DEBUG("[ThreadLoop ({0})] Fully started!", m_DebugName);
         }
+
+        m_EventListener->On<EH_ThreadStarted>();
     }
 
     void ThreadLoop::Stop()
@@ -112,6 +118,7 @@ namespace Application
             std::lock_guard<std::mutex> stateGuard(m_StateMutex);
             DE_ASSERT(m_State <= State::RUNNING);
             m_State = State::STOPPING_ABANDONED;
+            m_EventListener->Clear();
             if (m_Thread != nullptr && m_Thread->joinable())
                 m_Thread->detach();
         }
