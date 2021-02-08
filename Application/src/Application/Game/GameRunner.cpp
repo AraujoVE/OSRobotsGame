@@ -14,6 +14,7 @@ namespace Application
     //TODO: fix ml on new GameConsts()
     GameRunner::GameRunner(GameConsts *gameConsts) : m_GameSave(new GameSave(gameConsts)), m_GameConsts(gameConsts), m_EventListener(new EventListener())
     {
+        m_GameSave->NewSave();
     }
 
     GameRunner::~GameRunner()
@@ -32,11 +33,11 @@ namespace Application
         // DE_ASSERT(!m_GameStatus.GameStarted, "Trying to start the game 2 times in the same runner");
 
         //TODO: if someday the game needs to be saved, this will need to change
-        // if (m_GameStatus.GameLost)
-        // {
-        ResetSave();
-        m_GameStatus.GameLost = false;
-        // }
+        if (m_GameStatus.GameLost)
+        {
+            ResetSave();
+            m_GameStatus.GameLost = false;
+        }
 
         VillageStats &villageStats = *m_GameSave->GetVillageStats();
         SetupGameOverConditions();
@@ -117,7 +118,7 @@ namespace Application
 
     void GameRunner::ResetSave()
     {
-        m_GameSave->Reset();
+        m_GameSave->NewSave();
     }
 
     //PRIVATE:

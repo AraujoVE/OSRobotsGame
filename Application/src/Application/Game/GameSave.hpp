@@ -25,7 +25,7 @@ namespace Application
 
         static void Load();
         static void Save();
-        void Reset();
+        void NewSave();
 
         inline VillageStats *GetVillageStats() { return m_VillageStats; }
         inline RobotsManagement *GetRobotsManagement() { return m_RobotsManagement; }
