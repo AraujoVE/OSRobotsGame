@@ -136,7 +136,7 @@ DampEngine::Application *CreateApplication()
             // usleep(10e6);
         }
         else if (test == 2) {
-            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return true;}, 5000e3); 
+            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return true;}, 1); 
             ThreadLoop *threadLoop = new ThreadLoop("Testing");
             threadLoop->Start(tlp);
             threadLoop->Stop();
