@@ -52,7 +52,17 @@ namespace Application
                             DA_DECL_PARAM_BASIC(FAILURE_TAX)});
     }
 
-    GameConsts::~GameConsts() { delete m_EventListener; }
+    GameConsts::~GameConsts()
+    {
+        m_MapMutex.lock();
+        for (auto &mapEntry : m_ConstsMap)
+        {
+            delete mapEntry.second; //delete ParameterData
+        }
+        m_MapMutex.unlock();
+
+        delete m_EventListener;
+    }
 
     std::mutex GameConsts::s_FileMutex;
     void GameConsts::LoadFromFile(const std::string &srcFile)
@@ -86,7 +96,7 @@ namespace Application
         s_FileMutex.unlock();
 
         for (auto &pairIt : m_ConstsMap)
-            pairIt.second.Apply(this);
+            pairIt.second->Apply(this);
 
         DE_DEBUG("GameConsts::LoadFromFile SUCCESS");
 
@@ -130,18 +140,48 @@ namespace Application
         m_MapMutex.unlock();
 
         for (auto &pairIt : m_ConstsMap)
-            pairIt.second.Apply(this);
+            pairIt.second->Apply(this);
 
         m_EventListener->On<EH_GameConstsChanged>();
     }
 
-    std::vector<double> GameConsts::SaveToCromossome() {
+    std::vector<double> GameConsts::SaveToCromossome()
+    {
         const static size_t geneCount = 27;
-        const static std::string cromossomeOrder[] = { "ON_ATTACK_MULTIPLIER", "POP_INCREASE_TAX", "POP_PER_CONSTRUCTION", "INIT_POP_VALUE", "INIT_STAT_VALUE", "ON_ATTACK_DECAY_TAX", "NORMAL_DECAY_TAX", "ATTACK_FREQUENCY", "INIT_RESOURCES_VALUE", "TAX_REDUCT", "MIN_LOSS_0", "MIN_LOSS_1", "MIN_LOSS_2", "MIN_LOSS_3", "MAX_LOSS_0", "MAX_LOSS_1", "MAX_LOSS_2", "MAX_LOSS_3", "TOT_ROBOTS_INI", "PROD_COST_INI", "PROD_COST_INCREASE_TAX", "TIME_STEP", "INIT_TIME_STEP", "MAX_TIME_STEPS", "MIN_REWARD", "REWARD_RANGE", "FAILURE_TAX", };
-        DE_ASSERT(sizeof(cromossomeOrder)/sizeof(std::string) == geneCount)
+        const static std::string cromossomeOrder[] = {
+            "ON_ATTACK_MULTIPLIER",
+            "POP_INCREASE_TAX",
+            "POP_PER_CONSTRUCTION",
+            "INIT_POP_VALUE",
+            "INIT_STAT_VALUE",
+            "ON_ATTACK_DECAY_TAX",
+            "NORMAL_DECAY_TAX",
+            "ATTACK_FREQUENCY",
+            "INIT_RESOURCES_VALUE",
+            "TAX_REDUCT",
+            "MIN_LOSS_0",
+            "MIN_LOSS_1",
+            "MIN_LOSS_2",
+            "MIN_LOSS_3",
+            "MAX_LOSS_0",
+            "MAX_LOSS_1",
+            "MAX_LOSS_2",
+            "MAX_LOSS_3",
+            "TOT_ROBOTS_INI",
+            "PROD_COST_INI",
+            "PROD_COST_INCREASE_TAX",
+            "TIME_STEP",
+            "INIT_TIME_STEP",
+            "MAX_TIME_STEPS",
+            "MIN_REWARD",
+            "REWARD_RANGE",
+            "FAILURE_TAX",
+        };
+        DE_ASSERT(sizeof(cromossomeOrder) / sizeof(std::string) == geneCount)
 
         std::vector<double> cromossome;
-        for (unsigned int i = 0; i < geneCount; i++) {
+        for (unsigned int i = 0; i < geneCount; i++)
+        {
             cromossome.push_back(GetRawValue(cromossomeOrder[i]));
         }
 
@@ -153,7 +193,7 @@ namespace Application
         m_MapMutex.lock();
         auto findIt = m_ConstsMap.find(key);
         DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
-        float val = findIt->second.CapturedValue;
+        float val = findIt->second->CapturedValue;
         m_MapMutex.unlock();
         return val;
     }
@@ -163,7 +203,7 @@ namespace Application
         m_MapMutex.lock();
         auto findIt = m_ConstsMap.find(key);
         DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
-        float val = findIt->second.AppliedValue;
+        float val = findIt->second->AppliedValue;
         m_MapMutex.unlock();
 
         return val;
@@ -172,11 +212,11 @@ namespace Application
     void GameConsts::SetValue(const std::string &key, float newValue)
     {
         //ASSUMING MUTEX IS LOCKED
-        m_ConstsMap[key].Capture(newValue);
+        m_ConstsMap[key]->Capture(newValue);
     }
 
-    void GameConsts::RegisterOnValueChanged(EH_GameConstsChanged *eHandler) const { m_EventListener->Register(eHandler);}
-    void GameConsts::UnregisterOnValueChanged(EH_GameConstsChanged *eHandler) const { m_EventListener->Unregister(eHandler);}
+    void GameConsts::RegisterOnValueChanged(EH_GameConstsChanged *eHandler) const { m_EventListener->Register(eHandler); }
+    void GameConsts::UnregisterOnValueChanged(EH_GameConstsChanged *eHandler) const { m_EventListener->Unregister(eHandler); }
 
     void GameConsts::SetTickDelay(uint32_t newTickDelay)
     {
@@ -188,7 +228,7 @@ namespace Application
         : m_GameConsts(gameConsts)
     {
         std::function<void()> handler(std::bind(&GameConstsCache::UpdateAll, this));
-        
+
         m_GameConsts.RegisterOnValueChanged(new EH_GameConstsChanged([handler]() {
             handler();
             return false;
@@ -197,8 +237,8 @@ namespace Application
         UpdateAll();
     }
 
-    GameConstsCache::~GameConstsCache() {
+    GameConstsCache::~GameConstsCache()
+    {
     }
-
 
 } // namespace Application

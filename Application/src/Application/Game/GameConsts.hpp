@@ -58,14 +58,14 @@ namespace Application
         }
     };
 
-#define DA_DECL_PARAM_BASIC(name) { #name, ParameterData() }
-#define DA_DECL_PARAM_APPLY(name, func, ...) { #name, ParameterData(PredefinedAppliers::func, {#__VA_ARGS__}) }
+#define DA_DECL_PARAM_BASIC(name) { #name, new ParameterData() }
+#define DA_DECL_PARAM_APPLY(name, func, ...) { #name, new ParameterData(PredefinedAppliers::func, {#__VA_ARGS__}) }
 
     class GameConsts final
     {
     private:
 
-        std::unordered_map<std::string, ParameterData> m_ConstsMap;
+        std::unordered_map<std::string, ParameterData*> m_ConstsMap;
         EventListener * m_EventListener;
         uint32_t TICK_DELAY_MICRO = HUMAN_TICK_DELAY_MICRO;
 
