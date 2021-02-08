@@ -108,32 +108,42 @@ namespace Application
 DampEngine::Application *CreateApplication()
 {
 
-    int tests = 10e4;
+    int tests = 10;
 
     while (tests-- > 0)
     {
-
-        GameConsts *gameConsts = new GameConsts();
-        gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
-        gameConsts->SetTickDelay(1);
-
-        GameRunner *gameRunner = new GameRunner(gameConsts);
-
-        EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
-        EvoAlg::Script *script = scriptConverter.Convert();
-        EvoAlg::ScriptRunner scriptRunner(*script);
-
-        EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
-        EvoAlg::Individual indv{0, genes};
-
         uint32_t tickDelay = 500e3;
         int test = 2;
 
         if (test == 1)
         {
+            GameConsts *gameConsts = new GameConsts();
+            gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+            gameConsts->SetTickDelay(1);
+
+            GameRunner *gameRunner = new GameRunner(gameConsts);
+
+            EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
+            EvoAlg::Script *script = scriptConverter.Convert();
+            EvoAlg::ScriptRunner scriptRunner(*script);
+
+            EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
+            EvoAlg::Individual indv{0, genes};
+
             gameRunner->Start();
             gameRunner->Stop();
             // usleep(10e6);
+
+            DE_TRACE("Deleting script");
+            delete script;
+
+            DE_TRACE("Deleting gameRunner");
+            delete gameRunner;
+            DE_TRACE("Deleting gameConsts");
+            delete gameConsts;
+
+            // scriptRunner.RunAllGameplays(*gameRunner, indv);
+
         }
         else if (test == 2) {
             ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return true;}, 1); 
@@ -143,15 +153,6 @@ DampEngine::Application *CreateApplication()
             delete threadLoop;
         }
 
-        // scriptRunner.RunAllGameplays(*gameRunner, indv);
-
-        DE_TRACE("Deleting script");
-        delete script;
-
-        DE_TRACE("Deleting gameRunner");
-        delete gameRunner;
-        DE_TRACE("Deleting gameConsts");
-        delete gameConsts;
     }
 
     DE_TRACE("Ending Application");

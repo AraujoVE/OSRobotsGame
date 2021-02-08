@@ -28,6 +28,7 @@ namespace Application
     {
         delete m_Thread;
         delete m_ExecutionParams;
+        delete m_EventListener;
     }
 
     void ThreadLoop::Loop()
