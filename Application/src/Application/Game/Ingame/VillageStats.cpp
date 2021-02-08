@@ -42,12 +42,15 @@ namespace Application
 
     VillageStats::~VillageStats()
     {
+        m_DecayThreadLoop->m_EventListener->Clear();
+        if (m_DecayThreadLoop->IsRunning())
+            m_DecayThreadLoop->Stop();
         delete m_DecayThreadLoop;
         for (int i = 0; i < BASE_STATS_NO + 1; i++)
         {
-            DE_DEBUG("Stoping avenue consumer {0} @VillageStats::~VillageStats()");
-            avenueVS[i]->stopConsumer();
-            DE_DEBUG("Deleting avenue {0} @VillageStats::~VillageStats()");
+            // DE_DEBUG("Stoping avenue consumer {0} @VillageStats::~VillageStats()");
+            // avenueVS[i]->stopConsumer();
+            // DE_DEBUG("Deleting avenue {0} @VillageStats::~VillageStats()");
             delete avenueVS[i];
         }
     }
@@ -195,7 +198,7 @@ namespace Application
         //TODO: update tickDelay
         auto tickFn = std::bind(&VillageStats::DecayStats, this);
         auto aliveFn = [this] { return this->getPopulation() > 0; };
-        ThreadLoopParams *threadLoopParams = new ThreadLoopParams(tickFn, aliveFn);
+        ThreadLoopParams *threadLoopParams = new ThreadLoopParams(tickFn, aliveFn, m_GameConstsCache.TICK_DELAY_MICRO);
 
         m_DecayThreadLoop->m_EventListener->Register(new EH_ThreadEnded([=](ThreadEndedReason::ThreadEndedReason_t reason) {
             DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
@@ -217,7 +220,7 @@ namespace Application
     {
         if (m_DecayThreadLoop->IsRunning())
         {
-            m_DecayThreadLoop->Abandon();
+            m_DecayThreadLoop->Stop();
         }
     }
 

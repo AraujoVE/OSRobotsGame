@@ -109,11 +109,10 @@ namespace Application
 DampEngine::Application *CreateApplication()
 {
 
-    uint64_t tests = 1e4;
+    uint64_t tests = 1;
 
     while (tests-- > 0)
     {
-        uint32_t tickDelay = 500e3;
         int test = 1;
 
         if (test == 1)
@@ -136,8 +135,6 @@ DampEngine::Application *CreateApplication()
             DE_INFO("[Main] Stopping game...");
             gameRunner->Stop();
             DE_INFO("[Main] Game Stopped successfully!");
-
-            // usleep(10e6);/
 
             DE_TRACE("Deleting script");
             delete script;
@@ -169,7 +166,7 @@ DampEngine::Application *CreateApplication()
         }
         else if (test == 3) {
             DE_INFO("Start test 3");
-            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return false;}, 1); 
+            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return false;}, 500e3); 
             ThreadLoop *threadLoop = new ThreadLoop("Testing");
             
             threadLoop->Start(tlp);
@@ -179,6 +176,25 @@ DampEngine::Application *CreateApplication()
 
             delete threadLoop;
             DE_INFO("End test 3");
+
+        }
+
+
+
+
+
+        else if (test == -1) {
+            DE_INFO("Start test 4");
+            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return false;}, 500e3); 
+            ThreadLoop *threadLoop = new ThreadLoop("Testing");
+            
+            threadLoop->Start(tlp);
+            usleep(3e2);
+            threadLoop->Abandon(); //This should not work, if yet disabled
+            threadLoop->Start(tlp);
+
+            delete threadLoop;
+            DE_INFO("End test 4");
 
         }
 

@@ -26,6 +26,9 @@ namespace Application
 
     ThreadLoop::~ThreadLoop()
     {
+        if (m_Thread != nullptr && m_Thread->joinable()) {
+            Stop();
+        }
         delete m_Thread;
         delete m_ExecutionParams;
         delete m_EventListener;
@@ -112,16 +115,19 @@ namespace Application
             m_Thread->join();
     }
 
+    //Temporarily disabled, caused problems when used too much (lots of threads piling up)
     void ThreadLoop::Abandon()
     {
-        {
-            std::lock_guard<std::mutex> stateGuard(m_StateMutex);
-            DE_ASSERT(m_State <= State::RUNNING);
-            m_State = State::STOPPING_ABANDONED;
-            m_EventListener->Clear();
-            if (m_Thread != nullptr && m_Thread->joinable())
-                m_Thread->detach();
-        }
+        DE_ERROR("ThreadLoop::Abandoned() should not be used!");
+        exit(121);
+        // {
+        //     std::lock_guard<std::mutex> stateGuard(m_StateMutex);
+        //     DE_ASSERT(m_State <= State::RUNNING);
+        //     m_State = State::STOPPING_ABANDONED;
+        //     m_EventListener->Clear();
+        //     if (m_Thread != nullptr && m_Thread->joinable())
+        //         m_Thread->detach();
+        // }
     }
 
 } // namespace Application

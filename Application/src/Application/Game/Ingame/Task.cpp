@@ -45,7 +45,9 @@ namespace Application
         }
         m_ELMutex.unlock();
 
-        m_ThreadLoop->Abandon();
+        m_ThreadLoop->m_EventListener->Clear();
+        if (m_ThreadLoop->IsRunning())
+            m_ThreadLoop->Stop();
         delete m_ThreadLoop;
     }
 
@@ -86,7 +88,7 @@ namespace Application
         //TODO: update tickDelay
         auto tickFn = std::bind(&Task::UpdateTask, this);
         auto aliveFn = [this] { return !IsTaskCompleted(); };
-        ThreadLoopParams *threadLoopParams = new ThreadLoopParams(tickFn, aliveFn);
+        ThreadLoopParams *threadLoopParams = new ThreadLoopParams(tickFn, aliveFn, m_GameConstsCache.TICK_DELAY_MICRO);
 
         m_ThreadLoop->m_EventListener->Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
         m_ThreadLoop->m_EventListener->Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
