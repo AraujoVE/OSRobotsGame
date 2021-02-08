@@ -58,7 +58,8 @@ namespace Application
             ImGui::SameLine();
             abortPressed = ImGui::Button("Abort EA");
             ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.Pause);
-
+            
+            //TODO: *** currently not updating ThreadLoop ***
             ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
 
             ImGui::Text("Current Generation: %lu", eaStatus.m_EvolutionInfo.CurrentGeneration);
