@@ -26,20 +26,20 @@ namespace Application
 
     //TODO: use promises to call EH_GameStarted to assure game is totally started
     void GameRunner::Start()
-    {   
-        
+    {
+
         m_GSMutex.lock();
-        DE_ASSERT(!m_GameStatus.GameStarted, "Trying to start the game 2 times in the same runner");
+        // DE_ASSERT(!m_GameStatus.GameStarted, "Trying to start the game 2 times in the same runner");
 
         //TODO: if someday the game needs to be saved, this will need to change
         // if (m_GameStatus.GameLost)
         // {
-        ResetSave();
-        m_GameStatus.GameLost = false;
+            ResetSave();
+            m_GameStatus.GameLost = false;
         // }
 
         VillageStats &villageStats = *m_GameSave->GetVillageStats();
-        SetupGameOverConditions();
+        // SetupGameOverConditions();
 
         std::promise<void> gameStartedPr;
         std::future<void> gameStartedFut = gameStartedPr.get_future();
@@ -55,38 +55,37 @@ namespace Application
         m_GameStatus.GameStarted = true;
         m_GameStatus.GamePaused = false;
 
-        DE_TRACE("Gamerunner finished starting");
+        // DE_TRACE("Gamerunner finished starting");
         m_GSMutex.unlock();
 
-        m_EventListener->OnAsync<EH_GameStarted>(*this);
+        // m_EventListener->OnAsync<EH_GameStarted>(*this);
     }
 
     void GameRunner::Stop()
     {
         DE_TRACE("GameRunner::Stop()");
-        if (!m_GameStatus.GameStarted) return;
-        
-        m_GSMutex.lock();
+        if (!m_GameStatus.GameStarted)
+            return;
 
-        auto elapsedTicks = m_GameSave->GetVillageStats()->GetElapsedTimeTicks();
+        {
+            std::lock_guard<std::mutex> gsGuard(m_GSMutex);
+            auto elapsedTicks = m_GameSave->GetVillageStats()->GetElapsedTimeTicks();
 
-        DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running (somehow)");
+            // DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running (somehow)");
 
-        m_GameStatus.GameStarted = false;
+            m_GameStatus.GameStarted = false;
 
-        DE_TRACE("Stopping game: 0/3 @GameRunner::Stop()");
-        m_GameSave->GetRobotsManagement()->clearEvents();
-        DE_TRACE("Stopping game: 1/3 @GameRunner::Stop()");
-        m_GameSave->GetVillageStats()->ClearEvents();
-        DE_TRACE("Stopping game: 2/3 @GameRunner::Stop()");
-        m_GameSave->GetVillageStats()->onGameEnded();
-        DE_TRACE("Stopping game: 3/3 @GameRunner::Stop()");
-
-
-        m_GSMutex.unlock();
+            DE_TRACE("Stopping game: 0/3 @GameRunner::Stop()");
+            m_GameSave->GetRobotsManagement()->clearEvents();
+            DE_TRACE("Stopping game: 1/3 @GameRunner::Stop()");
+            m_GameSave->GetVillageStats()->ClearEvents();
+            DE_TRACE("Stopping game: 2/3 @GameRunner::Stop()");
+            m_GameSave->GetVillageStats()->onGameEnded();
+            DE_TRACE("Stopping game: 3/3 @GameRunner::Stop()");
+        }
 
         DE_TRACE("Emmiting EH_GameEnded @GameRunner::Stop()");
-        m_EventListener->OnAsync<EH_GameEnded>({*this, elapsedTicks});
+        // m_EventListener->OnAsync<EH_GameEnded>({*this, elapsedTicks});
         //TODO: promise to join TASK + VS ended callbacks
     }
 

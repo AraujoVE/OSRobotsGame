@@ -19,6 +19,7 @@
 #endif //!BOOST_VERSION
 
 //TODO: remove test includes
+#include "Application/Threads/ThreadLoop.hpp"
 #include "EvoAlg/Threads/ThreadController.hpp"
 #include "EvoAlg/ScriptRunner.hpp"
 #include "EvoAlg/ScriptConverter.hpp"
@@ -125,13 +126,19 @@ DampEngine::Application *CreateApplication()
         EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
         EvoAlg::Individual indv{0, genes};
 
-        int test = 1;
+        uint32_t tickDelay = 500e3;
+        int test = 2;
 
         if (test == 1)
         {
             gameRunner->Start();
             gameRunner->Stop();
             // usleep(10e6);
+        }
+        else if (test == 2) {
+            ThreadLoop *threadLoop = new ThreadLoop("Testing");
+            threadLoop->Start(&tickDelay);
+            delete threadLoop;
         }
 
         // scriptRunner.RunAllGameplays(*gameRunner, indv);

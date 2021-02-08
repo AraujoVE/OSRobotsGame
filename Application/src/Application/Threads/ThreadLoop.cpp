@@ -52,6 +52,7 @@ namespace Application
             m_EventListener->On<EH_ThreadStarted>();
         }
 
+
         uint32_t currTickDelay = 1;
         while (true)
         {
@@ -70,7 +71,7 @@ namespace Application
 
                 if (!m_Paused)
                 {
-                    if (!m_AliveCheckFunction()) //If finished naturally (neither force nor abortion)
+                    if (true || !m_AliveCheckFunction()) //If finished naturally (neither force nor abortion)
                         m_State = State::FINISHED;
                     else
                         m_TickFunction();
@@ -122,6 +123,8 @@ namespace Application
         if (m_Thread != nullptr)
             delete m_Thread;
         m_Thread = new std::thread(std::bind(&ThreadLoop::InnerLoop, this));
+
+
     }
 
     void ThreadLoop::Stop()
@@ -130,6 +133,8 @@ namespace Application
             std::lock_guard<std::mutex> guard(m_StateMutex);
             DE_ASSERT(m_State == State::RUNNING, "(ThreadLoop::Stop) Trying to stop a ThreadLoop while it's NOT running!!!")
             m_State = State::FORCED_STOP;
+            if (m_Thread->joinable())
+                m_Thread->join();
         }
     }
 
