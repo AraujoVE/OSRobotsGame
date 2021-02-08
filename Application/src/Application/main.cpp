@@ -70,28 +70,27 @@ namespace Application
             // m_LayerStack.PushOverlay(m_GameGuiLayer);
 
             // EA Code:
-            // m_GameGuiLayer = new GameGuiLayer();
-            // m_EAGameGuiLayer = new EAGameGuiLayer();
-            // m_LayerStack.PushOverlay(m_EAGameGuiLayer);
+            m_GameGuiLayer = new GameGuiLayer();
+            m_EAGameGuiLayer = new EAGameGuiLayer();
+            m_LayerStack.PushOverlay(m_EAGameGuiLayer);
 
-            // auto *l_LayerStack = &m_LayerStack;
-            // auto *l_GameGuiLayer = m_GameGuiLayer;
+            auto *l_LayerStack = &m_LayerStack;
+            auto *l_GameGuiLayer = m_GameGuiLayer;
 
-            // m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGuiPropsChanged([=](const EvoAlg::EAGuiProps& newSettings) {
-            //     if (newSettings.ShowGame)
-            //         l_LayerStack->PushOverlay(l_GameGuiLayer);
-            //     else
-            //         l_LayerStack->PopOverlay(l_GameGuiLayer);
+            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGuiPropsChanged([=](const EvoAlg::EAGuiProps& newSettings) {
+                if (newSettings.ShowGame)
+                    l_LayerStack->PushOverlay(l_GameGuiLayer);
+                else
+                    l_LayerStack->PopOverlay(l_GameGuiLayer);
 
-            //     l_GameGuiLayer->SetGameRunner(newSettings.MainGameRunner);
-            //     return false;
+                l_GameGuiLayer->SetGameRunner(newSettings.MainGameRunner);
+                return false;
 
-            // }));
+            }));
         }
 
         virtual void OnUpdate() override
         {
-            Stop();
         }
 
         virtual void OnStop() override
@@ -109,99 +108,112 @@ namespace Application
 DampEngine::Application *CreateApplication()
 {
 
-    uint64_t tests = 1;
+    // uint64_t tests = 1;
 
-    while (tests-- > 0)
-    {
-        int test = 1;
+    // while (tests-- > 0)
+    // {
+    //     int test = 1;
 
-        if (test == 1)
-        {
-            GameConsts *gameConsts = new GameConsts();
-            gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
-            gameConsts->SetTickDelay(1);
+    //     if (test == 0) {
+    //         GameConsts *gameConsts = new GameConsts();
+    //         gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+    //         gameConsts->SetTickDelay(1);
+    //         GameRunner *gameRunner = new GameRunner(gameConsts);
 
-            GameRunner *gameRunner = new GameRunner(gameConsts);
+    //         DE_INFO("[Main] Starting game...");
+    //         gameRunner->Start();
+    //         DE_INFO("[Main] Stopping game...");
+    //         gameRunner->Stop();
+    //         DE_INFO("[Main] Game Stopped successfully!");
 
-            EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
-            EvoAlg::Script *script = scriptConverter.Convert();
-            EvoAlg::ScriptRunner scriptRunner(*script);
+    //         DE_TRACE("Deleting gameRunner");
+    //         delete gameRunner;
+    //         DE_TRACE("Deleting gameConsts");
+    //         delete gameConsts;
 
-            EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
-            EvoAlg::Individual indv{0, genes};
+    //     }
+    //     else if (test == 1)
+    //     {
+    //         GameConsts *gameConsts = new GameConsts();
+    //         gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+    //         gameConsts->SetTickDelay(1);
 
-            DE_INFO("[Main] Starting game...");
-            gameRunner->Start();
-            DE_INFO("[Main] Stopping game...");
-            gameRunner->Stop();
-            DE_INFO("[Main] Game Stopped successfully!");
+    //         GameRunner *gameRunner = new GameRunner(gameConsts);
 
-            DE_TRACE("Deleting script");
-            delete script;
+    //         EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
+    //         EvoAlg::Script *script = scriptConverter.Convert();
+    //         EvoAlg::ScriptRunner scriptRunner(*script);
 
-            DE_TRACE("Deleting gameRunner");
-            delete gameRunner;
-            DE_TRACE("Deleting gameConsts");
-            delete gameConsts;
+    //         EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
+    //         EvoAlg::Individual indv{0, genes};
 
-            // scriptRunner.RunAllGameplays(*gameRunner, indv);
+    //         scriptRunner.RunAllGameplays(*gameRunner, indv);
 
-        }
-        else if (test == 2) {
-            DE_INFO("Start test 2");
-            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return true;}, 1); 
-            ThreadLoop *threadLoop = new ThreadLoop("Testing");
+    //         DE_TRACE("Deleting script");
+    //         delete script;
+
+    //         DE_TRACE("Deleting gameRunner");
+    //         delete gameRunner;
+    //         DE_TRACE("Deleting gameConsts");
+    //         delete gameConsts;
+
+
+    //     }
+    //     else if (test == 2) {
+    //         DE_INFO("Start test 2");
+    //         ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return true;}, 1); 
+    //         ThreadLoop *threadLoop = new ThreadLoop("Testing");
             
-            EH_ThreadEnded *teeh = new EH_ThreadEnded([=](ThreadEndedReason::ThreadEndedReason_t reason){
-                DE_TRACE("ThreadLoop end callback. reason: {0}", reason);
-                return false;
-            });
+    //         EH_ThreadEnded *teeh = new EH_ThreadEnded([=](ThreadEndedReason::ThreadEndedReason_t reason){
+    //             DE_TRACE("ThreadLoop end callback. reason: {0}", reason);
+    //             return false;
+    //         });
 
-            threadLoop->m_EventListener->Register(teeh);
-            threadLoop->Start(tlp);
-            threadLoop->Stop();
-            delete threadLoop;
-            DE_INFO("End test 2");
+    //         threadLoop->m_EventListener->Register(teeh);
+    //         threadLoop->Start(tlp);
+    //         threadLoop->Stop();
+    //         delete threadLoop;
+    //         DE_INFO("End test 2");
 
-        }
-        else if (test == 3) {
-            DE_INFO("Start test 3");
-            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return false;}, 500e3); 
-            ThreadLoop *threadLoop = new ThreadLoop("Testing");
+    //     }
+    //     else if (test == 3) {
+    //         DE_INFO("Start test 3");
+    //         ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return false;}, 500e3); 
+    //         ThreadLoop *threadLoop = new ThreadLoop("Testing");
             
-            threadLoop->Start(tlp);
-            usleep(3e2);
-            threadLoop->Stop();
-            // threadLoop->Start(tlp);
+    //         threadLoop->Start(tlp);
+    //         usleep(3e2);
+    //         threadLoop->Stop();
+    //         // threadLoop->Start(tlp);
 
-            delete threadLoop;
-            DE_INFO("End test 3");
+    //         delete threadLoop;
+    //         DE_INFO("End test 3");
 
-        }
-
-
+    //     }
 
 
 
-        else if (test == -1) {
-            DE_INFO("Start test 4");
-            ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return false;}, 500e3); 
-            ThreadLoop *threadLoop = new ThreadLoop("Testing");
+
+
+    //     else if (test == -1) {
+    //         DE_INFO("Start test 4");
+    //         ThreadLoopParams *tlp = new ThreadLoopParams([]{}, []{return false;}, 500e3); 
+    //         ThreadLoop *threadLoop = new ThreadLoop("Testing");
             
-            threadLoop->Start(tlp);
-            usleep(3e2);
-            threadLoop->Abandon(); //This should not work, if yet disabled
-            threadLoop->Start(tlp);
+    //         threadLoop->Start(tlp);
+    //         usleep(3e2);
+    //         threadLoop->Abandon(); //This should not work, if yet disabled
+    //         threadLoop->Start(tlp);
 
-            delete threadLoop;
-            DE_INFO("End test 4");
+    //         delete threadLoop;
+    //         DE_INFO("End test 4");
 
-        }
+    //     }
 
-    }
+    // }
 
-    DE_TRACE("Ending Application");
-    exit(0);
-    return nullptr;
+    // DE_TRACE("Ending Application");
+    // exit(0);
+    // return nullptr;
     return new Application::MyApplication();
 }

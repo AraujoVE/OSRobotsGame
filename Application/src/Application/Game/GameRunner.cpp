@@ -34,12 +34,12 @@ namespace Application
         //TODO: if someday the game needs to be saved, this will need to change
         // if (m_GameStatus.GameLost)
         // {
-            ResetSave();
-            m_GameStatus.GameLost = false;
+        ResetSave();
+        m_GameStatus.GameLost = false;
         // }
 
         VillageStats &villageStats = *m_GameSave->GetVillageStats();
-        // SetupGameOverConditions();
+        SetupGameOverConditions();
 
         std::promise<void> gameStartedPr;
         std::future<void> gameStartedFut = gameStartedPr.get_future();
@@ -50,11 +50,10 @@ namespace Application
 
         villageStats.RegisterOnStatsDecaymentStarted(eventHandler);
         villageStats.onGameStarted();
-        
+
         DE_DEBUG("[GameRunner] Waiting for VillageStats to start decaymen...");
         gameStartedFut.get();
         DE_DEBUG("[GameRunner] VillageStats decayment started!");
-        
 
         m_GameStatus.GameStarted = true;
         m_GameStatus.GamePaused = false;
@@ -62,7 +61,7 @@ namespace Application
         // DE_TRACE("Gamerunner finished starting");
         m_GSMutex.unlock();
 
-        // m_EventListener->OnAsync<EH_GameStarted>(*this);
+        m_EventListener->OnAsync<EH_GameStarted>(*this);
     }
 
     void GameRunner::Stop()
@@ -71,12 +70,12 @@ namespace Application
         if (!m_GameStatus.GameStarted)
             return;
 
+        uint32_t elapsedTicks = 0;
         {
             std::lock_guard<std::mutex> gsGuard(m_GSMutex);
-            auto elapsedTicks = m_GameSave->GetVillageStats()->GetElapsedTimeTicks();
 
-            // DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running (somehow)");
-
+            DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that has not started (somehow)");
+            elapsedTicks = m_GameSave->GetVillageStats()->GetElapsedTimeTicks();
             m_GameStatus.GameStarted = false;
 
             DE_TRACE("Stopping game: 0/3 @GameRunner::Stop()");
@@ -89,7 +88,7 @@ namespace Application
         }
 
         DE_TRACE("Emmiting EH_GameEnded @GameRunner::Stop()");
-        // m_EventListener->OnAsync<EH_GameEnded>({*this, elapsedTicks});
+        m_EventListener->OnAsync<EH_GameEnded>({*this, elapsedTicks});
         //TODO: promise to join TASK + VS ended callbacks
     }
 
