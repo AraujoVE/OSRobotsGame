@@ -13,6 +13,8 @@ class Avenue
 private:
     std::mutex m_ItemsMutex;
     T &m_ReferenceVariable;
+    uint64_t m_ID;
+    static uint64_t s_nextID;
 
     static void runConsumer(Avenue *consumerObject)
     {
@@ -21,6 +23,7 @@ private:
 public:
     Avenue(T &m_ReferenceVariable) : m_ReferenceVariable(m_ReferenceVariable)
     {
+        m_ID = s_nextID++;
     }
 
     ~Avenue()
@@ -30,11 +33,8 @@ public:
     //Method called every time an absolute increment/decrement is desired
     void producer(T value)
     {
-        m_ItemsMutex.lock();
-
+        std::lock_guard<std::mutex> itemGuard(m_ItemsMutex);
         m_ReferenceVariable += value;
-
-        m_ItemsMutex.unlock();
     }
 
     //Method called once, (in a separate thread)
@@ -63,3 +63,6 @@ public:
         m_ItemsMutex.unlock();
     }
 };
+
+template <typename T>
+uint64_t Avenue<T>::s_nextID = 0;

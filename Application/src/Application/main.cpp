@@ -107,7 +107,7 @@ namespace Application
 DampEngine::Application *CreateApplication()
 {
 
-    int tests = 3e2;
+    int tests = 12e4;
 
     while (tests-- > 0)
     {

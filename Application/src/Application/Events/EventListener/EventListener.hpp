@@ -12,7 +12,6 @@
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Threads/Action.hpp"
 
-
 namespace Application
 {
     template <class EventHandlerType>
@@ -30,17 +29,11 @@ namespace Application
 
         static unsigned long count = 0;
         count++;
-        m_MapMutex.lock();
 
-        do
+        std::lock_guard<std::mutex> mapGuard(m_MapMutex);
+        if (handlerQueueMap.find(eventType) != handlerQueueMap.end())
         {
-            if (handlerQueueMap.find(eventType) == handlerQueueMap.end()) break;
             const HandlerQueue &queue = handlerQueueMap[eventType];
-
-            if (queue.empty())
-            {
-                break;
-            }
 
             for (auto handlerIt = queue.begin(); handlerIt != queue.end(); handlerIt++)
             {
@@ -50,9 +43,7 @@ namespace Application
 
                 std::apply(((EventHandlerType *)eventHandler)->m_Handler, argTuple);
             }
-        } while (false);
-
-        m_MapMutex.unlock();
+        }
     }
 
     template <class EventHandlerType>

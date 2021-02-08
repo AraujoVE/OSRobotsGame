@@ -45,16 +45,13 @@ namespace Application
 
         void Clear()
         {
-            DE_DEBUG("Mutex lock: EventListener::Clear()");
-            m_MapMutex.lock();
+            std::lock_guard<std::mutex> mapGuard(m_MapMutex);
             for (auto &queuePair: handlerQueueMap) {
                 for (IEventHandler *eHandler : queuePair.second) {
                     delete eHandler;
                 }
             }
             handlerQueueMap.clear();
-            m_MapMutex.unlock();
-            DE_DEBUG("Mutex unlock: EventListener::Clear()");
         }
     };
 } // namespace Application
