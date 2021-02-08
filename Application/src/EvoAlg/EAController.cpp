@@ -71,7 +71,7 @@ namespace EvoAlg
         static bool first = true;
         static GameConsts *gameConsts = new GameConsts();
         static GameRunner *singleThreadGR = new GameRunner(gameConsts);
-        if (first) { gameConsts->SetTickDelay(50e3); first = false; } 
+        if (first) { gameConsts->SetTickDelay(1); first = false; } 
         m_GuiProps.MainGameRunner = singleThreadGR;
 
 
