@@ -34,7 +34,6 @@ namespace Application
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
 
-        initializeVSAvenues();
         initializeStats();
 
         
@@ -46,13 +45,6 @@ namespace Application
         if (m_DecayThreadLoop->IsRunning())
             m_DecayThreadLoop->Stop();
         delete m_DecayThreadLoop;
-        for (int i = 0; i < BASE_STATS_NO + 1; i++)
-        {
-            // DE_DEBUG("Stoping avenue consumer {0} @VillageStats::~VillageStats()");
-            // avenueVS[i]->stopConsumer();
-            // DE_DEBUG("Deleting avenue {0} @VillageStats::~VillageStats()");
-            delete avenueVS[i];
-        }
     }
 
     void VillageStats::initializeStats()
@@ -66,25 +58,7 @@ namespace Application
         m_ElapsedTicks = 0;
     }
 
-    void VillageStats::initializeVSAvenues()
-    {
-        for (int i = 0; i < BASE_STATS_NO; i++)
-        {
-            avenueVS[i] = new Avenue<double>(baseStats[i]);
-            avenueVS[i]->startConsumer();
-        }
-
-        avenueVS[POPULATION_INDEX] = new Avenue<double>(population);
-        avenueVS[POPULATION_INDEX]->startConsumer();
-    }
-
     // ======================== ADD/REMOVE FOOD, MEDICINE ETC (STATS) OBTAINED FROM A COMPLETED TASK ========================
-
-    //Increase in stats due to a task completion
-    void VillageStats::changeStat(int type, int increase)
-    {
-        avenueVS[type]->producer(increase);
-    }
 
     float VillageStats::calcRatio(int statType)
     {
@@ -114,9 +88,14 @@ namespace Application
         return reductionTax;
     }
 
-    void VillageStats::setStat(RobotFunction statType, float reductionTax)
+    void VillageStats::applyGainedGoods(RobotFunction statType, float gainedGoods) {
+        std::lock_guard<std::mutex> statGuard(statsMutexes[(int)statType]);
+        baseStats[(int)statType] += gainedGoods;
+    }
+
+    void VillageStats::applyReductionToStat(RobotFunction statType, float reductionTax)
     {
-        DE_ASSERT(statType != RobotFunction::RESOURCE_GATHERING, "You should call setResources instead of setStat(RobotFunction::RESOURCE, ...)");
+        DE_ASSERT(statType != RobotFunction::RESOURCE_GATHERING, "You should call setResources instead of applyReductionToStat(RobotFunction::RESOURCE, ...)");
 
         baseStats[(int)statType] = (uint64_t)((double)baseStats[(int)statType] * (1.0 - reductionTax));
     }
@@ -232,22 +211,22 @@ namespace Application
 
     void VillageStats::decayStat(int pos)
     {
-        avenueVS[pos]->down();
+        statsMutexes[pos].lock();
 
         float ratio = calcRatio(pos);
         float reduction = m_GameConstsCache.MIN_LOSS[pos];
 
         (this->*(decayStatsFuncts[pos]))(ratio, reduction);
 
-        setStat((RobotFunction)pos, reduction);
+        applyReductionToStat((RobotFunction)pos, reduction);
 
-        avenueVS[pos]->up();
+        statsMutexes[pos].unlock();
     }
 
     //The stats are decreased
     void VillageStats::DecayStats()
     {
-        avenueVS[POPULATION_INDEX]->down();
+        statsMutexes[POPULATION_INDEX].lock();
 
         onAttack = false;
         for (int i = 0; i < BASE_STATS_NO - 1; i++)
@@ -257,7 +236,7 @@ namespace Application
 
         decayPopulation();
 
-        avenueVS[POPULATION_INDEX]->up();
+        statsMutexes[POPULATION_INDEX].unlock();
 
         m_ElapsedTicks += 1;
     }
@@ -319,7 +298,7 @@ PROTECTION{
 
 /*
             for (int i = 0; i < BASE_STATS_NO - 1; i++) {
-                avenueVS[i]->down();
+                statsMutexes[i].lock();
 
                 minMaxFact = (float)currPopValue / (float)baseStats[i];
                 //The population per current stat ratio afects how much product will be lost
@@ -330,6 +309,6 @@ PROTECTION{
                 //set new absolut value 
                 (this->*(setStatsFuncts[i]))((int)(baseStats[i] * ((float)randVal / 100.0)));
 
-                avenueVS[i]->up();
+                statsMutexes[i].unlock();
             }
             */
