@@ -67,8 +67,6 @@ namespace Application
     std::mutex GameConsts::s_FileMutex;
     void GameConsts::LoadFromFile(const std::string &srcFile)
     {
-        DE_DEBUG("GameConsts::LoadFromFile START");
-
         s_FileMutex.lock();
         m_MapMutex.lock();
         {
@@ -97,8 +95,6 @@ namespace Application
 
         for (auto &pairIt : m_ConstsMap)
             pairIt.second->Apply(this);
-
-        DE_DEBUG("GameConsts::LoadFromFile SUCCESS");
 
         m_EventListener->On<EH_GameConstsChanged>();
     }

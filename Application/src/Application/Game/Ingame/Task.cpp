@@ -30,16 +30,10 @@ namespace Application
 
         m_EventListener = new EventListener();
 
-        //TODO: fix memory leak
-        //TODO: release those functions from threadloop when this object is dead
-
         m_ThreadLoop = new ThreadLoop(std::string("Task #") + std::to_string(id));
 
-        m_ThreadLoop->SetTickFunction(std::bind(&Task::UpdateTask, this));
-        m_ThreadLoop->SetAliveCheckFunction([this] { return !IsTaskCompleted(); });
+        
 
-        m_ThreadLoop->m_EventListener->Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
-        m_ThreadLoop->m_EventListener->Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
     }
 
     Task::~Task()
@@ -51,7 +45,10 @@ namespace Application
         }
         m_ELMutex.unlock();
 
-        m_ThreadLoop->Abandon();
+        m_ThreadLoop->m_EventListener->Clear();
+        if (m_ThreadLoop->IsRunning())
+            m_ThreadLoop->Stop();
+        delete m_ThreadLoop;
     }
 
     int Task::CalcLostRobots()
@@ -86,7 +83,17 @@ namespace Application
     void Task::Start()
     {
         DE_TRACE("Starting Task #{0} (Function:{1})", id, getRobotFunctionString(function));
-        m_ThreadLoop->Start(&m_GameConstsCache.TICK_DELAY_MICRO);
+
+
+        //TODO: update tickDelay
+        auto tickFn = std::bind(&Task::UpdateTask, this);
+        auto aliveFn = [this] { return !IsTaskCompleted(); };
+        ThreadLoopParams *threadLoopParams = new ThreadLoopParams(tickFn, aliveFn, m_GameConstsCache.TICK_DELAY_MICRO);
+
+        m_ThreadLoop->m_EventListener->Register(new EH_ThreadStarted(std::bind(&Task::OnThreadLoopStarted, this)));
+        m_ThreadLoop->m_EventListener->Register(new EH_ThreadEnded(std::bind(&Task::OnThreadLoopEnded, this, std::placeholders::_1)));
+
+        m_ThreadLoop->Start(threadLoopParams);
     }
 
     void Task::Cancel()

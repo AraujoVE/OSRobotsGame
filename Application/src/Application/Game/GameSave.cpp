@@ -30,7 +30,7 @@ namespace Application
         m_RobotsManagement = nullptr;
     }
 
-    void GameSave::Reset()
+    void GameSave::NewSave()
     {
         DE_TRACE("(GameSave) Starting new GameSave");
         delete m_VillageStats;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "RobotFunctions.hpp"
-#include "Application/Threads/Avenue.hpp"
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
@@ -35,7 +34,7 @@ namespace Application
             resources;
         */
 
-        Avenue<double> *avenueVS[BASE_STATS_NO + 1];
+        mutable std::mutex statsMutexes[BASE_STATS_NO + 1];
 
         ThreadLoop *m_DecayThreadLoop;
 
@@ -48,7 +47,6 @@ namespace Application
 
         unsigned int m_ElapsedTicks = 0;
 
-        void initializeVSAvenues();
         bool updateGameConsts();
 
     private:
@@ -79,13 +77,13 @@ namespace Application
         void setStatsDecaymentPaused(bool paused);
         inline bool isStatusDecaymentPaused() const { return m_DecayThreadLoop->IsPaused(); }
 
-        inline Avenue<double> *getAvenue(RobotFunction robotFunc) { return avenueVS[(uint8_t)robotFunc]; }
+        inline std::mutex &getMutex(RobotFunction robotFunc) const { return statsMutexes[(uint8_t)robotFunc]; }
         uint64_t getStat(RobotFunction robotFunc) const;
         uint64_t getPopulation() const;
         uint64_t getResources() const;
 
-        void changeStat(int type, int increase);
-        void setStat(RobotFunction, float reductionTax);
+        void applyGainedGoods(RobotFunction, float gainedGoods);
+        void applyReductionToStat(RobotFunction, float reductionTax);
         void setResources(uint64_t);
 
         void DecayStats();

@@ -86,12 +86,6 @@ namespace EvoAlg
         std::future<void> gameStartedFuture = gameStartedPromise.get_future();
 
         //Defining game callbacks that will activate the promises above
-        auto gameStartedConfirmationCB = [&individual, &gameStartedPromise](GameRunner &gameRunner) {
-            DE_DEBUG("(ScriptRunner -- {0}) OnGameStarted", individual.ID);
-            gameStartedPromise.set_value();
-            return false;
-        };
-
         auto gameEndedConfirmationCB = [&individual, &measuredDurationInTicks, &gameEndedPromise](GameRunner &gameRunner, int elapsedTimeInTicks) {
             DE_DEBUG("(ScriptRunner -- {0}) OnGameEnded", individual.ID);
             measuredDurationInTicks = elapsedTimeInTicks;
@@ -99,31 +93,24 @@ namespace EvoAlg
             return false;
         };
 
-        EH_GameStarted *gameStartedEventHandler = new EH_GameStarted(gameStartedConfirmationCB);
         EH_GameEnded *gameEndedEventHandler = new EH_GameEnded(gameEndedConfirmationCB);
 
         //Add to the GameRunner our callbacks
-        gameRunner.RegisterOnGameStarted(gameStartedEventHandler);
         gameRunner.RegisterOnGameEnded(gameEndedEventHandler);
 
         //Request the game to start and wait it to be completely started
         DE_TRACE("(ScriptRunner -- {0}) Requesting gameplay #{1} to start", individual.ID, gameplayIndex);
-        {
-            gameRunner.Start();
-            gameStartedFuture.get();
-        }
+        gameRunner.Start();
         DE_TRACE("(ScriptRunner -- {0}) Gameplay #{1} to started successfully", individual.ID, gameplayIndex);
 
-        //
         DE_TRACE("(ScriptRunner -- {0}) Starting operations of gameplay #{1}...", individual.ID, gameplayIndex);
         auto &operations = m_GameScript.at(gameplayIndex);
         for (size_t i = 1; i < operations.size(); i++)
         {
             DE_DEBUG("(ScriptRunner -- {0}) Executing operation #{2} of gameplay #{1}", individual.ID, gameplayIndex, i);
 
-            // m_OperationFunctions.Execute(gameRunner, operations[i]);
+            m_OperationFunctions.Execute(gameRunner, operations[i]);
 
-            //TODO: check if this is correct
             usleep(gameRunner.GetGameConsts().GetTickDelay());
         }
         DE_TRACE("(ScriptRunner -- {0}) All operations of gameplay #{1} executed Successfully!", individual.ID, gameplayIndex);
@@ -139,7 +126,6 @@ namespace EvoAlg
         double targetDurationAU = stol(m_GameScript.at(gameplayIndex).at(0).at(0));
         double measuredDurationAU = measuredDurationInTicks * AU_PER_TICK;
 
-        gameRunner.UnregisterOnGameStarted(gameStartedEventHandler);
         gameRunner.UnregisterOnGameEnded(gameEndedEventHandler);
 
         return TimeResult{targetDurationAU, measuredDurationAU};

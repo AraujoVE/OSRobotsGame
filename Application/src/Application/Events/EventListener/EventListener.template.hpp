@@ -22,7 +22,7 @@ namespace Application
     {
         mutable std::mutex m_MapMutex;
         using HandlerQueue = std::vector<IEventHandler*>;
-        std::unordered_map<std::string, HandlerQueue> handlerQueueMap = {};
+        std::unordered_map<std::string, HandlerQueue> handlerQueueMap;
 
     public:
         ~EventListener() { Clear(); }

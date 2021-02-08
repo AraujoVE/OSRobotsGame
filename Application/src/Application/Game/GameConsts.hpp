@@ -8,7 +8,7 @@
 #include "Application/Events/EventHandler/DefaultHandlers.fwd.hpp"
 #include "Application/Events/EventListener/EventListener.fwd.hpp"
 
-#define HUMAN_TICK_DELAY_MICRO 500e3
+#define DEFAULT_GAME_TICK_DELAY 500e3
 
 namespace Application
 {
@@ -67,7 +67,7 @@ namespace Application
 
         std::unordered_map<std::string, ParameterData*> m_ConstsMap;
         EventListener * m_EventListener;
-        uint32_t TICK_DELAY_MICRO = HUMAN_TICK_DELAY_MICRO;
+        uint32_t TICK_DELAY_MICRO = DEFAULT_GAME_TICK_DELAY;
 
         //Static to force all instances to open file synchronously
         static std::mutex s_FileMutex;
