@@ -16,23 +16,32 @@ namespace Application
     //PUBLIC:
     GameSave::GameSave(GameConsts *gameConsts) : m_GameConsts(gameConsts)
     {
-        Reset();
+        m_VillageStats = nullptr;
+        m_RobotsManagement = nullptr;
     }
 
     GameSave::~GameSave()
     {
+        DE_DEBUG("Deleting m_VillageStats GameSave::~GameSave()");
+        delete m_VillageStats;
+        DE_DEBUG("Deleting m_RobotsManagement GameSave::~GameSave()");
+        delete m_RobotsManagement;
+        m_VillageStats = nullptr;
+        m_RobotsManagement = nullptr;
     }
 
     void GameSave::Reset()
     {
         DE_TRACE("(GameSave) Starting new GameSave");
-        m_VillageStats.reset(new VillageStats(*m_GameConsts));
-        m_RobotsManagement.reset(new RobotsManagement(*m_GameConsts));
-        m_RobotsManagement->setVillageStats(m_VillageStats.get());
+        delete m_VillageStats;
+        delete m_RobotsManagement;
+
+        m_VillageStats = new VillageStats(*m_GameConsts);
+        m_RobotsManagement = new RobotsManagement(*m_GameConsts);
+        m_RobotsManagement->setVillageStats(m_VillageStats);
     }
 
-    std::unique_ptr<VillageStats> &GameSave::GetVillageStats() { return m_VillageStats; }
-    std::unique_ptr<RobotsManagement> &GameSave::GetRobotsManagement() { return m_RobotsManagement; }
+  
 
     void GameSave::Load()
     {

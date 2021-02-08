@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Application/Game/GameConsts.hpp"
-#include "DampEngine/Threads/Mutex.hpp"
 
 #include <functional>
 #include <memory>
-#include <pthread.h>
+#include <thread>
+#include <mutex>
 
 namespace Application
 {
@@ -26,7 +26,7 @@ namespace Application
     public:
 
         enum class State {
-            INACTIVE, RUNNING, FORCED_STOP, FINISHED, ABANDONED
+            INACTIVE, STARTING, RUNNING, FORCED_STOP, FINISHED, ABANDONED
         };
 
         using TickFunction = std::function<void()>;
@@ -34,7 +34,7 @@ namespace Application
 
 
     private:
-        pthread_t m_Thread;
+        std::thread *m_Thread = nullptr;
 
         std::function<void()> m_TickFunction;
         std::function<bool()> m_AliveCheckFunction;
@@ -42,7 +42,7 @@ namespace Application
         void InnerLoop();
         friend void *threadRountine(void *threadLoopV);
 
-        DampEngine::Mutex m_FunctsMutex;
+        std::mutex m_StateMutex;
 
         State m_State;
         bool m_Paused;
@@ -63,8 +63,8 @@ namespace Application
 
         void Pause(bool paused = true);
         inline void Unpause() { Pause(false); }
-        inline bool IsPaused() { return m_Paused; }
-        inline bool IsRunning() { return m_State == State::RUNNING; }
+        inline bool IsPaused() const { return m_Paused; }
+        inline bool IsRunning() const { return m_State == State::RUNNING; }
         void Start(const uint32_t *tickDelay);
         void Stop();
         void Abandon();

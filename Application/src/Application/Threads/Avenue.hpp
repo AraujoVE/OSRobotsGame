@@ -1,8 +1,9 @@
 #pragma once
 
-#include <pthread.h>
+#include <thread>
 #include <semaphore.h>
 #include <queue>
+#include <mutex>
 
 #define FULL_N 1000
 
@@ -10,92 +11,58 @@ template <typename T>
 class Avenue
 {
 private:
-    bool m_ConsumerRunning = false;
-    sem_t empty, full;
-    pthread_mutex_t mutex;
-    T &attr;
-    std::queue<T> items;
+    std::mutex m_ItemsMutex;
+    T &m_ReferenceVariable;
+    uint64_t m_ID;
+    static uint64_t s_nextID;
 
-    pthread_t consumer_thread;
-
-    static void *runConsumer(void *consumerObject)
+    static void runConsumer(Avenue *consumerObject)
     {
-        Avenue *avenue = (Avenue *)consumerObject;
-        avenue->consumer();
-        return NULL;
     }
 
 public:
-    Avenue(T &attr) : attr(attr)
+    Avenue(T &m_ReferenceVariable) : m_ReferenceVariable(m_ReferenceVariable)
     {
-        sem_init(&empty, 1, FULL_N);
-        sem_init(&full, 1, 0);
-        pthread_mutex_init(&mutex, NULL);
+        m_ID = s_nextID++;
     }
 
     ~Avenue()
     {
-        sem_destroy(&empty);
-        sem_destroy(&full);
-        pthread_mutex_destroy(&mutex);
     }
 
     //Method called every time an absolute increment/decrement is desired
     void producer(T value)
     {
-        sem_wait(&empty);
-        pthread_mutex_lock(&mutex);
-
-        //Queues an absolute increment/decrement
-        items.push(value);
-
-        pthread_mutex_unlock(&mutex);
-        sem_post(&full);
+        std::lock_guard<std::mutex> itemGuard(m_ItemsMutex);
+        m_ReferenceVariable += value;
     }
 
     //Method called once, (in a separate thread)
     void consumer()
     {
-        while (m_ConsumerRunning)
-        {
-            sem_wait(&full);
-            pthread_mutex_lock(&mutex);
 
-            //Eval one absolute increment/decrement (delta)
-            attr += items.front();
-
-            items.pop();
-
-            if (attr < 0)
-                attr = 0;
-
-            pthread_mutex_unlock(&mutex);
-            sem_post(&empty);
-        }
     }
 
     void startConsumer()
     {
-        m_ConsumerRunning = true;
-        pthread_create(&consumer_thread, NULL, runConsumer, this);
+
     }
 
     void stopConsumer()
     {
-        m_ConsumerRunning = false;
-        producer(1);
-        // DE_DEBUG("IN: join @stopConsumer");
-        pthread_join(consumer_thread, NULL);
-        // DE_DEBUG("OUT: join @stopConsumer");
+
     }
 
     void up()
     {
-        pthread_mutex_unlock(&mutex);
+        m_ItemsMutex.lock();
     }
 
     void down()
     {
-        pthread_mutex_lock(&mutex);
+        m_ItemsMutex.unlock();
     }
 };
+
+template <typename T>
+uint64_t Avenue<T>::s_nextID = 0;

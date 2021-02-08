@@ -9,8 +9,6 @@
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 
-#include "DampEngine/Threads/Mutex.hpp"
-
 #include <optional>
 
 #include <unordered_map>
@@ -33,7 +31,7 @@ namespace Application
 
         GameConstsCache m_GameConstsCache;
 
-        DampEngine::Mutex m_VillageStatsMutex;
+        std::mutex m_VillageStatsMutex;
         VillageStats *villageStats;
         std::unordered_map<Task::TaskID, Task*> tasks[FUNCTION_QTY];
         Avenue<uint64_t> *robotsAvenues[3];
@@ -57,6 +55,8 @@ namespace Application
         bool canRemoveRobots() const;
         bool canAddRobots();
 
+
+        void clearEvents();
         void setOnTaskCreated(EH_TaskCreated*);
         void setOnTaskEnded(EH_TaskFinished*);
         void setOnTaskCancelled(EH_TaskCancelled*);

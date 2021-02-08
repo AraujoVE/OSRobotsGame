@@ -30,25 +30,20 @@ namespace Application
 
     // ======================== CONSTRUCTOR / INITIALIZE VILLAGES STATS ========================
     VillageStats::VillageStats(GameConsts &gameConsts)
-        : m_GameConstsCache(gameConsts), m_DecayThreadLoop("VillageStatsDecay")
+        : m_GameConstsCache(gameConsts), m_DecayThreadLoop(new ThreadLoop("VillageStatsDecay"))
     {
         std::srand(std::time(nullptr)); // use current time as seed for random generator
-        
+
         initializeVSAvenues();
         initializeStats();
-        
-        m_DecayThreadLoop.SetTickFunction(std::bind(&VillageStats::DecayStats, this));
-        m_DecayThreadLoop.SetAliveCheckFunction([this] {
+
+        m_DecayThreadLoop->SetTickFunction(std::bind(&VillageStats::DecayStats, this));
+        m_DecayThreadLoop->SetAliveCheckFunction([this] {
             return this->getPopulation() > 0;
         });
 
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadStarted([] {
-            DE_TRACE("(VillageStats) m_DecayThreadLoop started successfully.");
-            return false;
-        }));
-
         auto &eventListener = m_EventListener;
-        m_DecayThreadLoop.m_EventListener->Register(new EH_ThreadEnded([&eventListener](ThreadEndedReason::ThreadEndedReason_t reason) {
+        m_DecayThreadLoop->m_EventListener->Register(new EH_ThreadEnded([&eventListener](ThreadEndedReason::ThreadEndedReason_t reason) {
             DE_TRACE("(VillageStats) m_DecayThreadLoop ended. reason = {0}", reason);
             eventListener.OnAsync<EH_DecaymentStopped>();
             return false;
@@ -57,12 +52,12 @@ namespace Application
 
     VillageStats::~VillageStats()
     {
-        if (m_DecayThreadLoop.IsRunning())
-            m_DecayThreadLoop.Abandon();
-
+        delete m_DecayThreadLoop;
         for (int i = 0; i < BASE_STATS_NO + 1; i++)
         {
+            DE_DEBUG("Stoping avenue consumer {0} @VillageStats::~VillageStats()");
             avenueVS[i]->stopConsumer();
+            DE_DEBUG("Deleting avenue {0} @VillageStats::~VillageStats()");
             delete avenueVS[i];
         }
     }
@@ -206,19 +201,25 @@ namespace Application
     {
         DE_TRACE("VillageStats::onGameStarted()");
         initializeStats();
-        m_DecayThreadLoop.Start(&m_GameConstsCache.TICK_DELAY_MICRO);
+        m_DecayThreadLoop->m_EventListener->Register(new EH_ThreadStarted([=]{
+            m_EventListener.On<EH_DecaymentStarted>();
+            return false;
+        }));
+        m_DecayThreadLoop->Start(&m_GameConstsCache.TICK_DELAY_MICRO);
     }
 
-    void VillageStats::onGameEnded() {
-        if (m_DecayThreadLoop.IsRunning()) {
-            m_DecayThreadLoop.Abandon();
+    void VillageStats::onGameEnded()
+    {
+        if (m_DecayThreadLoop->IsRunning())
+        {
+            m_DecayThreadLoop->Abandon();
         }
     }
 
     void VillageStats::setStatsDecaymentPaused(bool paused)
     {
         DE_TRACE("VillageStats::setStatsDecaymentPaused({0})", paused);
-        m_DecayThreadLoop.Pause(paused);
+        m_DecayThreadLoop->Pause(paused);
     }
 
     void VillageStats::decayStat(int pos)

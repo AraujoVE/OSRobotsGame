@@ -6,8 +6,6 @@
 
 #include "mypch.hpp"
 
-#include "DampEngine/Threads/Mutex.hpp"
-
 namespace Application
 {
 
@@ -54,15 +52,25 @@ namespace Application
                             DA_DECL_PARAM_BASIC(FAILURE_TAX)});
     }
 
-    GameConsts::~GameConsts() { delete m_EventListener; }
+    GameConsts::~GameConsts()
+    {
+        m_MapMutex.lock();
+        for (auto &mapEntry : m_ConstsMap)
+        {
+            delete mapEntry.second; //delete ParameterData
+        }
+        m_MapMutex.unlock();
 
-    DampEngine::Mutex GameConsts::s_FileMutex;
+        delete m_EventListener;
+    }
+
+    std::mutex GameConsts::s_FileMutex;
     void GameConsts::LoadFromFile(const std::string &srcFile)
     {
         DE_DEBUG("GameConsts::LoadFromFile START");
 
-        s_FileMutex.Lock();
-        m_MapMutex.Lock();
+        s_FileMutex.lock();
+        m_MapMutex.lock();
         {
             std::fstream myFile;
             int tokenPos;
@@ -84,11 +92,11 @@ namespace Application
 
             myFile.close();
         }
-        m_MapMutex.Unlock();
-        s_FileMutex.Unlock();
+        m_MapMutex.unlock();
+        s_FileMutex.unlock();
 
         for (auto &pairIt : m_ConstsMap)
-            pairIt.second.Apply(this);
+            pairIt.second->Apply(this);
 
         DE_DEBUG("GameConsts::LoadFromFile SUCCESS");
 
@@ -97,8 +105,9 @@ namespace Application
 
     void GameConsts::LoadFromCromossome(const std::vector<double> &cromossome)
     {
-        m_MapMutex.Lock();
+        m_MapMutex.lock();
         {
+            DE_ASSERT(cromossome.size() == 27, "(GameConsts::LoadFromCromossome) WRONG CROMOSSOME INFORMED")
             int i = 0;
             SetValue("ON_ATTACK_MULTIPLIER", (float)cromossome.at(i++));
             SetValue("POP_INCREASE_TAX", (float)cromossome.at(i++));
@@ -128,31 +137,74 @@ namespace Application
             SetValue("REWARD_RANGE", (float)cromossome.at(i++));
             SetValue("FAILURE_TAX", (float)cromossome.at(i++));
         }
-        m_MapMutex.Unlock();
+        m_MapMutex.unlock();
 
         for (auto &pairIt : m_ConstsMap)
-            pairIt.second.Apply(this);
+            pairIt.second->Apply(this);
 
         m_EventListener->On<EH_GameConstsChanged>();
     }
 
-    float GameConsts::GetRawValue(const std::string &key)
+    std::vector<double> GameConsts::SaveToCromossome()
     {
-        m_MapMutex.Lock();
+        const static size_t geneCount = 27;
+        const static std::string cromossomeOrder[] = {
+            "ON_ATTACK_MULTIPLIER",
+            "POP_INCREASE_TAX",
+            "POP_PER_CONSTRUCTION",
+            "INIT_POP_VALUE",
+            "INIT_STAT_VALUE",
+            "ON_ATTACK_DECAY_TAX",
+            "NORMAL_DECAY_TAX",
+            "ATTACK_FREQUENCY",
+            "INIT_RESOURCES_VALUE",
+            "TAX_REDUCT",
+            "MIN_LOSS_0",
+            "MIN_LOSS_1",
+            "MIN_LOSS_2",
+            "MIN_LOSS_3",
+            "MAX_LOSS_0",
+            "MAX_LOSS_1",
+            "MAX_LOSS_2",
+            "MAX_LOSS_3",
+            "TOT_ROBOTS_INI",
+            "PROD_COST_INI",
+            "PROD_COST_INCREASE_TAX",
+            "TIME_STEP",
+            "INIT_TIME_STEP",
+            "MAX_TIME_STEPS",
+            "MIN_REWARD",
+            "REWARD_RANGE",
+            "FAILURE_TAX",
+        };
+        DE_ASSERT(sizeof(cromossomeOrder) / sizeof(std::string) == geneCount)
+
+        std::vector<double> cromossome;
+        for (unsigned int i = 0; i < geneCount; i++)
+        {
+            cromossome.push_back(GetRawValue(cromossomeOrder[i]));
+        }
+
+        return cromossome;
+    }
+
+    float GameConsts::GetRawValue(const std::string &key) const
+    {
+        m_MapMutex.lock();
         auto findIt = m_ConstsMap.find(key);
         DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
-        float val = findIt->second.CapturedValue;
-        m_MapMutex.Unlock();
+        float val = findIt->second->CapturedValue;
+        m_MapMutex.unlock();
         return val;
     }
 
-    float GameConsts::GetValue(const std::string &key)
+    float GameConsts::GetValue(const std::string &key) const
     {
-        m_MapMutex.Lock();
+        m_MapMutex.lock();
         auto findIt = m_ConstsMap.find(key);
         DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
-        float val = findIt->second.AppliedValue;
-        m_MapMutex.Unlock();
+        float val = findIt->second->AppliedValue;
+        m_MapMutex.unlock();
 
         return val;
     }
@@ -160,13 +212,11 @@ namespace Application
     void GameConsts::SetValue(const std::string &key, float newValue)
     {
         //ASSUMING MUTEX IS LOCKED
-        m_ConstsMap[key].Capture(newValue);
+        m_ConstsMap[key]->Capture(newValue);
     }
 
-    void GameConsts::SetOnValueChanged(EH_GameConstsChanged *eHandler)
-    {
-        m_EventListener->Register(eHandler);
-    }
+    void GameConsts::RegisterOnValueChanged(EH_GameConstsChanged *eHandler) const { m_EventListener->Register(eHandler); }
+    void GameConsts::UnregisterOnValueChanged(EH_GameConstsChanged *eHandler) const { m_EventListener->Unregister(eHandler); }
 
     void GameConsts::SetTickDelay(uint32_t newTickDelay)
     {
@@ -179,12 +229,16 @@ namespace Application
     {
         std::function<void()> handler(std::bind(&GameConstsCache::UpdateAll, this));
 
-        gameConsts.SetOnValueChanged(new EH_GameConstsChanged([handler]() {
+        m_GameConsts.RegisterOnValueChanged(new EH_GameConstsChanged([handler]() {
             handler();
             return false;
         }));
 
         UpdateAll();
+    }
+
+    GameConstsCache::~GameConstsCache()
+    {
     }
 
 } // namespace Application

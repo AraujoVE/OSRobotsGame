@@ -3,6 +3,10 @@ bin
 bin-int
 extras/annotations.txt
 gameScript.cfg
+
+vgcore*
+valgrindlog
+
 # Prerequisites
 *.d
 

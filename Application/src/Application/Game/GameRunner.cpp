@@ -16,52 +16,77 @@ namespace Application
     {
     }
 
-    GameRunner::GameRunner(const std::shared_ptr<GameSave> &gameSave) : m_GameSave(gameSave), m_GameConsts(&gameSave->GetGameConsts()), m_EventListener(new EventListener())
-    {
-    }
-
     GameRunner::~GameRunner()
     {
+        DE_DEBUG("Deleting m_EventListener @GameRunner::~GameRunner()");
         delete m_EventListener;
+        DE_DEBUG("Deleting m_GameSave @GameRunner::~GameRunner()");
+        delete m_GameSave;
     }
 
-    //TODO: use promises to call EH_GameStarted to assure game is totally started 
+    //TODO: use promises to call EH_GameStarted to assure game is totally started
     void GameRunner::Start()
-    {
+    {   
+        
+        m_GSMutex.lock();
         DE_ASSERT(!m_GameStatus.GameStarted, "Trying to start the game 2 times in the same runner");
 
-        DE_ASSERT(m_GameSave->GetVillageStats()->GetElapsedTimeTicks() == 0, "VillageStats is in an invalid statem, more than 0 ticks have been done");
-        DE_ASSERT(m_GameSave->GetVillageStats()->GetElapsedTimeTicks() == 0, "VillageStats is already decaying before game start");
-        // DE_ASSERT() ROBOTMAN
-
         //TODO: if someday the game needs to be saved, this will need to change
-        if (m_GameStatus.GameLost || true)
-        {
-            ResetSave();
-            m_GameStatus.GameLost = false;
-        }
+        // if (m_GameStatus.GameLost)
+        // {
+        ResetSave();
+        m_GameStatus.GameLost = false;
+        // }
+
+        VillageStats &villageStats = *m_GameSave->GetVillageStats();
+        SetupGameOverConditions();
+
+        std::promise<void> gameStartedPr;
+        std::future<void> gameStartedFut = gameStartedPr.get_future();
+        EH_DecaymentStarted *eventHandler = new EH_DecaymentStarted([&gameStartedPr] {
+            gameStartedPr.set_value();
+            return false;
+        });
+
+        villageStats.RegisterOnStatsDecaymentStarted(eventHandler);
+        villageStats.onGameStarted();
+        gameStartedFut.get();
 
         m_GameStatus.GameStarted = true;
         m_GameStatus.GamePaused = false;
-        
-        
+
+        DE_TRACE("Gamerunner finished starting");
+        m_GSMutex.unlock();
+
         m_EventListener->OnAsync<EH_GameStarted>(*this);
-        
-        SetupGameOverConditions();
-        //TODO: register villagestats::onGameStarted on GameRunner::m_EventListener ?
-        m_GameSave->GetVillageStats()->onGameStarted();
     }
 
     void GameRunner::Stop()
     {
-        DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running");
+        DE_TRACE("GameRunner::Stop()");
+        if (!m_GameStatus.GameStarted) return;
+        
+        m_GSMutex.lock();
+
+        auto elapsedTicks = m_GameSave->GetVillageStats()->GetElapsedTimeTicks();
+
+        DE_ASSERT(m_GameStatus.GameStarted, "Trying to stop a game that is not running (somehow)");
 
         m_GameStatus.GameStarted = false;
 
-
+        DE_TRACE("Stopping game: 0/3 @GameRunner::Stop()");
+        m_GameSave->GetRobotsManagement()->clearEvents();
+        DE_TRACE("Stopping game: 1/3 @GameRunner::Stop()");
+        m_GameSave->GetVillageStats()->ClearEvents();
+        DE_TRACE("Stopping game: 2/3 @GameRunner::Stop()");
         m_GameSave->GetVillageStats()->onGameEnded();
+        DE_TRACE("Stopping game: 3/3 @GameRunner::Stop()");
 
-        m_EventListener->OnAsync<EH_GameEnded>({*this, m_GameSave->GetVillageStats()->GetElapsedTimeTicks()});
+
+        m_GSMutex.unlock();
+
+        DE_TRACE("Emmiting EH_GameEnded @GameRunner::Stop()");
+        m_EventListener->OnAsync<EH_GameEnded>({*this, elapsedTicks});
         //TODO: promise to join TASK + VS ended callbacks
     }
 
@@ -78,9 +103,14 @@ namespace Application
 
     void GameRunner::OnGameLost(const std::string &reason)
     {
+        DE_INFO("(GameRunner::OnGameLost) Game Over! ['{0}']", reason);
+        m_GSMutex.lock();
         m_GameStatus.GameLost = true;
         m_GameStatus.GameLostReason = reason;
-        Stop();
+        m_GSMutex.unlock();
+
+        Action<> stopAction([=] { Stop(); });
+        stopAction.Invoke();
     }
 
     void GameRunner::ResetSave()
@@ -91,14 +121,16 @@ namespace Application
     //PRIVATE:
     void GameRunner::SetupGameOverConditions()
     {
-        auto *robotsManagement = m_GameSave->GetRobotsManagement().get();
-        auto *villageStats = m_GameSave->GetVillageStats().get();
-
+        auto *robotsManagement = m_GameSave->GetRobotsManagement();
+        auto *villageStats = m_GameSave->GetVillageStats();
 
         const static std::string noRobotsReason = "No more robots available!";
         const static std::string popuDeadReason = "Your population reached 0";
 
         robotsManagement->setOnRobotsDestroyed(new EH_RobotsDestroyed([=](int _) {
+            // m_GSMutex.lock();
+            // DE_ASSERT(m_GameStatus.GameStarted, "(GameRunner) EH_RobotsDestroyed before game started?????");
+            // m_GSMutex.unlock();
             if (robotsManagement->getTotRobots() <= 0 && villageStats->getResources() <= 0 && !IsGameLost())
             {
                 this->OnGameLost(noRobotsReason);
@@ -107,12 +139,17 @@ namespace Application
             return false;
         }));
 
-        villageStats->RegisterOnPopReachZero(new EH_DecaymentStopped([=]() {
-            DE_TRACE("(GameRunner) Received EH_DecaymentStopped");
+        //TODO?: event passes a reason (why it has stopped)
+        villageStats->RegisterOnStatsDecaymentStopped(new EH_DecaymentStopped([=]() {
+            // m_GSMutex.lock();
+            // DE_ASSERT(m_GameStatus.GameStarted, "(GameRunner) EH_DecaymentStopped before game started?????");
+            // m_GSMutex.unlock();
             if (villageStats->getPopulation() <= 0 && !IsGameLost())
             {
                 this->OnGameLost(popuDeadReason);
-            } else {
+            }
+            else
+            {
                 DE_TRACE("(GameRunner) Ignoring EH_DecaymentStopped, POP={0}, GameLost={1}", villageStats->getPopulation(), IsGameLost());
             }
 

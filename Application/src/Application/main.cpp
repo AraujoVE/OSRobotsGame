@@ -18,11 +18,14 @@
 #error "Boost needs to be installed on the system (tested with version 1.75)"
 #endif //!BOOST_VERSION
 
+//TODO: remove test includes
+#include "EvoAlg/Threads/ThreadController.hpp"
+#include "EvoAlg/ScriptRunner.hpp"
+#include "EvoAlg/ScriptConverter.hpp"
+#include "EvoAlg/Script.hpp"
+#include "EvoAlg/Types.hpp"
+
 //TODO: stop using optional to avoid cpphack.hpp
-
-
-//TODO: TICK_DELAY for Task and VilageStats:;decay
-//TODO: OnGameEnded -> sends VilageStats::decay threadloop tickCount to callback as "gameDurationInTicks"
 
 //TODO: unregister events
 
@@ -43,7 +46,7 @@ namespace Application
         {
             DE_TRACE("MyApplication::~MyApplication()");
         }
-        
+
         //TODO: Jogo versão normal ou calibração
         virtual void OnStart() override
         {
@@ -54,7 +57,6 @@ namespace Application
         {
             DE_TRACE("MyApplication::InitLayers()");
 
-
             // Simple Game Code:
             // GameConsts *gameConsts = new GameConsts();
             // gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
@@ -63,36 +65,36 @@ namespace Application
             // GameRunner *runner = new GameRunner(gameConsts);
             // m_GameGuiLayer->SetGameRunner(runner);
             // runner->Start();
-            // m_LayerStack.PushOverlay(m_GameGuiLayer); 
-           
+            // m_LayerStack.PushOverlay(m_GameGuiLayer);
+
             // EA Code:
-            m_GameGuiLayer = new GameGuiLayer();
-            m_EAGameGuiLayer = new EAGameGuiLayer();
-            m_LayerStack.PushOverlay(m_EAGameGuiLayer);
-            
-            auto *l_LayerStack = &m_LayerStack;
-            auto *l_GameGuiLayer = m_GameGuiLayer;
+            // m_GameGuiLayer = new GameGuiLayer();
+            // m_EAGameGuiLayer = new EAGameGuiLayer();
+            // m_LayerStack.PushOverlay(m_EAGameGuiLayer);
 
-            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGuiPropsChanged([=](const EvoAlg::EAGuiProps& newSettings) {
-                if (newSettings.ShowGame)
-                    l_LayerStack->PushOverlay(l_GameGuiLayer);
-                else
-                    l_LayerStack->PopOverlay(l_GameGuiLayer);
+            // auto *l_LayerStack = &m_LayerStack;
+            // auto *l_GameGuiLayer = m_GameGuiLayer;
 
-                l_GameGuiLayer->SetGameRunner(newSettings.MainGameRunner);
-                return false;
+            // m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGuiPropsChanged([=](const EvoAlg::EAGuiProps& newSettings) {
+            //     if (newSettings.ShowGame)
+            //         l_LayerStack->PushOverlay(l_GameGuiLayer);
+            //     else
+            //         l_LayerStack->PopOverlay(l_GameGuiLayer);
 
-            }));           
+            //     l_GameGuiLayer->SetGameRunner(newSettings.MainGameRunner);
+            //     return false;
+
+            // }));
         }
 
         virtual void OnUpdate() override
         {
+            Stop();
         }
 
         virtual void OnStop() override
         {
             DE_INFO("MyApplication::OnStop()");
-
         }
 
     private:
@@ -104,5 +106,47 @@ namespace Application
 
 DampEngine::Application *CreateApplication()
 {
+
+    int tests = 12e4;
+
+    while (tests-- > 0)
+    {
+
+        GameConsts *gameConsts = new GameConsts();
+        gameConsts->LoadFromFile(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_CONSTS));
+        gameConsts->SetTickDelay(1);
+
+        GameRunner *gameRunner = new GameRunner(gameConsts);
+
+        EvoAlg::ScriptConverter scriptConverter(Util::Path::getDefaultPath(Util::Path::ResourceType::GAME_SCRIPT_HUMAN_FOLDER));
+        EvoAlg::Script *script = scriptConverter.Convert();
+        EvoAlg::ScriptRunner scriptRunner(*script);
+
+        EvoAlg::GeneVec genes = gameConsts->SaveToCromossome();
+        EvoAlg::Individual indv{0, genes};
+
+        int test = 1;
+
+        if (test == 1)
+        {
+            gameRunner->Start();
+            gameRunner->Stop();
+            // usleep(10e6);
+        }
+
+        // scriptRunner.RunAllGameplays(*gameRunner, indv);
+
+        DE_TRACE("Deleting script");
+        delete script;
+
+        DE_TRACE("Deleting gameRunner");
+        delete gameRunner;
+        DE_TRACE("Deleting gameConsts");
+        delete gameConsts;
+    }
+
+    DE_TRACE("Ending Application");
+    exit(0);
+    return nullptr;
     return new Application::MyApplication();
 }

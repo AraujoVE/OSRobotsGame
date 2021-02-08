@@ -8,7 +8,7 @@ namespace Application::GameWindows
     class StatusWindow final : IGWindow
     {
     public:
-        StatusWindow(const std::unique_ptr<VillageStats> &villageStats)
+        StatusWindow(const VillageStats* villageStats)
             : IGWindow(ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar),
               m_VillageStatus(villageStats)
         {
@@ -50,7 +50,7 @@ namespace Application::GameWindows
         }
 
     private:
-        const std::unique_ptr<VillageStats> &m_VillageStatus;
+        const VillageStats* m_VillageStatus;
     };
 
 } // namespace Application::GameWindows

@@ -31,7 +31,7 @@ namespace Application
 
             TaskWindow(
                 TaskWindowProps taskWindowProps,
-                std::unique_ptr<Application::RobotsManagement> &robotsManagement,
+                RobotsManagement* robotsManagement,
                 Task &task,
                 OnTaskCancelledFn onTaskCancelledFn);
 
@@ -55,7 +55,7 @@ namespace Application
 
         private:
             TaskWindowProps m_TaskWindowProps;
-            std::unique_ptr<Application::RobotsManagement> &m_RobotsManagement;
+            RobotsManagement* m_RobotsManagement;
             Task &m_Task;
             std::string m_WindowName;
             OnTaskCancelledFn m_OnTaskCancelledFn;

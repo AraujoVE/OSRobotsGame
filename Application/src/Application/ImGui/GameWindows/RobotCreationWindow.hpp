@@ -13,7 +13,7 @@ namespace Application
         class RobotCreationWindow final : Application::IGWindow
         {
         public:
-            RobotCreationWindow(std::unique_ptr<Application::RobotsManagement> &robotsManagement)
+            RobotCreationWindow(Application::RobotsManagement *robotsManagement)
                 : IGWindow(ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse),
                   m_RobotsManagement(robotsManagement)
             {
@@ -25,7 +25,7 @@ namespace Application
             virtual void Render() override;
 
         private:
-            std::unique_ptr<Application::RobotsManagement> &m_RobotsManagement;
+            Application::RobotsManagement *m_RobotsManagement;
         };
     } // namespace GameWindows
 } // namespace Application
