@@ -13,8 +13,6 @@
 #include "Application/Threads/Action.hpp"
 
 
-#include <pthread.h>
-
 namespace Application
 {
     template <class EventHandlerType>

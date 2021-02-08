@@ -3,8 +3,6 @@
 #include "Application/ImGui/IGWindow.hpp"
 #include "Application/Game/Ingame/Task.hpp"
 
-#include "DampEngine/Threads/Mutex.hpp"
-
 #include <queue>
 
 namespace Application
@@ -32,7 +30,7 @@ namespace Application
         private:
         private:
 
-            DampEngine::Mutex m_TaskWindowMapMutex, m_TaskDeletionQueueMutex;
+            std::mutex m_TaskWindowMapMutex, m_TaskDeletionQueueMutex;
 
             RobotFunction m_Function;
             RobotsManagement* m_RobotsManagement;

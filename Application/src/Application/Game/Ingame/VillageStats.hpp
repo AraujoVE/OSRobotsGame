@@ -2,7 +2,6 @@
 
 #include "RobotFunctions.hpp"
 #include "Application/Threads/Avenue.hpp"
-#include <pthread.h>
 
 #include "Application/Events/EventListener/EventListener.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"

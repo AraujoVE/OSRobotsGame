@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DampEngine/Core/Layer.hpp"
-#include "DampEngine/Threads/Mutex.hpp"
+#include <mutex>
 
 namespace DampEngine
 {
@@ -26,8 +26,8 @@ namespace DampEngine
         //TODO: CURRENTLY SUPPORTS ONLY ONE GLFW WINDOW
         static int s_InstanceCount;
         static bool s_FrameBegun;
-        static Mutex s_FrameControlMutex;
-        static Mutex s_AttachDetachMutex;
+        static std::mutex s_FrameControlMutex;
+        static std::mutex s_AttachDetachMutex;
     };
 
 } // namespace DampEngine

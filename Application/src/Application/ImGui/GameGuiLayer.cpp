@@ -27,11 +27,11 @@ namespace Application
 
     void GameGuiLayer::SetGameRunner(GameRunner *newRunner)
     {
-        m_GameRunnerMutex.Lock();
+        m_GameRunnerMutex.lock();
         {
             if (m_GameRunner == newRunner)
             {
-                m_GameRunnerMutex.Unlock();
+                m_GameRunnerMutex.unlock();
                 return;
             }
 
@@ -49,12 +49,12 @@ namespace Application
                 m_GameRunner->RegisterOnGameStarted(m_GameStartedEventHandler);
             }
         }
-        m_GameRunnerMutex.Unlock();
+        m_GameRunnerMutex.unlock();
     }
 
     void GameGuiLayer::InitializeGameWindows()
     {
-        m_GameWindowsMutex.Lock();
+        m_GameWindowsMutex.lock();
         {
             DE_ASSERT(m_GameRunner != nullptr, "Trying to initialize game windows with no GameRunner attached");
 
@@ -76,12 +76,12 @@ namespace Application
             m_FunctionWindows[(int)RobotFunction::PROTECTION]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
             m_FunctionWindows[(int)RobotFunction::RESOURCE_GATHERING]->SetEventHandlers(m_GameRunner->GetSave().GetRobotsManagement());
         }
-        m_GameWindowsMutex.Unlock();
+        m_GameWindowsMutex.unlock();
     }
 
     void GameGuiLayer::DeinitializeGameWindows()
     {
-        m_GameWindowsMutex.Lock();
+        m_GameWindowsMutex.lock();
         {
             delete m_StatusWindow;
             m_StatusWindow = nullptr;
@@ -104,13 +104,13 @@ namespace Application
             delete m_RobotCreationWindow;
             m_RobotCreationWindow = nullptr;
         }
-        m_GameWindowsMutex.Unlock();
+        m_GameWindowsMutex.unlock();
     }
 
     void GameGuiLayer::ImGuiDescription()
     {
-        m_GameRunnerMutex.Lock();
-        m_GameWindowsMutex.Lock();
+        m_GameRunnerMutex.lock();
+        m_GameWindowsMutex.lock();
         {
             if (m_GameRunner == nullptr)
                 NoGameAttachedGuiDescription();
@@ -119,8 +119,8 @@ namespace Application
             else
                 MainGameGuiDescription();
         }
-        m_GameWindowsMutex.Unlock();
-        m_GameRunnerMutex.Unlock();
+        m_GameWindowsMutex.unlock();
+        m_GameRunnerMutex.unlock();
     }
 
     void GameGuiLayer::NoGameAttachedGuiDescription()

@@ -2,7 +2,6 @@
 
 #include "EventListener.fwd.hpp"
 
-#include "DampEngine/Threads/Mutex.hpp"
 
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 #include "Application/Events/EventHandler/IEventHandler.hpp"

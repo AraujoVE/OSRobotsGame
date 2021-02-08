@@ -26,7 +26,7 @@ namespace Application
     {
 
     private:
-        DampEngine::Mutex m_ValuesMutex;
+        std::mutex m_ValuesMutex;
         ParameterApplier valueApplierFn;
         std::vector<std::string> applierParameters;
 
@@ -45,16 +45,16 @@ namespace Application
 
         void Capture(float capturedValue)
         {
-            m_ValuesMutex.Lock();
+            m_ValuesMutex.lock();
             CapturedValue = capturedValue;
-            m_ValuesMutex.Unlock();
+            m_ValuesMutex.unlock();
         }
 
         void Apply(GameConsts *gameConsts)
         {
-            m_ValuesMutex.Lock();
+            m_ValuesMutex.lock();
             AppliedValue = valueApplierFn(gameConsts, CapturedValue, applierParameters);
-            m_ValuesMutex.Unlock();
+            m_ValuesMutex.unlock();
         }
     };
 
@@ -70,8 +70,8 @@ namespace Application
         uint32_t TICK_DELAY_MICRO = HUMAN_TICK_DELAY_MICRO;
 
         //Static to force all instances to open file synchronously
-        static DampEngine::Mutex s_FileMutex;
-        mutable DampEngine::Mutex m_MapMutex;
+        static std::mutex s_FileMutex;
+        mutable std::mutex m_MapMutex;
 
         void SetValue(const std::string &key, float newValue);
 

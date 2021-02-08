@@ -54,12 +54,12 @@ namespace Application::GameWindows
             m_RobotsManagement->createTask(m_Function);
 
         //Render children
-        m_TaskWindowMapMutex.Lock();
+        m_TaskWindowMapMutex.lock();
         {
             for (auto taskWindowPairIt = m_TaskWindowMap.begin(); taskWindowPairIt != m_TaskWindowMap.end(); taskWindowPairIt++)
                 taskWindowPairIt->second->Render();
         }
-        m_TaskWindowMapMutex.Unlock();
+        m_TaskWindowMapMutex.unlock();
     }
 
     void FunctionWindow::SetEventHandlers(RobotsManagement *robotsManagement)
@@ -69,7 +69,7 @@ namespace Application::GameWindows
             if (createdTask.GetRobotFunction() != thisFunction)
                 return false;
 
-            m_TaskWindowMapMutex.Lock();
+            m_TaskWindowMapMutex.lock();
             {
                 auto taskCanceledCallback = std::bind(&RobotsManagement::cancelTask, m_RobotsManagement, std::placeholders::_1);
                 TaskWindowProps associatedWindowProps = {m_TaskWindowMap.size(), m_WindowProps};
@@ -77,7 +77,7 @@ namespace Application::GameWindows
 
                 m_TaskWindowMap.insert({createdTask.GetID(), associatedWindow});
             }
-            m_TaskWindowMapMutex.Unlock();
+            m_TaskWindowMapMutex.unlock();
 
             return true;
         }));
@@ -96,7 +96,7 @@ namespace Application::GameWindows
 
     void FunctionWindow::ClearTaskWindows()
     {
-        m_TaskWindowMapMutex.Lock();
+        m_TaskWindowMapMutex.lock();
         {
             for (auto deletePair : m_TaskWindowMap)
             {
@@ -104,7 +104,7 @@ namespace Application::GameWindows
             }
             m_TaskWindowMap.clear();
         }
-        m_TaskWindowMapMutex.Unlock();
+        m_TaskWindowMapMutex.unlock();
     }
 
     void FunctionWindow::OnTaskEnded(Task &endedTask)
@@ -114,13 +114,13 @@ namespace Application::GameWindows
 
     void FunctionWindow::OnTaskEnded(int id)
     {
-        m_TaskWindowMapMutex.Lock();
+        m_TaskWindowMapMutex.lock();
         {
             auto windowIt = m_TaskWindowMap.find(id);
 
             if (windowIt == m_TaskWindowMap.end()) {
                 DE_WARN("(FunctionWindow::OnTaskEnded) Trying to end an unknown Task... Ignoring.\n\t (TODO: Make EAController wait for UI if ShowGame is on)");
-                m_TaskWindowMapMutex.Unlock();
+                m_TaskWindowMapMutex.unlock();
                 return;
             }
 
@@ -132,7 +132,7 @@ namespace Application::GameWindows
                 (windowIt->second)->SetIndex(i--);
             }
         }
-        m_TaskWindowMapMutex.Unlock();
+        m_TaskWindowMapMutex.unlock();
     }
 
 } // namespace Application::GameWindows

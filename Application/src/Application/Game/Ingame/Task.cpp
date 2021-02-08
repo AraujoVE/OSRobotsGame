@@ -44,12 +44,12 @@ namespace Application
 
     Task::~Task()
     {
-        m_ELMutex.Lock();
+        m_ELMutex.lock();
         {
             delete m_EventListener;
             m_EventListener = nullptr;
         }
-        m_ELMutex.Unlock();
+        m_ELMutex.unlock();
 
         m_ThreadLoop->Abandon();
     }
@@ -98,17 +98,17 @@ namespace Application
 
     bool Task::OnThreadLoopStarted()
     {
-        m_ELMutex.Lock();
+        m_ELMutex.lock();
         {
             m_EventListener->On<EH_TaskStarted>(*this);
         }
-        m_ELMutex.Unlock();
+        m_ELMutex.unlock();
         return false;
     }
     
     bool Task::OnThreadLoopEnded(ThreadEndedReason::ThreadEndedReason_t reason)
     {
-        m_ELMutex.Lock();
+        m_ELMutex.lock();
         if (m_EventListener != nullptr)
         {
             switch (reason)
@@ -121,7 +121,7 @@ namespace Application
                     break;
             }
         }
-        m_ELMutex.Unlock();
+        m_ELMutex.unlock();
 
         return false;
     }

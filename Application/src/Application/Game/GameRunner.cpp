@@ -141,7 +141,7 @@ namespace Application
 
         //TODO?: event passes a reason (why it has stopped)
         villageStats->RegisterOnStatsDecaymentStopped(new EH_DecaymentStopped([=]() {
-            // m_GSMutex.Lock();
+            // m_GSMutex.lock();
             // DE_ASSERT(m_GameStatus.GameStarted, "(GameRunner) EH_DecaymentStopped before game started?????");
             // m_GSMutex.unlock();
             if (villageStats->getPopulation() <= 0 && !IsGameLost())

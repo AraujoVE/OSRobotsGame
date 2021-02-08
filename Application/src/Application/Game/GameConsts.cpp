@@ -6,8 +6,6 @@
 
 #include "mypch.hpp"
 
-#include "DampEngine/Threads/Mutex.hpp"
-
 namespace Application
 {
 
@@ -56,13 +54,13 @@ namespace Application
 
     GameConsts::~GameConsts() { delete m_EventListener; }
 
-    DampEngine::Mutex GameConsts::s_FileMutex;
+    std::mutex GameConsts::s_FileMutex;
     void GameConsts::LoadFromFile(const std::string &srcFile)
     {
         DE_DEBUG("GameConsts::LoadFromFile START");
 
-        s_FileMutex.Lock();
-        m_MapMutex.Lock();
+        s_FileMutex.lock();
+        m_MapMutex.lock();
         {
             std::fstream myFile;
             int tokenPos;
@@ -84,8 +82,8 @@ namespace Application
 
             myFile.close();
         }
-        m_MapMutex.Unlock();
-        s_FileMutex.Unlock();
+        m_MapMutex.unlock();
+        s_FileMutex.unlock();
 
         for (auto &pairIt : m_ConstsMap)
             pairIt.second.Apply(this);
@@ -97,7 +95,7 @@ namespace Application
 
     void GameConsts::LoadFromCromossome(const std::vector<double> &cromossome)
     {
-        m_MapMutex.Lock();
+        m_MapMutex.lock();
         {
             DE_ASSERT(cromossome.size() == 27, "(GameConsts::LoadFromCromossome) WRONG CROMOSSOME INFORMED")
             int i = 0;
@@ -129,7 +127,7 @@ namespace Application
             SetValue("REWARD_RANGE", (float)cromossome.at(i++));
             SetValue("FAILURE_TAX", (float)cromossome.at(i++));
         }
-        m_MapMutex.Unlock();
+        m_MapMutex.unlock();
 
         for (auto &pairIt : m_ConstsMap)
             pairIt.second.Apply(this);
@@ -152,21 +150,21 @@ namespace Application
 
     float GameConsts::GetRawValue(const std::string &key) const
     {
-        m_MapMutex.Lock();
+        m_MapMutex.lock();
         auto findIt = m_ConstsMap.find(key);
         DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
         float val = findIt->second.CapturedValue;
-        m_MapMutex.Unlock();
+        m_MapMutex.unlock();
         return val;
     }
 
     float GameConsts::GetValue(const std::string &key) const
     {
-        m_MapMutex.Lock();
+        m_MapMutex.lock();
         auto findIt = m_ConstsMap.find(key);
         DE_ASSERT(findIt != m_ConstsMap.end(), "(CONSTSMAP) MISSING KEY: '" + key + "'");
         float val = findIt->second.AppliedValue;
-        m_MapMutex.Unlock();
+        m_MapMutex.unlock();
 
         return val;
     }
