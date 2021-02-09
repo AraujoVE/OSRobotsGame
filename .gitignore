@@ -44,5 +44,4 @@ valgrindlog
 .vscode
 
 # CSV
-.csv
-history*.csv
+*.csv
