@@ -10,6 +10,7 @@
 
 #include "Application/Game/GameConsts.hpp"
 
+
 using namespace EvoAlg;
 namespace Application
 {
@@ -33,25 +34,24 @@ namespace Application
         ));
     }
 
+
     void EAGameGuiLayer::ImGuiDescription()
     {
-        bool settingsChanged = false;
+        #define BTN(code, btnenum) { if( (code) && pressedButton == NONE) pressedButton = btnenum; } 
+        enum PressedButton : uint8_t {
+            NONE = 0, START_EA, ABORT_EA
+        };
 
-        static int a = 0;
+        PressedButton pressedButton = NONE;
+        
         ImGui::Begin("Settings");
         {
             // settingsChanged |= ImGui::Checkbox("Show game", &m_EAGuiProps.ShowGame);
 
             ImGui::Text("Current Running Threads: 0");
-            ImGui::SliderInt("Max threads", &a, 1, 10);
+            ImGui::SliderInt("Max threads", (int*)&m_EAGuiProps.m_Settings.SelectedMaxThreads, 1, 10);
         }
         ImGui::End();
-
-        // uint32_t gameSpeed = 0, min = 1, max = 500e3;
-
-        // if (m_EAGuiProps.MainGameRunner != nullptr)
-        //     gameSpeed = m_EAGuiProps.MainGameRunner->GetGameConsts().GetTickDelay();
-        // uint32_t receivedSpeed = gameSpeed;
 
         const EAStatus &eaStatus = m_EAController->GetStatus();
         static const char *const stageMessage[] = {
@@ -61,20 +61,17 @@ namespace Application
             "FINISHED",
             "ABORTED"};
 
-        unsigned int oldTickDelay = 0;
-        unsigned int gameSpeed = oldTickDelay, min = 5, max = 1e6;
-
-        bool startPressed = false, abortPressed = false;
         ImGui::Begin("EAStatus");
         {
             ImGui::Text("Evolutionary Algorithm (stage: %s)", stageMessage[(int)eaStatus.m_ExecutionInfo.Stage]);
-            startPressed = ImGui::Button("Start EA");
+            BTN(ImGui::Button("Start EA"), START_EA);
             ImGui::SameLine();
-            abortPressed = ImGui::Button("Abort EA");
-            // ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.Pause);
+            BTN(ImGui::Button("Abort EA"), ABORT_EA);
+            ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.m_Settings.Paused);
 
             //TODO: *** currently not updating ThreadLoop ***
-            ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
+            const static uint32_t minTickDelay = 1, maxTickDelay = 10e6;
+            ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &m_EAGuiProps.m_Settings.SelectedTickDelay, &minTickDelay, &maxTickDelay, NULL, ImGuiSliderFlags_Logarithmic);
 
             ImGui::Text("Current Generation: %lu", eaStatus.m_EvolutionInfo.CurrentGeneration);
 
@@ -94,25 +91,10 @@ namespace Application
         }
         ImGui::End();
 
-        if (oldTickDelay != gameSpeed)
-        {
-            // m_EAGuiProps.MainGameRunner->GetGameConsts().SetTickDelay(gameSpeed);
-        }
-
-        if (settingsChanged)
-        {
-            m_EventListener.OnAsync<EH_GuiPropsChanged>(m_EAGuiProps);
-        }
-
-        if (startPressed && !m_EAController->IsRunning())
+        if (pressedButton == START_EA && !m_EAController->IsRunning())
         {
             m_EAController->Start();
         }
-
-        // if (gameSpeed != receivedSpeed)
-        // {
-        //     m_EAGuiProps.MainGameRunner->GetGameConsts().SetTickDelay(gameSpeed);
-        // }
     }
 
 } // namespace Application
