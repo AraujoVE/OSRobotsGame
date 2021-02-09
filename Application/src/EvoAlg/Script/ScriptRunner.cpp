@@ -59,16 +59,17 @@ namespace EvoAlg
         }
     }
 
-    std::vector<TimeResult> *ScriptRunner::RunAllGameplays(GameRunner &gameRunner, Individual &individual)
+    std::vector<TimeResult> ScriptRunner::RunAllGameplays(GameRunner &gameRunner, Individual &individual)
     {
 
-        auto *gameplaysResults = new std::vector<TimeResult>();
+        std::vector<TimeResult> gameplaysResults;
         uint64_t gameplayCount = m_GameScript.size();
 
         //TODO?: async calling more gameplays (respecting MAX_THREADS) [problem with unique m_GameRunner]
         for (uint64_t curGameplayIdx = 0; curGameplayIdx < gameplayCount; curGameplayIdx++)
-        {
-            gameplaysResults->push_back(RunGameplay(gameRunner, individual, curGameplayIdx));
+        {  
+            TimeResult gameplayResult = RunGameplay(gameRunner, individual, curGameplayIdx);
+            gameplaysResults.push_back(gameplayResult);
             DE_TRACE("(ScriptRunner -- {0}) Changing gameplay ", individual.ID);
         }
 

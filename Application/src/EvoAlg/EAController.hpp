@@ -3,6 +3,7 @@
 #include "EvoAlg/EvolutionaryAlgorithm.hpp"
 
 #include "EvoAlg/Types.hpp"
+#include "EvoAlg/Gui/EAGuiProps.hpp"
 #include "EvoAlg/Script/Script.hpp"
 #include "EvoAlg/EAStatus.hpp"
 

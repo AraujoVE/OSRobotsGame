@@ -65,7 +65,7 @@ namespace EvoAlg
         void initScriptDirections();
 
         
-        std::vector<TimeResult> *RunAllGameplays(GameRunner&, Individual&);
+        std::vector<TimeResult> RunAllGameplays(GameRunner&, Individual&);
         TimeResult RunGameplay(GameRunner&, Individual&, uint64_t gameplayIndex);
        
 

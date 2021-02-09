@@ -33,7 +33,7 @@ namespace EvoAlg
         });
         rpig.Invoke();
     }
-    
+
     //TODO: implement
     void EAController::Cancel()
     {
@@ -49,18 +49,10 @@ namespace EvoAlg
         DE_DEBUG("EAController::RunPopulationInGame()");
         //Index of array corresponds to IndividualID
 
-        // ThreadController threadController;
-
-        //TODO: change
-        m_GuiProps.MainGameRunner = nullptr;
-
-        //TODO: event EH_GGuiGameAttached (wait for UI to be ready (only if ShowGame is true))
-        // usleep(1);
-
-        std::vector<void *> pointersPendingDeletion;
-
         ScriptRunner scriptRunner(*m_Script);
 
+        // Code Multithreaded (WIP):
+        // ThreadController threadController;
         // for (unsigned int i = 0; i < populationGenes.size(); i++)
         // {
         //     threadController.AddIndividual(Individual{i, populationGenes[i]});
@@ -68,13 +60,19 @@ namespace EvoAlg
 
         // std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteAllIndividuals(scriptRunner);
 
-        //TODO: REMOVE TEMP TEST AFTER PRESENTATION
+        //Code Single Threaded:
+
+        ThreadID singleThreadID = 0;
+
         static bool first = true;
         static GameConsts *gameConsts = new GameConsts();
         static GameRunner *singleThreadGR = new GameRunner(gameConsts);
-        if (first) { gameConsts->SetTickDelay(1); first = false; } 
-        m_GuiProps.MainGameRunner = singleThreadGR;
-
+        if (first)
+        {
+            first = false;
+            gameConsts->SetTickDelay(1);
+            m_GuiProps.UpdateGameRunner(singleThreadID, singleThreadGR);
+        }
 
         std::vector<IndividualRunResult> gameplayResults;
         gameplayResults.reserve(populationGenes.size());
@@ -83,7 +81,8 @@ namespace EvoAlg
         {
             Individual indv{i, populationGenes[i]};
             gameConsts->LoadFromCromossome(populationGenes[i]);
-            gameplayResults.push_back(*scriptRunner.RunAllGameplays(*singleThreadGR, indv));
+            std::vector<TimeResult> individualResult = scriptRunner.RunAllGameplays(*singleThreadGR, indv);
+            gameplayResults.push_back(individualResult);
             DE_TRACE("Indo pro próximo individuo.");
         }
 

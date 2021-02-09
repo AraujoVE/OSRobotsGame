@@ -56,27 +56,27 @@ namespace EvoAlg
             GameRunner *currentRunner = new GameRunner(currentConsts);
 
 
-            auto executeAllGameplaysFn = [=, &scriptRunner, &gambiarra, &individual]() {
-                //TODO: support more threads per individual (assuming only one for all gameplays)
-                // indvRun.scriptRunner->RunGameplay(gamplInd, customGameRunner);
+            // auto executeAllGameplaysFn = [=, &scriptRunner, &gambiarra, &individual]() {
+            //     //TODO: support more threads per individual (assuming only one for all gameplays)
+            //     // indvRun.scriptRunner->RunGameplay(gamplInd, customGameRunner);
 
-                auto *threadRet = scriptRunner.RunAllGameplays(*currentRunner, individual);
+            //     auto *threadRet = scriptRunner.RunAllGameplays(*currentRunner, individual);
 
-                delete currentRunner;
-                delete currentConsts;
+            //     delete currentRunner;
+            //     delete currentConsts;
 
-                if (forceSync)
-                    gambiarra.unlock();
+            //     if (forceSync)
+            //         gambiarra.unlock();
 
-                return threadRet;
-            };
+            //     return threadRet;
+            // };
 
             m_QueuedIndividuals.pop();
 
             if (forceSync)
                 gambiarra.lock();        
 
-            futureVec.push_back(std::async(executeAllGameplaysFn));
+            // futureVec.push_back(std::async(executeAllGameplaysFn));
             
         }
 

@@ -1,5 +1,7 @@
 #include "Application/ImGui/EAGameGuiLayer.hpp"
 
+#include "Application/ImGui/GameGuiLayer.hpp"
+
 #include "Application/Game/GameSave.hpp"
 #include "Application/Game/GameRunner.hpp"
 #include "Application/Game/Ingame/VillageStats.hpp"
@@ -17,6 +19,20 @@ namespace Application
     {
     }
 
+    void EAGameGuiLayer::SetGameGuiLayer(GameGuiLayer *guiLayer)
+    {
+        DE_ASSERT(m_GameGuiLayer == nullptr);
+        m_GameGuiLayer = guiLayer;
+
+        m_EAGuiProps.RegisterEAGameRunnerChanged(new EH_GameRunnerChanged(
+            [guiLayer](ThreadID threadID, GameRunner *newGameRunner) {
+                DE_ASSERT(threadID == 0, "multi-thread not yet supported!");
+                guiLayer->SetGameRunner(newGameRunner);
+                return false;
+            }
+        ));
+    }
+
     void EAGameGuiLayer::ImGuiDescription()
     {
         bool settingsChanged = false;
@@ -24,7 +40,7 @@ namespace Application
         static int a = 0;
         ImGui::Begin("Settings");
         {
-            settingsChanged |= ImGui::Checkbox("Show game", &m_EAGuiProps.ShowGame);
+            // settingsChanged |= ImGui::Checkbox("Show game", &m_EAGuiProps.ShowGame);
 
             ImGui::Text("Current Running Threads: 0");
             ImGui::SliderInt("Max threads", &a, 1, 10);
@@ -46,8 +62,6 @@ namespace Application
             "ABORTED"};
 
         unsigned int oldTickDelay = 0;
-        if (m_EAGuiProps.MainGameRunner != nullptr)
-            oldTickDelay = m_EAGuiProps.MainGameRunner->GetGameConsts().GetTickDelay();
         unsigned int gameSpeed = oldTickDelay, min = 5, max = 1e6;
 
         bool startPressed = false, abortPressed = false;
@@ -57,8 +71,8 @@ namespace Application
             startPressed = ImGui::Button("Start EA");
             ImGui::SameLine();
             abortPressed = ImGui::Button("Abort EA");
-            ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.Pause);
-            
+            // ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.Pause);
+
             //TODO: *** currently not updating ThreadLoop ***
             ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &gameSpeed, &min, &max, NULL, ImGuiSliderFlags_Logarithmic);
 
@@ -82,12 +96,12 @@ namespace Application
 
         if (oldTickDelay != gameSpeed)
         {
-            m_EAGuiProps.MainGameRunner->GetGameConsts().SetTickDelay(gameSpeed);
+            // m_EAGuiProps.MainGameRunner->GetGameConsts().SetTickDelay(gameSpeed);
         }
 
         if (settingsChanged)
         {
-            m_EventListener.OnAsync<EH_EAGuiPropsChanged>(m_EAGuiProps);
+            m_EventListener.OnAsync<EH_GuiPropsChanged>(m_EAGuiProps);
         }
 
         if (startPressed && !m_EAController->IsRunning())

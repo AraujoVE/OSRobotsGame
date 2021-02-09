@@ -20,16 +20,4 @@ namespace EvoAlg
     
     //Index of vector corresponds to gameplay ID, which is in range [0, inf[
     using IndividualRunResult = std::vector<TimeResult>;
-
-
-    struct EAGuiProps
-    {
-        bool
-            ShowGame = false,
-            Pause = false;
-
-        Application::GameRunner *MainGameRunner = nullptr;
-    };
-
-
 } // namespace EvoAlg

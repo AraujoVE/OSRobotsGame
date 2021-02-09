@@ -72,21 +72,11 @@ namespace Application
             // EA Code:
             m_GameGuiLayer = new GameGuiLayer();
             m_EAGameGuiLayer = new EAGameGuiLayer();
+
+            m_EAGameGuiLayer->SetGameGuiLayer(m_GameGuiLayer);
+
             m_LayerStack.PushOverlay(m_EAGameGuiLayer);
 
-            auto *l_LayerStack = &m_LayerStack;
-            auto *l_GameGuiLayer = m_GameGuiLayer;
-
-            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGuiPropsChanged([=](const EvoAlg::EAGuiProps& newSettings) {
-                if (newSettings.ShowGame)
-                    l_LayerStack->PushOverlay(l_GameGuiLayer);
-                else
-                    l_LayerStack->PopOverlay(l_GameGuiLayer);
-
-                l_GameGuiLayer->SetGameRunner(newSettings.MainGameRunner);
-                return false;
-
-            }));
         }
 
         virtual void OnUpdate() override
