@@ -40,6 +40,9 @@ namespace Application
         EvoAlg::EAController *m_EAController;
         EventListener m_EventListener;
 
+        uint8_t elapsedGuiTicks = 0;
+        //TODO: this should probably not be dependent on tick count
+        const uint8_t ticksPerFlush = 30; //aprox. 500ms between flushs if 60fps
 
         Application::GameGuiLayer *m_GameGuiLayer = nullptr;
         EvoAlg::EAGuiProps m_EAGuiProps;

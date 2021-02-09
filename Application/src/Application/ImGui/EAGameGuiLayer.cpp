@@ -10,6 +10,7 @@
 
 #include "Application/Game/GameConsts.hpp"
 
+#include "mypch.hpp"
 
 using namespace EvoAlg;
 namespace Application
@@ -49,7 +50,9 @@ namespace Application
             // settingsChanged |= ImGui::Checkbox("Show game", &m_EAGuiProps.ShowGame);
 
             ImGui::Text("Current Running Threads: 0");
-            ImGui::SliderInt("Max threads", (int*)&m_EAGuiProps.m_Settings.SelectedMaxThreads, 1, 10);
+            const static uint8_t minThreads = 1, maxThreads = std::max(5U, std::thread::hardware_concurrency());
+            ImGui::SliderScalar("Max threads", ImGuiDataType_U8, &m_EAGuiProps.m_Settings.SelectedMaxThreads, &minThreads, &maxThreads, NULL, ImGuiSliderFlags_Logarithmic);
+
         }
         ImGui::End();
 
@@ -70,8 +73,8 @@ namespace Application
             ImGui::Checkbox("Pause EA and Game", &m_EAGuiProps.m_Settings.Paused);
 
             //TODO: *** currently not updating ThreadLoop ***
-            const static uint32_t minTickDelay = 1, maxTickDelay = 10e6;
-            ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &m_EAGuiProps.m_Settings.SelectedTickDelay, &minTickDelay, &maxTickDelay, NULL, ImGuiSliderFlags_Logarithmic);
+            const static uint32_t minTickDelay = 0, maxTickDelay = 500e3;
+            ImGui::SliderScalar("Tick Delay", ImGuiDataType_U32, &m_EAGuiProps.m_Settings.SelectedTickDelay, &minTickDelay, &maxTickDelay, NULL, ImGuiSliderFlags_ClampOnInput);
 
             ImGui::Text("Current Generation: %lu", eaStatus.m_EvolutionInfo.CurrentGeneration);
 
@@ -95,6 +98,13 @@ namespace Application
         {
             m_EAController->Start();
         }
+        else if (pressedButton == ABORT_EA && m_EAController->IsRunning())
+        {
+            m_EAController->Cancel();
+        }
+
+        if (elapsedGuiTicks++ % ticksPerFlush)
+            m_EAGuiProps.FlushSettings(*m_EAController);
     }
 
 } // namespace Application

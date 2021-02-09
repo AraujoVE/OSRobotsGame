@@ -13,6 +13,7 @@ namespace EvoAlg
     class EAGuiProps
     {
 
+        //TODO: make multi-game (multi-thread) support
         struct EAGuiSettings {
             bool Paused = false;
 
@@ -27,6 +28,9 @@ namespace EvoAlg
         Application::EventListener m_EventListener;
 
     public:
+        void FlushSettings(EAController&);
+        
+
         void UpdateGameRunner(ThreadID threadID, Application::GameRunner *gameRunner)
         {
             auto findIt = m_GameRunnerThreadMap.find(threadID);

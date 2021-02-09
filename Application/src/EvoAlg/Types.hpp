@@ -6,6 +6,9 @@
 
 namespace EvoAlg
 {
+    class EAController;
+
+
     using ThreadID = uint64_t;
     using GeneVec = std::vector<double>;
     

@@ -93,15 +93,10 @@ namespace Application
         //TODO: promise to join TASK + VS ended callbacks
     }
 
-    void GameRunner::Pause()
+    void GameRunner::Pause(bool paused)
     {
-        m_GameStatus.GamePaused = true;
-        m_GameSave->GetVillageStats()->setStatsDecaymentPaused(true);
-    }
-    void GameRunner::Unpause()
-    {
-        m_GameStatus.GamePaused = false;
-        m_GameSave->GetVillageStats()->setStatsDecaymentPaused(false);
+        m_GameStatus.GamePaused = paused;
+        m_GameSave->GetVillageStats()->setStatsDecaymentPaused(paused);
     }
 
     void GameRunner::OnGameLost(const std::string &reason)
