@@ -1,13 +1,12 @@
 #pragma once
 
+#include "Application/Game/Types.fwd.hpp"
 #include <vector>
 
-namespace Application {
-    class GameRunner;
-}
 
 namespace EvoAlg
 {
+    using ThreadID = uint64_t;
     using GeneVec = std::vector<double>;
     
     struct Individual {

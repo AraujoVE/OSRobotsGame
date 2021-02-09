@@ -6,6 +6,7 @@
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 
 #include "Application/Game/Types.fwd.hpp"
+#include "EvoAlg/Types.hpp"
 
 #include <string>
 
@@ -40,5 +41,6 @@ namespace Application
 
     /* EA HANDLERS */
     DA_EVENT(EH_EAScriptEnded, bool, int /* individualIndex */, std::vector<std::pair<double, double>> /* gameplayResults */);
+    DA_EVENT(EH_EAGameRunnerChanged, bool, EvoAlg::ThreadID, GameRunner* /* new game runner, nullable*/);
 
 } // namespace Application
