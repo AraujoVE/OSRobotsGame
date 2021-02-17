@@ -6,6 +6,7 @@
 #include "Application/Events/EventHandler/EventHandler.template.hpp"
 
 #include "Application/Game/Types.fwd.hpp"
+#include "EvoAlg/Types.hpp"
 
 #include <string>
 
@@ -32,13 +33,20 @@ namespace Application
     DA_EVENT(EH_ThreadStarted, bool);
     DA_EVENT(EH_ThreadEnded, bool, ThreadEndedReason::ThreadEndedReason_t);
 
-    /* EAGAME GUI LAYER EVENTS */
-    DA_EVENT(EH_EAGuiPropsChanged, bool, const EvoAlg::EAGuiProps &);
-
     /* GAME CONSTS EVENTS */
     DA_EVENT(EH_GameConstsChanged, bool);
 
-    /* EA HANDLERS */
-    DA_EVENT(EH_EAScriptEnded, bool, int /* individualIndex */, std::vector<std::pair<double, double>> /* gameplayResults */);
+    
 
 } // namespace Application
+
+
+namespace EvoAlg {
+    //TODO?: remove
+    /* EAGAME GUI LAYER EVENTS */
+    DA_EVENT(EH_GuiPropsChanged, bool, const EvoAlg::EAGuiProps &);
+
+    /* EA HANDLERS */
+    DA_EVENT(EH_ScriptEnded, bool, int /* individualIndex */, std::vector<std::pair<double, double>> /* gameplayResults */);
+    DA_EVENT(EH_GameRunnerChanged, bool, EvoAlg::ThreadID, Application::GameRunner* /* new game runner, nullable*/);
+}

@@ -1,9 +1,9 @@
 #pragma once
 
 #define DA_EVENT(name, R, ...) \
-    class name: public EventHandler<R, ## __VA_ARGS__> { \
+    class name: public Application::EventHandler<R, ## __VA_ARGS__> { \
     public: \
-        name(std::function< R(__VA_ARGS__) > handler): EventHandler::EventHandler(handler, #name) {} \
+        name(std::function< R(__VA_ARGS__) > handler): Application::EventHandler<R, ## __VA_ARGS__>::EventHandler(handler, #name) {} \
         virtual const std::string GetType() override { return #name; } \
         static const std::string GetTypeStatic() { return #name; } \
     };

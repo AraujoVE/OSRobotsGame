@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EvoAlg/Types.hpp"
-#include "EvoAlg/ScriptRunner.hpp"
+#include "EvoAlg/Script/ScriptRunner.hpp"
 #include "Application/Game/GameRunner.hpp"
 
 #include <stdint.h>

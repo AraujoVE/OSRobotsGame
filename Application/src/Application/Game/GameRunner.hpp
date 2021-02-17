@@ -37,8 +37,8 @@ namespace Application
         void Stop();
         void ResetSave();
 
-        void Pause();
-        void Unpause();
+        void Pause(bool paused = true);
+        inline void Unpause() { Pause(false); };
 
         void OnGameLost(const std::string &reason);
 
