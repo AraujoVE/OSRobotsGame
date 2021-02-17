@@ -5,7 +5,7 @@
 #include "Application/ImGui/EAGameGuiLayer.hpp"
 #include "Application/Game/GameConsts.hpp"
 
-#include "EvoAlg/ScriptConverter.hpp"
+#include "EvoAlg/Script/ScriptConverter.hpp"
 
 #include "Application/Game/Ingame/RobotsManagement.hpp"
 #include "Application/Game/Ingame/VillageStats.hpp"
@@ -22,14 +22,14 @@
 #include "Application/Threads/ThreadLoop.hpp"
 #include "Application/Events/EventHandler/DefaultHandlers.hpp"
 #include "EvoAlg/Threads/ThreadController.hpp"
-#include "EvoAlg/ScriptRunner.hpp"
-#include "EvoAlg/ScriptConverter.hpp"
-#include "EvoAlg/Script.hpp"
+#include "EvoAlg/Script/ScriptRunner.hpp"
+#include "EvoAlg/Script/ScriptConverter.hpp"
+#include "EvoAlg/Script/Script.hpp"
 #include "EvoAlg/Types.hpp"
 
 //TODO: stop using optional to avoid cpphack.hpp
 
-//TODO: unregister events
+//TODO: unregister events. done?
 
 namespace Application
 {
@@ -72,21 +72,11 @@ namespace Application
             // EA Code:
             m_GameGuiLayer = new GameGuiLayer();
             m_EAGameGuiLayer = new EAGameGuiLayer();
+
+            m_EAGameGuiLayer->SetGameGuiLayer(m_GameGuiLayer);
+
             m_LayerStack.PushOverlay(m_EAGameGuiLayer);
 
-            auto *l_LayerStack = &m_LayerStack;
-            auto *l_GameGuiLayer = m_GameGuiLayer;
-
-            m_EAGameGuiLayer->SetOnSettingsChanged(new EH_EAGuiPropsChanged([=](const EvoAlg::EAGuiProps& newSettings) {
-                if (newSettings.ShowGame)
-                    l_LayerStack->PushOverlay(l_GameGuiLayer);
-                else
-                    l_LayerStack->PopOverlay(l_GameGuiLayer);
-
-                l_GameGuiLayer->SetGameRunner(newSettings.MainGameRunner);
-                return false;
-
-            }));
         }
 
         virtual void OnUpdate() override
