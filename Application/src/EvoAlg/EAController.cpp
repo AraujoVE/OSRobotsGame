@@ -52,46 +52,46 @@ namespace EvoAlg
         ScriptRunner scriptRunner(*m_Script);
 
         // Code Multithreaded (WIP):
-        // ThreadController threadController;
-        // for (unsigned int i = 0; i < populationGenes.size(); i++)
-        // {
-        //     threadController.AddIndividual(Individual{i, populationGenes[i]});
-        // }
+        ThreadController threadController;
+        for (unsigned int i = 0; i < populationGenes.size(); i++)
+        {
+            threadController.AddIndividual(Individual{i, populationGenes[i]});
+        }
 
-        // std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteAllIndividuals(scriptRunner);
+        std::vector<IndividualRunResult> gameplayResults = threadController.ExecuteAllIndividuals(scriptRunner);
 
         //Code Single Threaded:
 
-        ThreadID singleThreadID = 0;
+        // ThreadID singleThreadID = 0;
 
-        static bool first = true;
-        static GameConsts *gameConsts = new GameConsts();
-        static GameRunner *singleThreadGR = new GameRunner(gameConsts);
-        if (first)
-        {
-            first = false;
-            gameConsts->SetTickDelay(1);
-            m_GuiProps.UpdateGameRunner(singleThreadID, singleThreadGR);
-        }
+        // static bool first = true;
+        // static GameConsts *gameConsts = new GameConsts();
+        // static GameRunner *singleThreadGR = new GameRunner(gameConsts);
+        // if (first)
+        // {
+        //     first = false;
+        //     gameConsts->SetTickDelay(1);
+        //     m_GuiProps.UpdateGameRunner(singleThreadID, singleThreadGR);
+        // }
 
-        std::vector<IndividualRunResult> gameplayResults;
-        gameplayResults.reserve(populationGenes.size());
+        // std::vector<IndividualRunResult> gameplayResults;
+        // gameplayResults.reserve(populationGenes.size());
 
-        for (unsigned int i = 0; i < populationGenes.size(); i++)
-        {
-            Individual indv{i, populationGenes[i]};
-            gameConsts->LoadFromCromossome(populationGenes[i]);
-            std::vector<TimeResult> individualResult = scriptRunner.RunAllGameplays(*singleThreadGR, indv);
-            gameplayResults.push_back(individualResult);
-            DE_TRACE("Indo pro próximo individuo.");
-        }
+        // for (unsigned int i = 0; i < populationGenes.size(); i++)
+        // {
+        //     Individual indv{i, populationGenes[i]};
+        //     gameConsts->LoadFromCromossome(populationGenes[i]);
+        //     std::vector<TimeResult> individualResult = scriptRunner.RunAllGameplays(*singleThreadGR, indv);
+        //     gameplayResults.push_back(individualResult);
+        //     DE_TRACE("Indo pro próximo individuo.");
+        // }
 
-        m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
+        // m_Status.m_ExecutionInfo.Stage = EAStage::WAITING_GENERATION;
 
-        //TODO: send m_EvolutionInfo to EvolutionaryAlgorithm.cpp to get more info, such as best and worst fitness, etc...
-        m_Status.m_EvolutionInfo.CurrentGeneration++;
+        // //TODO: send m_EvolutionInfo to EvolutionaryAlgorithm.cpp to get more info, such as best and worst fitness, etc...
+        // m_Status.m_EvolutionInfo.CurrentGeneration++;
 
-        // usleep(5e2);
+        // // usleep(5e2);
 
         return gameplayResults;
     }

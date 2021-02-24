@@ -39,51 +39,39 @@ namespace EvoAlg
     }
 
     std::vector<IndividualRunResult> ThreadController::ExecuteAllIndividuals(ScriptRunner& scriptRunner) {
-        std::vector<std::future<IndividualRunResult*>> futureVec;
+        std::vector<std::future<IndividualRunResult>> futureVec;
 
         std::vector<IndividualRunResult> results;
         results.reserve(m_QueuedIndividuals.size());
 
-        bool forceSync = true;
-        
         std::mutex gambiarra;
         while (!m_QueuedIndividuals.empty()) {
-            Individual &individual = m_QueuedIndividuals.front();
-
-            GameConsts *currentConsts = new GameConsts();
-            currentConsts->LoadFromCromossome(individual.Genes);
-            currentConsts->SetTickDelay(5e2);
-            GameRunner *currentRunner = new GameRunner(currentConsts);
-
-
-            // auto executeAllGameplaysFn = [=, &scriptRunner, &gambiarra, &individual]() {
-            //     //TODO: support more threads per individual (assuming only one for all gameplays)
-            //     // indvRun.scriptRunner->RunGameplay(gamplInd, customGameRunner);
-
-            //     auto *threadRet = scriptRunner.RunAllGameplays(*currentRunner, individual);
-
-            //     delete currentRunner;
-            //     delete currentConsts;
-
-            //     if (forceSync)
-            //         gambiarra.unlock();
-
-            //     return threadRet;
-            // };
+            Individual &individualRef = m_QueuedIndividuals.front();
 
             m_QueuedIndividuals.pop();
 
-            if (forceSync)
-                gambiarra.lock();        
+            futureVec.push_back(
+                std::async(
+                    [&individualRef, &scriptRunner]
+                    {
+                        Individual individual = individualRef;
+                        GameConsts *currentConsts = new GameConsts();
+                        currentConsts->LoadFromCromossome(individual.Genes);
+                        currentConsts->SetTickDelay(5e2);
+                        GameRunner *currentRunner = new GameRunner(currentConsts);
 
-            // futureVec.push_back(std::async(executeAllGameplaysFn));
+                        return scriptRunner.RunAllGameplays(*currentRunner, individual);
+                        delete currentRunner;
+                        delete currentConsts;
+                    }
+                )
+            );
             
         }
 
         for (auto &future : futureVec) {
-            IndividualRunResult *indivResPtr = future.get();
-            results.push_back(*indivResPtr);
-            delete indivResPtr;
+            IndividualRunResult indivRes = future.get();
+            results.push_back(indivRes);
         }
 
         return results;
